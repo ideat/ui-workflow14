@@ -1,0 +1,37 @@
+package com.mindware.workflow.ui.backend.entity.templateObservation;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+@Setter
+@Getter
+public class TemplateObservation {
+    private UUID id;
+
+    private String category;
+
+    private String condition;
+
+    private String observation;
+
+    private String answer;
+
+    private String task;
+
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate registerDate;
+
+    private String state;
+
+    private Integer sequence;
+}
