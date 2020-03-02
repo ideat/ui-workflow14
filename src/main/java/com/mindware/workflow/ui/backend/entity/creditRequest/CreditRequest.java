@@ -50,8 +50,10 @@ public class CreditRequest {
     @NotNull(message = "'Estado de la solicitud' es requerido")
     private String state;
 
-    @NotNull(message = "'Fecha de solicitud' es requerida")
+//    @NotNull(message = "'Fecha de solicitud' es requerida")
     private LocalDate requestDate;
+
+    private LocalDate paymentPlanDate;
 
     @NotNull(message = "'Destino del credito' es requerido")
     private String destination;

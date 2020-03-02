@@ -4,11 +4,11 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.charts.Chart;
-import com.vaadin.flow.component.charts.model.ChartType;
-import com.vaadin.flow.component.charts.model.Configuration;
-import com.vaadin.flow.component.charts.model.ListSeries;
-import com.vaadin.flow.component.charts.model.XAxis;
+//import com.vaadin.flow.component.charts.Chart;
+//import com.vaadin.flow.component.charts.model.ChartType;
+//import com.vaadin.flow.component.charts.model.Configuration;
+//import com.vaadin.flow.component.charts.model.ListSeries;
+//import com.vaadin.flow.component.charts.model.XAxis;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
@@ -62,8 +62,8 @@ public class AccountDetails extends ViewFrame implements HasUrlParameter<Long> {
 				createLogoSection(),
 				createRecentTransactionsHeader(),
 				createRecentTransactionsList(),
-				createMonthlyOverviewHeader(),
-				createMonthlyOverviewChart()
+				createMonthlyOverviewHeader()
+//				createMonthlyOverviewChart()
 		);
 		content.setFlexDirection(FlexDirection.COLUMN);
 		content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_L);
@@ -152,35 +152,35 @@ public class AccountDetails extends ViewFrame implements HasUrlParameter<Long> {
 		return header;
 	}
 
-	private Component createMonthlyOverviewChart() {
-		Chart chart = new Chart(ChartType.COLUMN);
-
-		Configuration conf = chart.getConfiguration();
-		conf.setTitle("");
-		conf.getLegend().setEnabled(true);
-
-		XAxis xAxis = new XAxis();
-		xAxis.setCategories("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-		conf.addxAxis(xAxis);
-
-		conf.getyAxis().setTitle("Amount ($)");
-
-		// Withdrawals and deposits
-		ListSeries withDrawals = new ListSeries("Withdrawals");
-		ListSeries deposits = new ListSeries("Deposits");
-
-		for (int i = 0; i < 8; i++) {
-			withDrawals.addData(DummyData.getRandomInt(5000, 10000));
-			deposits.addData(DummyData.getRandomInt(5000, 10000));
-		}
-
-		conf.addSeries(withDrawals);
-		conf.addSeries(deposits);
-
-		FlexBoxLayout card = new FlexBoxLayout(chart);
-		card.setHeight("400px");
-		return card;
-	}
+//	private Component createMonthlyOverviewChart() {
+//		Chart chart = new Chart(ChartType.COLUMN);
+//
+//		Configuration conf = chart.getConfiguration();
+//		conf.setTitle("");
+//		conf.getLegend().setEnabled(true);
+//
+//		XAxis xAxis = new XAxis();
+//		xAxis.setCategories("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+//		conf.addxAxis(xAxis);
+//
+//		conf.getyAxis().setTitle("Amount ($)");
+//
+//		// Withdrawals and deposits
+//		ListSeries withDrawals = new ListSeries("Withdrawals");
+//		ListSeries deposits = new ListSeries("Deposits");
+//
+//		for (int i = 0; i < 8; i++) {
+//			withDrawals.addData(DummyData.getRandomInt(5000, 10000));
+//			deposits.addData(DummyData.getRandomInt(5000, 10000));
+//		}
+//
+//		conf.addSeries(withDrawals);
+//		conf.addSeries(deposits);
+//
+//		FlexBoxLayout card = new FlexBoxLayout(chart);
+//		card.setHeight("400px");
+//		return card;
+//	}
 
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {

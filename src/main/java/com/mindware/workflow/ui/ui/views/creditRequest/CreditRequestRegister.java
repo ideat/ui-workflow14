@@ -721,8 +721,12 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         btnSearch.addClickListener(e -> {
             showSearch();
         });
-        btnSearch.setEnabled((creditRequest.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString())
-                || creditRequest.getId()==null));
+        if(creditRequest.getLoginUser()!=null) {
+            btnSearch.setEnabled((creditRequest.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString())
+                    || creditRequest.getId() == null));
+        }else{
+            btnSearch.setEnabled(true);
+        }
         FlexBoxLayout layoutSearch = new FlexBoxLayout(numberApplicant,btnSearch);
         layoutSearch.setFlexGrow(1,btnSearch);
         layoutSearch.setSpacing(Right.S);
@@ -829,9 +833,14 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
 
         DatePicker requestDate = new DatePicker();
-        requestDate.setRequired(true);
+//        requestDate.setRequired(true);
         requestDate.setLocale(Locale.ENGLISH);
         requestDate.setWidth("100%");
+        requestDate.setReadOnly(true);
+
+        DatePicker paymentPlanDate = new DatePicker();
+        paymentPlanDate.setRequired(true);
+        paymentPlanDate.setWidth("100%");
 
         TextField numberCredit = new TextField();
         numberCredit.setWidth("100%");
@@ -867,7 +876,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binder.forField(baseInterestRate).bind(CreditRequest::getBaseInterestRate,CreditRequest::setBaseInterestRate);
         binder.forField(initPeriodBaseRate).bind(CreditRequest::getInitPeriodBaseRate,CreditRequest::setInitPeriodBaseRate);
         binder.forField(caedec).asRequired("Caedec destino es requerido").bind(CreditRequest::getCaedec,CreditRequest::setCaedec);
-        binder.forField(requestDate).asRequired("Fecha de solicitud es requerida").bind(CreditRequest::getRequestDate,CreditRequest::setRequestDate);
+        binder.forField(requestDate).bind(CreditRequest::getRequestDate,CreditRequest::setRequestDate);
+        binder.forField(paymentPlanDate).asRequired("Fecha de inicio plan de pagos es requerida").bind(CreditRequest::getPaymentPlanDate,CreditRequest::setPaymentPlanDate);
         binder.forField(destination).asRequired("Destino del credito es requerido").bind(CreditRequest::getDestination,CreditRequest::setDestination);
         binder.forField(numberCredit)
                 .withConverter(Integer::valueOf,String::valueOf,"Ingrese un numero, 0 valor por defeccto")
@@ -916,6 +926,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         formRequest.addFormItem(initPeriodBaseRate,"Periodo inicio tasa base");
         formRequest.addFormItem(caedec,"CAEDEC");
         formRequest.addFormItem(requestDate,"Fecha solicitud");
+        formRequest.addFormItem(paymentPlanDate, "Fecha plan pagos");
         formRequest.addFormItem(typeGuarantee,"Garantia princial");
         formRequest.addFormItem(numberCredit,"Numero credito");
 //        formRequest.addFormItem(destination,"Destino del credito");
