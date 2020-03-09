@@ -6,6 +6,7 @@ import com.mindware.workflow.ui.backend.entity.stageHistory.StageHistory;
 import com.mindware.workflow.ui.backend.rest.email.MailRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,6 +55,18 @@ public class PrepareMail {
 
         }
 
+    }
+
+    public static void sendMailCreateUser(Users users, String plainPassword, String login, String comeFrom){
+        Mail mail = new Mail();
+        mail.setLoginUser(login);
+        mail.setSendDate(LocalDateTime.now());
+        mail.setNumberRequest(0);
+        mail.setMailFrom(comeFrom);
+        mail.setMailTo(users.getEmail());
+        mail.setMailSubject("Cuenta usuario PROMOCRED");
+        mail.setMailContent("Se creo su cuenta de usuario en el sisema PROMOCRED, su clave temporal es: " + plainPassword);
+        mailRestTemplate.add(mail);
     }
 
 }

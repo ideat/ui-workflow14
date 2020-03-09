@@ -49,6 +49,17 @@ public class PatrimonialStatementRestTemplate {
         return Arrays.asList(response.getBody());
     }
 
+    public List<PatrimonialStatement> getByIdCreditRequestApplicant(UUID idCreditRequestApplicant){
+        final String uri = "http://localhost:8080/rest/v1/patrimonialstatement/getByIdCreditRequestApplicant";
+
+        HttpHeaders headers =HeaderJwt.getHeader();
+        headers.set("idCreditRequestApplicant", idCreditRequestApplicant.toString());
+        HttpEntity<List<PatrimonialStatement>> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<PatrimonialStatement[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,PatrimonialStatement[].class);
+        return Arrays.asList(response.getBody());
+    }
+
     public void delete(String id){
         final String uri = "http://localhost:8080/rest/v1/patrimonialstatement/delete/{id}";
         Map<String,String> params = new HashMap<>();

@@ -53,7 +53,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
     private Map<String, List<String>> param;
     private LegalInformationRestTemplate legalInformationRestTemplate;
 
-    private FlexBoxLayout contentLegalInformation;
+//    private FlexBoxLayout contentLegalInformation;
     private DetailsDrawer detailsDrawer;
     private DetailsDrawerHeader detailsDrawerHeader;
 
@@ -64,10 +64,10 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
     private BeanValidationBinder<DataDocument> binderDataDocument;
     private BeanValidationBinder<Owners> binderOwners;
     private BeanValidationBinder<Seat> binderSeat;
-    private BeanValidationBinder<GenericItem> binderObservation;
-    private BeanValidationBinder<GenericItem> binderMissingDocumentation;
-    private BeanValidationBinder<GenericItem> binderContractRequiriment;
-    private BeanValidationBinder<GenericItem> binderClarification;
+//    private BeanValidationBinder<GenericItem> binderObservation;
+//    private BeanValidationBinder<GenericItem> binderMissingDocumentation;
+//    private BeanValidationBinder<GenericItem> binderContractRequiriment;
+//    private BeanValidationBinder<GenericItem> binderClarification;
     private BeanValidationBinder<GenericItem> binderGenericItem;
 
     private FlexBoxLayout contentIdentificationProperty;

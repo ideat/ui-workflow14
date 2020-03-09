@@ -77,7 +77,7 @@ public class NaviDrawer extends Div
 	}
 
 	private void initHeader() {
-		mainContent.add(new BrandExpression("ui-workflow"));
+		mainContent.add(new BrandExpression("PROMOCRED"));
 	}
 
 	private void initSearch() {

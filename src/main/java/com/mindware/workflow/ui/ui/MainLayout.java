@@ -9,6 +9,7 @@ import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.ui.views.applicant.ApplicantView;
+import com.mindware.workflow.ui.ui.views.cashFlow.CashFlowView;
 import com.mindware.workflow.ui.ui.views.config.office.OfficeView;
 import com.mindware.workflow.ui.ui.views.config.office.SignatorieView;
 import com.mindware.workflow.ui.ui.views.config.parameter.ParameterView;
@@ -138,7 +139,7 @@ public class MainLayout extends FlexBoxLayout
 		VaadinSession.getCurrent().setAttribute("options", options);
 		VaadinSession.getCurrent().setAttribute("rol", users.getRol());
 		VaadinSession.getCurrent().setAttribute("idOffice",users.getCodeOffice());
-
+		VaadinSession.getCurrent().setAttribute("email",users.getEmail());
 	}
 
 	private boolean assignedOption(String name){
@@ -205,6 +206,10 @@ public class MainLayout extends FlexBoxLayout
 		if(assignedOption("Declaracion Patrimonial")) {
 			menu.addNaviItem(VaadinIcon.COIN_PILES, "Declaracion Patrimonial", CreditPatrimonialStatement.class);
 		}
+		if(assignedOption("Flujo de Caja")) {
+			menu.addNaviItem(VaadinIcon.MONEY, "Flujo de Caja", CashFlowView.class);
+		}
+
 		if(assignedOption("Resolucion de Credito")) {
 			menu.addNaviItem(VaadinIcon.FILE_PRESENTATION, "Resolucion de Credito", CreditResolutionCreditRequestDtoView.class);
 		}

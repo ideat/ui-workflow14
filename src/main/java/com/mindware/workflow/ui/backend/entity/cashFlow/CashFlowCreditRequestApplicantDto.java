@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,7 +22,8 @@ public class CashFlowCreditRequestApplicantDto {
     private String city;
     private String official;
     private boolean hasPaymentPlan;
-    private boolean hastPatrimonalStatement;
+    private boolean hasPatrimonialStatement;
+    private UUID idCreditRequestApplicant;
 
     public String getFullName(){
         return Optional.ofNullable(this.lastName).orElse("")+" "

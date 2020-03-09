@@ -3,6 +3,7 @@ package com.mindware.workflow.ui.backend.rest.users;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.util.HeaderJwt;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,12 @@ public class UserRestTemplate {
         HttpEntity<Users> entity = new HttpEntity<>(users,HeaderJwt.getHeader());
         ResponseEntity<Users> response = restTemplate.postForEntity(uri,entity,Users.class);
         return response.getBody();
+    }
+
+    public void updatePassword(Users users){
+        final String uri = "http://localhost:8080/rest/user/v1/updatePassword";
+        HttpEntity<Users> entity = new HttpEntity<>(users,HeaderJwt.getHeader());
+        restTemplate.put(uri,entity);
     }
 
     public Users getById(UUID id){
@@ -57,5 +64,15 @@ public class UserRestTemplate {
 
         return Arrays.asList(response.getBody());
     }
+
+    public String getPassword(String password){
+        final String uri = "http://localhost:8080/rest/user/v1/getPassword";
+        HttpHeaders headers =HeaderJwt.getHeader();
+        headers.set("pass", password);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(uri,HttpMethod.GET,entity,String.class);
+        return response.getBody();
+    }
+
 
 }

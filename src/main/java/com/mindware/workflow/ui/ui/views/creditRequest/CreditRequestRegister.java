@@ -155,6 +155,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
         if(paramCredit.get("numberRequest").get(0).equals("NUEVO")){
             current = new CreditRequest();
+            current.setLoginUser(VaadinSession.getCurrent().getAttribute("login").toString());
             current.setCharge(getCharge());
             contentCreditRequest = (FlexBoxLayout) createContent(createCreditRequest(current));
 //            contentPatrimonialStatement = (FlexBoxLayout) createContent(createMenuPatrimonialStatement());

@@ -30,7 +30,7 @@ import java.util.Map;
 @Route(value = "legalInformationView", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Lista de creditos a registro para registrar Informe Legal")
-public class LegalInformationView extends SplitViewFrame implements RouterLayout {
+public class LegalInformationView extends SplitViewFrame {
     private Grid<LegalInformationCreditRequestDto> grid;
     private LegalInformationDataProvider dataProvider;
     private List<LegalInformationCreditRequestDto> legalInformationCreditRequestDtoList;

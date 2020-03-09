@@ -8,6 +8,7 @@ import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.PrepareMail;
 import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
@@ -44,6 +45,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -243,8 +245,14 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         footer = new DetailsDrawerFooter();
         footer.addSaveListener(e ->{
             if(binder.writeBeanIfValid(users)){
+                users.setPassword(UtilValues.generateRandomPassword());
                 restTemplate.add(users);
                 UIUtils.showNotification("Usuario Registrado");
+                if(users.getId()==null){
+                    PrepareMail.sendMailCreateUser(users, users.getPassword()
+                            , VaadinSession.getCurrent().getAttribute("login").toString()
+                            , VaadinSession.getCurrent().getAttribute("email").toString());
+                }
                 UI.getCurrent().navigate(UsersView.class);
             }
         });
