@@ -77,7 +77,7 @@ public class NaviDrawer extends Div
 	}
 
 	private void initHeader() {
-		mainContent.add(new BrandExpression("PROMOCRED"));
+		mainContent.add(new BrandExpression("")); //PROMOCRED
 	}
 
 	private void initSearch() {

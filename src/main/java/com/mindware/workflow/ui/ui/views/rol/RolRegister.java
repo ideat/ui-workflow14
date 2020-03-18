@@ -89,7 +89,7 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
         if(s.equals("NUEVO")){
             rol = new Rol();
             try {
-                File file = ResourceUtils.getFile("classpath:menu-json.json");
+                File file = ResourceUtils.getFile("classpath:static/menu-json.json");
                 optionList = mapper.readValue(file,new TypeReference<List<Option>>() {});
                 statesList = new ArrayList<>();
                 List<Parameter> parameterList = parameterRestTemplate.getParametersByCategory("ESTADO-WORKFLOW");
@@ -371,7 +371,7 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
         });
 
         footer.addCancelListener(e ->{
-
+            UI.getCurrent().navigate(RolView.class);
         });
 
         DetailsDrawer detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);

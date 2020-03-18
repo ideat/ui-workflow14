@@ -197,7 +197,12 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         Button btnReset = new Button("Reset Password");
         btnReset.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         btnReset.setWidth("100%");
-        btnReset.setEnabled(GrantOptions.grantedOption("Usuarios"));
+        btnReset.setEnabled(GrantOptions.grantedOption("Usuarios") && users.getId()!=null);
+        btnReset.addClickListener(event -> {
+           users.setState("RESET");
+           restTemplate.updateUser(users);
+           UIUtils.showNotification("Operacion realizada correctamente");
+        });
 
         binder = new BeanValidationBinder<>(Users.class);
         binder.forField(login).asRequired("Login es requerido").bind(Users::getLogin,Users::setLogin);

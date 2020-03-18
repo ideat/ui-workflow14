@@ -1,6 +1,7 @@
 package com.mindware.workflow.ui.ui.views.report;
 
 import com.mindware.workflow.ui.backend.rest.applicantStatement.ApplicantStatementRestTemplate;
+import com.mindware.workflow.ui.backend.rest.cashFlow.CashFlowCreditRequestReportRestTemplate;
 import com.mindware.workflow.ui.backend.rest.creditResolution.CreditResolutionRestTemplate;
 import com.mindware.workflow.ui.backend.rest.legal.LegalInformationReportDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.observation.ObservationRestTemplate;
@@ -191,6 +192,16 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             paramPrev.put("created-by",param.get("created-by"));
             paramPrev.put("task",param.get("task"));
             paramPrev.put("full-name",param.get("full-name"));
+        }else if(param.get("origin").get(0).equals("cashFlow")){
+            CashFlowCreditRequestReportRestTemplate restTemplate = new CashFlowCreditRequestReportRestTemplate();
+            file = restTemplate.report(param.get("number-request").get(0));
+            previousPage = param.get("path").get(0);
+            paramPrev.put("number-request",param.get("number-request"));
+            paramPrev.put("full-name", param.get("full-name"));
+            paramPrev.put("id-credit-request-applicant",param.get("id-credit-request-applicant"));
+
+
+
         }
 
         qp = new QueryParameters(paramPrev);

@@ -74,5 +74,9 @@ public class UserRestTemplate {
         return response.getBody();
     }
 
-
+    public void updateUser(Users users){
+        final String uri = "http://localhost:8080/rest/user/v1/updateUser";
+        HttpEntity<Users> entity = new HttpEntity<>(users,HeaderJwt.getHeader());
+        restTemplate.exchange(uri,HttpMethod.PUT,entity,Users.class);
+    }
 }

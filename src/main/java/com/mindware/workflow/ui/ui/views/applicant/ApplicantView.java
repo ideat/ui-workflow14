@@ -38,7 +38,7 @@ import java.util.List;
 @Route(value = "applicant", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Aplicante")
-public class ApplicantView extends ViewFrame implements RouterLayout {
+public class ApplicantView extends ViewFrame {
     private Grid<Applicant> grid;
 
     private ApplicantDataProvider dataProvider;

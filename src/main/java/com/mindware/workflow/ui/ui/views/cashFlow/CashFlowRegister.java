@@ -18,6 +18,7 @@ import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawerHeader;
 import com.mindware.workflow.ui.ui.components.navigation.bar.AppBar;
 import com.mindware.workflow.ui.ui.layout.size.Horizontal;
 import com.mindware.workflow.ui.ui.layout.size.Vertical;
+import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.FlexDirection;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
 import com.vaadin.flow.component.AttachEvent;
@@ -50,6 +51,8 @@ public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<
 
     private Integer numberRequest;
     private UUID idCreditRequestApplicant;
+
+
     private  List<FlowItem> cashFlowItems;
     private Grid<String[]> grid;
     private TextArea description;
@@ -74,14 +77,17 @@ public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<
         cashFlow = cashFlowRestTemplate.getByNumberRequest(numberRequest);
         if(cashFlow == null) {
             cashFlow = new CashFlow();
+
         }else{
             ObjectMapper mapper = new ObjectMapper();
             try {
                 cashFlowItems = Arrays.asList(mapper.readValue(cashFlow.getItems(),FlowItem[].class));
+
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
         }
+
         cashFlowItems = cashFlowRestTemplate.getGenerateCashFlow(numberRequest,idCreditRequestApplicant);
 
     }
@@ -105,12 +111,14 @@ public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<
                 cashFlow.setNumberRequest(numberRequest);
                 binder.writeBeanIfValid(cashFlow);
                 cashFlowRestTemplate.add(cashFlow);
+                UIUtils.showNotification("Flujo guardado");
 
             } catch (JsonProcessingException ex) {
                 ex.printStackTrace();
             }
         });
 
+        footer.addCancelListener(event -> UI.getCurrent().navigate("cashFlowCreditRequestApplicantView"));
         setViewHeader(topBar());
         setViewContent(contentGrid);
         setViewDetails(createDetailDrawer());
@@ -131,13 +139,41 @@ public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<
 
     private HorizontalLayout topBar(){
         HorizontalLayout layout = new HorizontalLayout();
+        layout.setSpacing(true);
         layout.setWidth("100%");
         Button btnPrint = new Button("Imprimir");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
         btnPrint.addClickListener(e -> {
+            Map<String, List<String>> paramCashFlow = new HashMap<>();
+            List<String> origin = new ArrayList<>();
+            origin.add("cashFlow");
+            List<String> path = new ArrayList<>();
+            path.add("register-cashflow");
+
+
+
+
+            List<String> titleReport = new ArrayList<>();
+            titleReport.add("Flujo de Caja Mensual ");
+            paramCashFlow.put("path",path);
+            paramCashFlow.put("title",titleReport);
+            paramCashFlow.put("origin",origin);
+            paramCashFlow.put("number-request",param.get("number-request"));
+            paramCashFlow.put("full-name",param.get("full-name"));
+            paramCashFlow.put("id-credit-request-applicant",param.get("id-credit-request-applicant"));
+
+            QueryParameters qp = new QueryParameters(paramCashFlow);
+            UI.getCurrent().navigate("report-preview", qp);
 
         });
 
+        Button btnCreate = new Button("Actualizar");
+        btnCreate.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnCreate.addClickListener(event -> {
+            cashFlowItems = cashFlowRestTemplate.getGenerateCashFlow(numberRequest,idCreditRequestApplicant);
+            createGrid();
+
+        });
         layout.add(btnPrint);
 
         return layout;

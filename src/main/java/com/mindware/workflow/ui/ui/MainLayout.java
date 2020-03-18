@@ -4,12 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.exceptions.UserAuthorizer;
 import com.mindware.workflow.ui.backend.entity.rol.Option;
 import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.ui.views.applicant.ApplicantView;
 import com.mindware.workflow.ui.ui.views.cashFlow.CashFlowView;
+import com.mindware.workflow.ui.ui.views.config.authorizer.UserAuthorizerView;
+import com.mindware.workflow.ui.ui.views.config.exceptions.ExceptionsView;
 import com.mindware.workflow.ui.ui.views.config.office.OfficeView;
 import com.mindware.workflow.ui.ui.views.config.office.SignatorieView;
 import com.mindware.workflow.ui.ui.views.config.parameter.ParameterView;
@@ -216,6 +219,11 @@ public class MainLayout extends FlexBoxLayout
 		if(assignedOption("Formulario Observaciones")) {
 			menu.addNaviItem(VaadinIcon.NEWSPAPER, "Formulario Observaciones", ObservationCreditRequestApplicantView.class);
 		}
+
+		if(assignedOption("Excepciones")){
+			menu.addNaviItem(VaadinIcon.WARNING, "Excepciones", ExceptionsView.class);
+		}
+
 		if(assignedOption("Informe Legal") || assignedOption("Contratos")) {
 			NaviItem legal = menu.addNaviItem(VaadinIcon.BRIEFCASE, "Asesoria Legal", null);
 			if (assignedOption("Informe Legal")) {
@@ -260,10 +268,13 @@ public class MainLayout extends FlexBoxLayout
 				menu.addNaviItem(configuration,"Flujo por Producto", WorflowProductView.class);
 			}
 			if (assignedOption("Roles")) {
-				menu.addNaviItem(VaadinIcon.GRID, "Roles", RolView.class);
+				menu.addNaviItem(configuration, "Roles", RolView.class);
 			}
 			if (assignedOption("Usuarios")) {
-				menu.addNaviItem(VaadinIcon.USER, "Usuarios", UsersView.class);
+				menu.addNaviItem(configuration, "Usuarios", UsersView.class);
+			}
+			if(assignedOption("Autorizadores")){
+				menu.addNaviItem(configuration,"Autorizadores", UserAuthorizerView.class);
 			}
 		}
 	}
