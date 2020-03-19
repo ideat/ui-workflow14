@@ -3,6 +3,7 @@ package com.mindware.workflow.ui.backend.rest.office;
 import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.util.HeaderJwt;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,15 @@ public class OfficeRestTemplate {
 
     }
 
+    public Office getByCode(Integer internalCode){
+        final String uri = "http://localhost:8080/rest/v1/office/getByCode";
+        HttpHeaders headers =HeaderJwt.getHeader();
+        headers.set("internal-code",internalCode.toString());
+        HttpEntity<Office> entity = new HttpEntity<>(headers);
+        ResponseEntity<Office> response = restTemplate.exchange(uri,HttpMethod.GET,entity,Office.class);
+        return response.getBody();
+    }
+
     public Office addOffice(Office office){
         final String uri = "http://localhost:8080/rest/v1/office/add";
 
@@ -43,8 +53,6 @@ public class OfficeRestTemplate {
         final String uri = "http://localhost:8080/rest/v1/office/updateSignatorie";
         HttpEntity<Office> entity = new HttpEntity<>(office, HeaderJwt.getHeader());
         restTemplate.exchange(uri, HttpMethod.PUT,entity,Office.class);
-
-
     }
 
 

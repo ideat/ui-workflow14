@@ -11,6 +11,7 @@ import com.mindware.workflow.ui.ui.layout.size.Top;
 import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.BoxSizing;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
+import com.mindware.workflow.ui.ui.views.ViewFrame;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -30,7 +31,7 @@ import java.util.Map;
 @Route(value = "observacionCreditoApplicant", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Solicitudes de credito - Observaciones")
-public class ObservationCreditRequestApplicantView extends SplitViewFrame implements RouterLayout {
+public class ObservationCreditRequestApplicantView extends ViewFrame {
     private Grid<ObservationCreditRequestApplicant> grid;
     private ObservationCreditRequestApplicantDataProvider dataProvider;
     private List<ObservationCreditRequestApplicant> observationCreditRequestApplicantList;

@@ -1,6 +1,5 @@
 package com.mindware.workflow.ui.backend.rest.exceptions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.exceptions.Exceptions;
 import com.mindware.workflow.ui.backend.exception.CustomError;
@@ -14,9 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ExceptionsRestTemplate {
     private static RestTemplate restTemplate;

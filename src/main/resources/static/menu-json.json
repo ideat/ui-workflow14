@@ -145,5 +145,12 @@
     "name": "Autorizadores",
     "read": "false",
     "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Autorizar Excepciones",
+    "read": "false",
+    "write": "false"
   }]
 

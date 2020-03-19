@@ -370,7 +370,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     private DetailsDrawer createExceptions(){
         VerticalLayout topLayout = new VerticalLayout();
-        topLayout.setWidthFull();
+        topLayout.setWidth("100%");
         gridExceptionsCreditRequestDto = new Grid<>();
         Button btnCreateException = new Button("Agregar");
         btnCreateException.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -391,12 +391,13 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         exceptionsCreditRequestDtoList = new ArrayList<>(exceptionsCreditRequestDtoRestTemplate.getByNumberRequest(paramNumberRequest));
         dataProviderExceptionsCreditRequestDto = new ListDataProvider<>(exceptionsCreditRequestDtoList);
         gridExceptionsCreditRequestDto.setDataProvider(dataProviderExceptionsCreditRequestDto);
-        gridExceptionsCreditRequestDto.setWidthFull();
+        gridExceptionsCreditRequestDto.setWidth("100%");
         gridExceptionsCreditRequestDto.addColumn(ExceptionsCreditRequestDto::getInternalCode).setHeader("Cod. Excepcion")
                 .setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true);
         gridExceptionsCreditRequestDto.addColumn(ExceptionsCreditRequestDto::getExceptionDetail).setHeader("Excepcion")
                 .setFlexGrow(1).setResizable(true);
-        gridExceptionsCreditRequestDto.addColumn(new ComponentRenderer<>(this::createButtonDeleteException)).setResizable(true);
+        gridExceptionsCreditRequestDto.addColumn(new ComponentRenderer<>(this::createButtonDeleteException)).setResizable(true)
+                .setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_S);
         topLayout.add(gridExceptionsCreditRequestDto);
 //        VerticalLayout contentLayout = new VerticalLayout();
 //        contentLayout.setWidthFull();
@@ -405,7 +406,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
         DetailsDrawer detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
         detailsDrawer.setHeight("100%");
-        detailsDrawer.setWidthFull();
+        detailsDrawer.setWidth("100%");
         detailsDrawer.setContent(topLayout);
 
         return detailsDrawer;
@@ -1101,8 +1102,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         });
 
         RadioButtonGroup<String> state = new RadioButtonGroup<>();
-        state.setItems("ACEPTADA","RECHAZADA");
-        state.setValue(Optional.ofNullable(exceptionsCreditRequest.getState()).orElse("").equals("ACEPTADA") ? "ACEPTADA":"RECHAZADA");
+        state.setItems("PROPUESTA");
+        state.setValue(Optional.ofNullable(exceptionsCreditRequest.getState()).orElse("PROPUESTA"));
         state.setRequired(true);
 
         TextArea justification = new TextArea();
@@ -1447,7 +1448,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     private DetailsDrawer createDetailDrawer(){
         detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
-
+        detailsDrawer.setWidthFull();
         // Header
         detailsDrawerHeader = new DetailsDrawerHeader("");
         detailsDrawerHeader.addCloseListener(buttonClickEvent -> detailsDrawer.hide());

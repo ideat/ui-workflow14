@@ -10,6 +10,8 @@ import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.ui.views.applicant.ApplicantView;
+import com.mindware.workflow.ui.ui.views.authorizerExceptions.AuthorizerExceptionsCreditRequestDtoView;
+import com.mindware.workflow.ui.ui.views.authorizerExceptions.AuthorizerExceptionsCreditRequestView;
 import com.mindware.workflow.ui.ui.views.cashFlow.CashFlowView;
 import com.mindware.workflow.ui.ui.views.config.authorizer.UserAuthorizerView;
 import com.mindware.workflow.ui.ui.views.config.exceptions.ExceptionsView;
@@ -220,9 +222,6 @@ public class MainLayout extends FlexBoxLayout
 			menu.addNaviItem(VaadinIcon.NEWSPAPER, "Formulario Observaciones", ObservationCreditRequestApplicantView.class);
 		}
 
-		if(assignedOption("Excepciones")){
-			menu.addNaviItem(VaadinIcon.WARNING, "Excepciones", ExceptionsView.class);
-		}
 
 		if(assignedOption("Informe Legal") || assignedOption("Contratos")) {
 			NaviItem legal = menu.addNaviItem(VaadinIcon.BRIEFCASE, "Asesoria Legal", null);
@@ -241,6 +240,9 @@ public class MainLayout extends FlexBoxLayout
 		}
 		if(assignedOption("Bandeja Pendientes")) {
 			menu.addNaviItem(VaadinIcon.INBOX, "Bandeja Pendientes", StageHistoryView.class);
+		}
+		if(assignedOption("Autorizar Excepciones")){
+			menu.addNaviItem(VaadinIcon.FILE_PRESENTATION, "Autorizar Excepciones", AuthorizerExceptionsCreditRequestDtoView.class);
 		}
 
 		if(assignedOption("Oficinas") || assignedOption("Responsables")
@@ -275,6 +277,10 @@ public class MainLayout extends FlexBoxLayout
 			}
 			if(assignedOption("Autorizadores")){
 				menu.addNaviItem(configuration,"Autorizadores", UserAuthorizerView.class);
+			}
+
+			if(assignedOption("Excepciones")){
+				menu.addNaviItem(configuration, "Excepciones", ExceptionsView.class);
 			}
 		}
 	}
