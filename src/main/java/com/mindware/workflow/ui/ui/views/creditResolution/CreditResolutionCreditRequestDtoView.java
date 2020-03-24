@@ -19,6 +19,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.VaadinSession;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +58,13 @@ public class CreditResolutionCreditRequestDtoView extends SplitViewFrame impleme
     }
 
     private void getListCreditResolutionCreditRequest(){
-        creditResolutionCreditRequestDtoList = new ArrayList<>(restTemplate.getAll());
+        String rol = VaadinSession.getCurrent().getAttribute("rol").toString();
+        String login = VaadinSession.getCurrent().getAttribute("login").toString();
+        if(rol.equals("OFICIAL")){
+            creditResolutionCreditRequestDtoList = new ArrayList<>(restTemplate.getByLogin(login));
+        }else {
+            creditResolutionCreditRequestDtoList = new ArrayList<>(restTemplate.getAll());
+        }
         dataProvider = new CreditResolutionCreditRequestDataProvider(creditResolutionCreditRequestDtoList);
     }
 

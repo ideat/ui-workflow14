@@ -4,14 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.Users;
-import com.mindware.workflow.ui.backend.entity.exceptions.UserAuthorizer;
 import com.mindware.workflow.ui.backend.entity.rol.Option;
 import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.ui.views.applicant.ApplicantView;
 import com.mindware.workflow.ui.ui.views.authorizerExceptions.AuthorizerExceptionsCreditRequestDtoView;
-import com.mindware.workflow.ui.ui.views.authorizerExceptions.AuthorizerExceptionsCreditRequestView;
 import com.mindware.workflow.ui.ui.views.cashFlow.CashFlowView;
 import com.mindware.workflow.ui.ui.views.config.authorizer.UserAuthorizerView;
 import com.mindware.workflow.ui.ui.views.config.exceptions.ExceptionsView;
@@ -54,12 +52,7 @@ import com.mindware.workflow.ui.ui.components.navigation.drawer.NaviMenu;
 import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.FlexDirection;
 import com.mindware.workflow.ui.ui.util.css.Overflow;
-import com.mindware.workflow.ui.ui.views.Accounts;
 import com.mindware.workflow.ui.ui.views.Home;
-import com.mindware.workflow.ui.ui.views.Payments;
-import com.mindware.workflow.ui.ui.views.Statistics;
-import com.mindware.workflow.ui.ui.views.personnel.Accountants;
-import com.mindware.workflow.ui.ui.views.personnel.Managers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +73,7 @@ import java.util.stream.Collectors;
 @CssImport("./styles/misc/box-shadow-borders.css")
 @CssImport(value = "./styles/styles.css", include = "lumo-badge")
 @JsModule("@vaadin/vaadin-lumo-styles/badge")
-@PWA(name = "ui-workflow", shortName = "ui-workflow", iconPath = "images/logo.png", backgroundColor = "#233348", themeColor = "#233348")
+@PWA(name = "Workflow-PROMOCRED", shortName = "Workflow-PROMOCRED", iconPath = "images/logo.png", backgroundColor = "#233348", themeColor = "#233348")
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
 @Route("main")
 public class MainLayout extends FlexBoxLayout
@@ -242,7 +235,7 @@ public class MainLayout extends FlexBoxLayout
 			menu.addNaviItem(VaadinIcon.INBOX, "Bandeja Pendientes", StageHistoryView.class);
 		}
 		if(assignedOption("Autorizar Excepciones")){
-			menu.addNaviItem(VaadinIcon.FILE_PRESENTATION, "Autorizar Excepciones", AuthorizerExceptionsCreditRequestDtoView.class);
+			menu.addNaviItem(VaadinIcon.SPECIALIST, "Autorizar Excepciones", AuthorizerExceptionsCreditRequestDtoView.class);
 		}
 
 		if(assignedOption("Oficinas") || assignedOption("Responsables")
@@ -369,7 +362,7 @@ public class MainLayout extends FlexBoxLayout
 		settings.addMetaTag("apple-mobile-web-app-capable", "yes");
 		settings.addMetaTag("apple-mobile-web-app-status-bar-style", "black");
 
-		settings.addFavIcon("icon", "frontend/images/favicons/favicon.ico",
+		settings.addFavIcon("icon", "static/frontend/images/favicons/favicon.ico",
 				"256x256");
 	}
 

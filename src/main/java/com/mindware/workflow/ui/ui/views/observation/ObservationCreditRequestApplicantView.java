@@ -1,7 +1,9 @@
 package com.mindware.workflow.ui.ui.views.observation;
 
+import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.observation.dto.ObservationCreditRequestApplicant;
 import com.mindware.workflow.ui.backend.rest.observationCreditRequestApplicant.ObservationCreditRequestApplicantRestTemplate;
+import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.Badge;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
@@ -49,7 +51,18 @@ public class ObservationCreditRequestApplicantView extends ViewFrame {
     }
 
     private void getListObservationCreditRequestApplicant(){
-        observationCreditRequestApplicantList = new ArrayList<>(restTemplate.getByUser(VaadinSession.getCurrent().getAttribute("login").toString()));
+        String rol = VaadinSession.getCurrent().getAttribute("rol").toString();
+        String login = VaadinSession.getCurrent().getAttribute("login").toString();
+        Integer codOffice = Integer.parseInt(VaadinSession.getCurrent().getAttribute("idOffice").toString());
+        if(rol.equals("OFICIAL")) {
+            observationCreditRequestApplicantList = new ArrayList<>(restTemplate.getByUser(login));
+        }else if(rol.equals("RIESGOS")){
+            OfficeRestTemplate officeRestTemplate = new OfficeRestTemplate();
+            Office office = officeRestTemplate.getByCode(codOffice);
+            observationCreditRequestApplicantList = new ArrayList<>(restTemplate.getByCity(office.getCity()));
+        }else{
+            observationCreditRequestApplicantList  = new ArrayList<>(restTemplate.getAll());
+        }
         dataProvider = new ObservationCreditRequestApplicantDataProvider(observationCreditRequestApplicantList);
     }
 

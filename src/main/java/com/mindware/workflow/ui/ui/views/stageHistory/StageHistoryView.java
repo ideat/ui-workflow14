@@ -5,11 +5,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.config.RequestStage;
 import com.mindware.workflow.ui.backend.entity.config.WorkflowProduct;
-import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.entity.config.States;
 import com.mindware.workflow.ui.backend.entity.stageHistory.StageHistory;
 import com.mindware.workflow.ui.backend.entity.stageHistory.StageHistoryCreditRequestDto;
-import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.stageHistory.StageHistoryRestTemplate;
 import com.mindware.workflow.ui.backend.rest.stageHistoryCreditRequestDto.StageHistoryCreditRequestDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.workflowProducdt.WorkflowProductRestTemplate;
@@ -25,9 +23,10 @@ import com.mindware.workflow.ui.ui.views.SplitViewFrame;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -46,6 +45,8 @@ import java.util.stream.Collectors;
 @Route(value = "stateHistoryView", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Listado de pendientes")
+//@HtmlImport("static/frontend/grid-styles.html")
+@CssImport(value = "grid-styles.css", themeFor = "vaadin-grid")
 public class StageHistoryView extends SplitViewFrame implements RouterLayout {
 
     private StageHistoryCreditRequestDataProvider dataProvider;
@@ -112,6 +113,7 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
 
     private Grid createGrid(){
         grid = new Grid<>();
+
         grid.setSizeFull();
         grid.setDataProvider(dataProvider);
         grid.addSelectionListener(event -> {
@@ -163,6 +165,12 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
                 .setSortable(true).setHeader("Horas restantes").setTextAlign(ColumnTextAlign.CENTER);
         grid.addColumn(new ComponentRenderer<>(this::createButtonAssing))
                 .setFlexGrow(1).setResizable(true);
+        grid.getClassNames().add("my-grid-theme");
+        grid.setClassNameGenerator(
+                dto -> dto.getHoursLeft()>=24?"fine"
+                        :dto.getHoursLeft()>=15 && dto.getHoursLeft()<24?"warning"
+                        :dto.getHoursLeft()<15?"danger":"");
+
         return grid;
     }
 

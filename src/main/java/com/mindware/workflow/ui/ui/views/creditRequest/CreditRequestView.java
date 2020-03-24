@@ -78,7 +78,7 @@ public class CreditRequestView extends SplitViewFrame implements RouterLayout {
 
     private void getListCreditRequest(){
         String login="";
-        if(VaadinSession.getCurrent().getAttribute("rol").toString().equals("oficial")){
+        if(VaadinSession.getCurrent().getAttribute("rol").toString().equals("OFICIAL")){
             login = VaadinSession.getCurrent().getAttribute("login").toString();
         }else{
             login = "%";

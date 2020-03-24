@@ -43,4 +43,12 @@ public class ObservationCreditRequestApplicantRestTemplate {
         return Arrays.asList(observationCreditRequestApplicants);
     }
 
+    public List<ObservationCreditRequestApplicant> getAll(){
+        final String uri = "http://localhost:8080/rest/v1/observationCreditRequestApplicant/getAll";
+        HttpEntity<ObservationCreditRequestApplicant[]> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<ObservationCreditRequestApplicant[]> response = restTemplate.exchange(uri,HttpMethod.GET,
+                entity,ObservationCreditRequestApplicant[].class);
+        return Arrays.asList(response.getBody());
+    }
+
 }

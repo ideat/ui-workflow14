@@ -2,30 +2,34 @@ package com.mindware.workflow.ui.ui.views.creditRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindware.workflow.ui.backend.Payment;
 import com.mindware.workflow.ui.backend.entity.Applicant;
 import com.mindware.workflow.ui.backend.entity.CreditRequestApplicant;
+import com.mindware.workflow.ui.backend.entity.Office;
+import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.creditRequest.Charge;
 import com.mindware.workflow.ui.backend.entity.creditRequest.CreditRequest;
 import com.mindware.workflow.ui.backend.entity.creditRequest.LinkUp;
 import com.mindware.workflow.ui.backend.entity.creditRequest.PaymentPlan;
 import com.mindware.workflow.ui.backend.entity.dto.CreditRequestApplicantDto;
-import com.mindware.workflow.ui.backend.entity.exceptions.Exceptions;
-import com.mindware.workflow.ui.backend.entity.exceptions.ExceptionsCreditRequest;
-import com.mindware.workflow.ui.backend.entity.exceptions.ExceptionsCreditRequestDto;
+import com.mindware.workflow.ui.backend.entity.exceptions.*;
 import com.mindware.workflow.ui.backend.entity.stageHistory.StageHistory;
 import com.mindware.workflow.ui.backend.enums.TypeLinkUp;
 import com.mindware.workflow.ui.backend.rest.applicant.ApplicantRestTemplate;
 import com.mindware.workflow.ui.backend.rest.creditRequest.CreditRequestRestTemplate;
 import com.mindware.workflow.ui.backend.rest.creditRequestApplicant.CreditRequestAplicantRestTemplate;
 import com.mindware.workflow.ui.backend.rest.creditRequestApplicantDto.CreditRequestApplicantDtoRestTemplate;
+import com.mindware.workflow.ui.backend.rest.exceptions.AuthorizerOfficeUserDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsCreditRequestDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsCreditRequestRestTemplate;
 import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsRestTemplate;
+import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.workflow.ui.backend.rest.patrimonialStatement.PatrimonialStatementRestTemplate;
 import com.mindware.workflow.ui.backend.rest.paymentPlan.PaymentPlanRestTemplate;
 import com.mindware.workflow.ui.backend.rest.stageHistory.StageHistoryRestTemplate;
+import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
 import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
@@ -1148,10 +1152,15 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
         footerException.addSaveListener(e ->{
            if(binderExceptionCreditRequest.writeBeanIfValid(exceptionsCreditRequest)){
+               ObjectMapper mapper = new ObjectMapper();
                if(exceptionsCreditRequest.getId()==null){
                    exceptionsCreditRequest.setRegister(LocalDate.now());
                    exceptionsCreditRequest.setNumberRequest(paramNumberRequest);
-
+                   try {
+                       exceptionsCreditRequest.setStatusReview(mapper.writeValueAsString(setAuthorizers()));
+                   } catch (JsonProcessingException ex) {
+                       ex.printStackTrace();
+                   }
                }
                try {
                    exceptionsCreditRequestRestTemplate.add(exceptionsCreditRequest);
@@ -1183,6 +1192,38 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             }
         }
         return list;
+    }
+
+    private List<StatusReview> setAuthorizers(){
+        List<StatusReview> statusReviewList = new LinkedList<>();
+        UserRestTemplate userRestTemplate = new UserRestTemplate();
+        Users users = userRestTemplate.getByIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
+        OfficeRestTemplate officeRestTemplate = new OfficeRestTemplate();
+        Office office = officeRestTemplate.getByCode(users.getCodeOffice());
+        AuthorizerOfficeUserDtoRestTemplate  authorizerOfficeUserDtoRestTemplate = new AuthorizerOfficeUserDtoRestTemplate();
+        List<AuthorizersOfficeUserDto> authorizersOfficeUserDtos = new LinkedList<>();
+        if(current.getCurrency().equals("BS")) {
+            authorizersOfficeUserDtos = authorizerOfficeUserDtoRestTemplate.getByAmountBs(current.getAmount(), current.getAmount());
+        }else{
+            authorizersOfficeUserDtos = authorizerOfficeUserDtoRestTemplate.getByAmountSus(current.getAmount(), current.getAmount());
+        }
+
+        List<AuthorizersOfficeUserDto> authorizersNacional = authorizersOfficeUserDtos.stream().filter(a -> a.getScope().equals("NACIONAL"))
+                .collect(Collectors.toList());
+        List<AuthorizersOfficeUserDto> authorizersLocal = authorizersOfficeUserDtos.stream()
+                .filter(a -> a.getScope().equals("LOCAL") && a.getCity().equals(office.getCity()))
+                .collect(Collectors.toList());
+        authorizersLocal.addAll(authorizersNacional);
+
+        for(AuthorizersOfficeUserDto a : authorizersLocal){
+            StatusReview statusReview = new StatusReview();
+            statusReview.setState("PROPUESTA");
+            statusReview.setLoginUser(a.getLoginAuthorizer());
+            statusReview.setRegisterDate(LocalDate.now());
+            statusReviewList.add(statusReview);
+        }
+
+        return statusReviewList;
     }
 
 //    private Grid searchExceptions(){

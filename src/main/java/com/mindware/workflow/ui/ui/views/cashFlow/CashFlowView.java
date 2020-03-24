@@ -21,6 +21,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.VaadinSession;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,8 +48,14 @@ public class CashFlowView extends SplitViewFrame  {
     }
 
     private void getCashFlowCreditRequestApplicantDtoList(){
-        //TODO USAR EL ROL DEL USUARIO PARA SABER QUE DATOS RECUPERAR, TODOS, DEL OPERACIONES DEL USUARIO O CIUDAD
-        cashFlowCreditRequestApplicantDtoList = new ArrayList<>(restTemplate.getAll());
+
+        String rol = VaadinSession.getCurrent().getAttribute("rol").toString();
+        String login = VaadinSession.getCurrent().getAttribute("login").toString();
+        if(rol.equals("OFICIAL")){
+            cashFlowCreditRequestApplicantDtoList = new ArrayList<>(restTemplate.getByLogin(login));
+        }else {
+            cashFlowCreditRequestApplicantDtoList = new ArrayList<>(restTemplate.getAll());
+        }
         dataProvider = new CashFlowCreditRequestApplicantDtoDataProvider(cashFlowCreditRequestApplicantDtoList);
     }
 

@@ -46,7 +46,7 @@ public class AuthorizerRestTemplate {
         final String uri = "http://localhost:8080/rest/v1/authorizer/getById";
         HttpHeaders headers =HeaderJwt.getHeader();
         headers.set("id",id);
-        HttpEntity<Authorizer> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        HttpEntity<Authorizer> entity = new HttpEntity<>(headers);
         ResponseEntity<Authorizer> response = restTemplate.exchange(uri,HttpMethod.GET,entity,Authorizer.class);
         return response.getBody();
     }

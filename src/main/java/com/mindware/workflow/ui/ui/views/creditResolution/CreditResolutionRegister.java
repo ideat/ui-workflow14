@@ -7,7 +7,10 @@ import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.creditResolution.CreditResolution;
 import com.mindware.workflow.ui.backend.entity.creditResolution.DirectIndirectDebts;
 import com.mindware.workflow.ui.backend.entity.creditResolution.Exceptions;
+import com.mindware.workflow.ui.backend.entity.exceptions.ExceptionsCreditRequest;
 import com.mindware.workflow.ui.backend.rest.creditResolution.CreditResolutionRestTemplate;
+import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsCreditRequestRestTemplate;
+import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsRestTemplate;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.workflow.ui.backend.rest.patrimonialStatement.PatrimonialStatementRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
@@ -107,15 +110,18 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
             }
         }
 
-        if(exceptions==null || exceptions.equals("") || exceptions.equals("[]")){
-            exceptionsList = new ArrayList<>();
-        }else{
-            try {
-                exceptionsList = mapper.readValue(exceptions,new TypeReference<List<Exceptions>>(){});
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        if(exceptions==null || exceptions.equals("") || exceptions.equals("[]")){
+//            exceptionsList = new ArrayList<>();
+//
+//
+//        }else{
+//            try {
+//                exceptionsList = mapper.readValue(exceptions,new TypeReference<List<Exceptions>>(){});
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        exceptionsList = getExceptionsCreditRequest(numberRequest);
 
     }
 
@@ -131,6 +137,24 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         setViewDetails(createDetailDrawer());
         setViewDetailsPosition(Position.BOTTOM);
         binderCreditResolution.readBean(creditResolution);
+    }
+
+    private List<Exceptions> getExceptionsCreditRequest(Integer numberRequest){
+        ExceptionsCreditRequestRestTemplate exceptionsCreditRequestRestTemplate = new ExceptionsCreditRequestRestTemplate();
+        List<ExceptionsCreditRequest> exceptionsCreditRequestList = exceptionsCreditRequestRestTemplate.getByNumberRequest(numberRequest);
+        ExceptionsRestTemplate exceptionsRestTemplate = new ExceptionsRestTemplate();
+        List<Exceptions> exceptionsList = new ArrayList<>();
+        for(ExceptionsCreditRequest e : exceptionsCreditRequestList){
+            com.mindware.workflow.ui.backend.entity.exceptions.Exceptions ex = exceptionsRestTemplate.getByInternalCode(e.getCodeException());
+            if(ex.getTypeException().equals("PERMANENTE")) {
+                Exceptions exceptions = new Exceptions();
+                exceptions.setPoliticalNumber(e.getCodeException());
+                exceptions.setDescription(ex.getDescription());
+                exceptions.setId(UUID.randomUUID());
+                exceptionsList.add(exceptions);
+            }
+        }
+        return exceptionsList;
     }
 
     private AppBar initBar(){
@@ -286,14 +310,13 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         return detailsDrawer;
     }
 
-
     private Grid<Exceptions> createGridExceptions(){
         Grid<Exceptions> grid = new Grid<>();
         grid.setWidthFull();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT);
 
         grid.addColumn(Exceptions::getPoliticalNumber).setFlexGrow(0)
-                .setHeader("Nro politica").setWidth(UIUtils.COLUMN_WIDTH_M)
+                .setHeader("Cod. Excepcion").setWidth(UIUtils.COLUMN_WIDTH_M)
                 .setResizable(true);
         grid.addColumn(Exceptions::getDescription).setFlexGrow(0)
                 .setHeader("Excepcion").setWidth(UIUtils.COLUMN_WIDTH_XL)
@@ -351,16 +374,16 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
     private VerticalLayout gridLayoutExceptions(Grid<Exceptions> grid){
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
-        Button btnNew = new Button("Nuevo");
-        btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        btnNew.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
-        btnNew.addClickListener(click -> {
-           Exceptions exceptions = new Exceptions();
-           exceptions.setPoliticalNumber("");
-           exceptions.setDescription("");
-           showExceptions(exceptions);
-        });
-        layout.add(btnNew,grid);
+//        Button btnNew = new Button("Nuevo");
+//        btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+//        btnNew.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+//        btnNew.addClickListener(click -> {
+//           Exceptions exceptions = new Exceptions();
+//           exceptions.setPoliticalNumber("");
+//           exceptions.setDescription("");
+//           showExceptions(exceptions);
+//        });
+        layout.add(grid);
 
         return layout;
     }
@@ -616,7 +639,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         DetailsDrawerFooter footer = new DetailsDrawerFooter();
 
         binderExceptions = new BeanValidationBinder<>(Exceptions.class);
-        binderExceptions.forField(politicalNumber).asRequired("Nro. Politica es requerida")
+        binderExceptions.forField(politicalNumber).asRequired("Cod. Excepcion es requerido")
                 .bind(Exceptions::getPoliticalNumber,Exceptions::setPoliticalNumber);
         binderExceptions.forField(description).asRequired("Excepcion es requerida")
                 .bind(Exceptions::getDescription,Exceptions::setDescription);
@@ -627,7 +650,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
            footer.saveState(isValid && hasChanges);
         });
 
-        formLayout.addFormItem(politicalNumber,"Nro. Politica");
+        formLayout.addFormItem(politicalNumber,"Cod. Excepcion");
         formLayout.addFormItem(description,"Excepcion");
 
         footer.addSaveListener(event -> {

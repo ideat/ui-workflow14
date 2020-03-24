@@ -36,6 +36,31 @@ public class AuthorizerExceptionsCreditRequestDtoRestTemplate {
         return Arrays.asList(response.getBody());
     }
 
+    public List<AuthorizerExceptionsCreditRequestDto> getByCityCurrencyAmounts(String city, String currency, Double minimum, Double maximum){
+        final String uri = "http://localhost:8080/rest/v1/authorizerExceptionCreditRequest/getByCityCurrencyAmounts";
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("city",city);
+        headers.set("currency", currency);
+        headers.set("minimum", minimum.toString());
+        headers.set("maximum", maximum.toString());
+        HttpEntity<AuthorizerExceptionsCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<AuthorizerExceptionsCreditRequestDto[]> response = restTemplate.exchange(uri,HttpMethod.GET
+                ,entity,AuthorizerExceptionsCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<AuthorizerExceptionsCreditRequestDto> getByCurrencyAmounts(String currency, Double minimum, Double maximum){
+        final String uri = "http://localhost:8080/rest/v1/authorizerExceptionCreditRequest/getByCurrencyAmounts";
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("currency", currency);
+        headers.set("minimum", minimum.toString());
+        headers.set("maximum", maximum.toString());
+        HttpEntity<AuthorizerExceptionsCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<AuthorizerExceptionsCreditRequestDto[]> response = restTemplate.exchange(uri,HttpMethod.GET
+                ,entity,AuthorizerExceptionsCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
     public List<AuthorizerExceptionsCreditRequestDto> getByUser(String loginUser){
         final String uri = "http://localhost:8080/rest/v1/authorizerExceptionCreditRequest/getByUser";
         HttpHeaders headers = HeaderJwt.getHeader();
@@ -45,4 +70,5 @@ public class AuthorizerExceptionsCreditRequestDtoRestTemplate {
                 ,entity,AuthorizerExceptionsCreditRequestDto[].class);
         return Arrays.asList(response.getBody());
     }
+
 }

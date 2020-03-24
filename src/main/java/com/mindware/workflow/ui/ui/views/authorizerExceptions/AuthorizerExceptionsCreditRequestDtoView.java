@@ -17,10 +17,7 @@ import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.BoxSizing;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
 import com.mindware.workflow.ui.ui.views.ViewFrame;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -28,10 +25,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
-import java.util.List;
+import java.util.*;
 
 @Route(value = "authorizer-exception", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
@@ -62,13 +60,20 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
         Office office = officeRestTemplate.getByCode(users.getCodeOffice());
         AuthorizerRestTemplate authorizerRestTemplate = new AuthorizerRestTemplate();
         Authorizer authorizer =  authorizerRestTemplate.getByLoginUser(login);
+        authorizerExceptionsCreditRequestDtoList = new LinkedList<>();
         if(authorizer.getId()==null){
             authorizerExceptionsCreditRequestDtoList = restTemplate.getByUser(login);
         }else{
             if(authorizer.getScope().equals("LOCAL")){
-                authorizerExceptionsCreditRequestDtoList = restTemplate.getByCity(office.getCity());
-            }else{
-                authorizerExceptionsCreditRequestDtoList = restTemplate.getAll();
+                authorizerExceptionsCreditRequestDtoList = restTemplate.getByCityCurrencyAmounts(office.getCity(),
+                        "BS", authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs());
+                authorizerExceptionsCreditRequestDtoList.addAll(restTemplate.getByCityCurrencyAmounts(office.getCity(),
+                        "$US", authorizer.getMinimumAmountSus(),authorizer.getMaximumAmountSus()));
+            }else if (authorizer.getScope().equals("NACIONAL")){
+                authorizerExceptionsCreditRequestDtoList = restTemplate.getByCurrencyAmounts("BS",
+                        authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs());
+                authorizerExceptionsCreditRequestDtoList.addAll(restTemplate.getByCurrencyAmounts("$US",
+                        authorizer.getMinimumAmountSus(),authorizer.getMaximumAmountSus()));
             }
         }
         dataProvider = new AuthorizerExceptionsCreditRequestDtoDataProvider(authorizerExceptionsCreditRequestDtoList);
@@ -103,7 +108,9 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
         grid.setSizeFull();
         grid.setDataProvider(dataProvider);
         grid.addSelectionListener(event -> {
-
+            if(event.getFirstSelectedItem().isPresent()) {
+                viewRegister(event.getFirstSelectedItem().get());
+            }
         });
 
         grid.addColumn(new ComponentRenderer<>(this::createNameInfo)).setHeader("Solicitante")
@@ -142,6 +149,15 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
     }
 
     private void viewRegister(AuthorizerExceptionsCreditRequestDto authorizerExceptionsCreditRequestDto){
+        Map<String,List<String>> param = new HashMap<>();
+        List<String> numberRequestList = new LinkedList<>();
+        numberRequestList.add(authorizerExceptionsCreditRequestDto.getNumberRequest().toString());
+        List<String> fullName = new ArrayList<>();
+        fullName.add(authorizerExceptionsCreditRequestDto.getFullName());
 
+        param.put("number-request",numberRequestList);
+        param.put("full-name",fullName);
+        QueryParameters qp = new QueryParameters(param);
+        UI.getCurrent().navigate("authorizer-exceptions-creditrequest",qp);
     }
 }
