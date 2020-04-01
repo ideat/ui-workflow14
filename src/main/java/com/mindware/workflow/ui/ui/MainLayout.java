@@ -3,9 +3,11 @@ package com.mindware.workflow.ui.ui;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.rol.Option;
 import com.mindware.workflow.ui.backend.entity.rol.Rol;
+import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.ui.views.applicant.ApplicantView;
@@ -25,6 +27,7 @@ import com.mindware.workflow.ui.ui.views.legal.LegalInformationView;
 import com.mindware.workflow.ui.ui.views.observation.ObservationCreditRequestApplicantView;
 import com.mindware.workflow.ui.ui.views.patrimonialStatement.CreditPatrimonialStatement;
 import com.mindware.workflow.ui.ui.views.rol.RolView;
+import com.mindware.workflow.ui.ui.views.stageHistory.StageHistoryGlobalView;
 import com.mindware.workflow.ui.ui.views.stageHistory.StageHistoryView;
 import com.mindware.workflow.ui.ui.views.templateObservation.TemplateObservationView;
 import com.mindware.workflow.ui.ui.views.users.UsersView;
@@ -72,6 +75,7 @@ import java.util.stream.Collectors;
 @CssImport("./styles/lumo/typography.css")
 @CssImport("./styles/misc/box-shadow-borders.css")
 @CssImport(value = "./styles/styles.css", include = "lumo-badge")
+@CssImport(value = "./styles/components/orgchart.css")
 @JsModule("@vaadin/vaadin-lumo-styles/badge")
 @PWA(name = "Workflow-PROMOCRED", shortName = "Workflow-PROMOCRED", iconPath = "images/logo.png", backgroundColor = "#233348", themeColor = "#233348")
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
@@ -133,11 +137,16 @@ public class MainLayout extends FlexBoxLayout
 		Users users = userRestTemplate.getByIdUser(login);
 		RolRestTemplate rolRestTemplate = new RolRestTemplate();
 		Rol rol = rolRestTemplate.getRolByName(users.getRol());
+		OfficeRestTemplate officeRestTemplate = new OfficeRestTemplate();
+		Office office = officeRestTemplate.getByCode(users.getCodeOffice());
+
 		String options = rol.getOptions();
 		VaadinSession.getCurrent().setAttribute("options", options);
 		VaadinSession.getCurrent().setAttribute("rol", users.getRol());
 		VaadinSession.getCurrent().setAttribute("idOffice",users.getCodeOffice());
 		VaadinSession.getCurrent().setAttribute("email",users.getEmail());
+		VaadinSession.getCurrent().setAttribute("scope-rol",rol.getScope());
+		VaadinSession.getCurrent().setAttribute("city",office.getCity());
 	}
 
 	private boolean assignedOption(String name){
@@ -195,6 +204,19 @@ public class MainLayout extends FlexBoxLayout
 //		menu.addNaviItem(personnel, "Accountants", Accountants.class);
 //		menu.addNaviItem(personnel, "Managers", Managers.class);
 
+		if(assignedOption("Clientes")){
+			NaviItem mercadeo = menu.addNaviItem(VaadinIcon.SITEMAP,"Mercadeo",null);
+			if(assignedOption("Clientes")){
+				menu.addNaviItem(mercadeo, "Clientes", Home.class);
+			}
+			if(assignedOption("Propuestas")){
+				menu.addNaviItem(mercadeo,"Propuestas",Home.class);
+			}
+			if(assignedOption("Monitoreo")){
+				menu.addNaviItem(mercadeo,"Monitoreo",Home.class);
+			}
+		}
+
 		if(assignedOption("Solicitantes")) {
 			menu.addNaviItem(VaadinIcon.GROUP, "Solicitantes", ApplicantView.class);
 		}
@@ -229,7 +251,7 @@ public class MainLayout extends FlexBoxLayout
 			}
 		}
 		if(assignedOption("Bandeja Seguimiento")) {
-			menu.addNaviItem(VaadinIcon.OUTBOX, "Bandeja Seguimiento", Home.class);
+			menu.addNaviItem(VaadinIcon.OUTBOX, "Bandeja Seguimiento", StageHistoryGlobalView.class);
 		}
 		if(assignedOption("Bandeja Pendientes")) {
 			menu.addNaviItem(VaadinIcon.INBOX, "Bandeja Pendientes", StageHistoryView.class);

@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 @ParentLayout(MainLayout.class)
 @PageTitle("Listado de pendientes")
 //@HtmlImport("static/frontend/grid-styles.html")
-@CssImport(value = "grid-styles.css", themeFor = "vaadin-grid")
+//@CssImport(value = "grid-styles.css", themeFor = "vaadin-grid")
 public class StageHistoryView extends SplitViewFrame implements RouterLayout {
 
     private StageHistoryCreditRequestDataProvider dataProvider;
@@ -85,8 +85,11 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
     private void getListStageHistoryCreditRequest(){
         rol = VaadinSession.getCurrent().getAttribute("rol").toString();
         loginUser = VaadinSession.getCurrent().getAttribute("login").toString();
+        String scope = VaadinSession.getCurrent().getAttribute("scope-rol").toString();
+        String city = VaadinSession.getCurrent().getAttribute("city").toString();
         initStatesByRol = getInitStateByRol(rol);
-        stageHistoryCreditRequestDtoList = restTemplate.getByUserRolState(loginUser,initStatesByRol,rol);
+        if(scope.equals("NACIONAL")) city ="";
+        stageHistoryCreditRequestDtoList = restTemplate.getResumByUserRol(loginUser,rol,initStatesByRol,city);
         dataProvider = new StageHistoryCreditRequestDataProvider(stageHistoryCreditRequestDtoList);
     }
 
@@ -118,7 +121,7 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
         grid.setDataProvider(dataProvider);
         grid.addSelectionListener(event -> {
             if(event.getFirstSelectedItem().isPresent()) {
-                if (event.getFirstSelectedItem().get().getOfficer() == null) {
+                if (event.getFirstSelectedItem().get().getUserTask() == null) {
                     UIUtils.showNotification("Primero asignese la etapa");
                 }else{
                     Map<String,List<String>> param = new HashMap<>();
@@ -157,12 +160,14 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
                 .setSortable(true).setFlexGrow(1).setResizable(true);
         grid.addColumn(StageHistoryCreditRequestDto::getCurrency)
                 .setResizable(true).setHeader("Moneda").setTextAlign(ColumnTextAlign.CENTER);
-        grid.addColumn(StageHistoryCreditRequestDto::getTotalHours).setFlexGrow(1)
-                .setSortable(true).setHeader("Total horas").setTextAlign(ColumnTextAlign.CENTER);
+        grid.addColumn(StageHistoryCreditRequestDto::getTotalHoursStage).setFlexGrow(1)
+                .setSortable(true).setHeader("Total hrs Etapa").setTextAlign(ColumnTextAlign.CENTER);
+        grid.addColumn(StageHistoryCreditRequestDto::getTimeToBeAssigned).setFlexGrow(1)
+                .setTextAlign(ColumnTextAlign.CENTER).setHeader("Hrs. iniciar etapa");
         grid.addColumn(StageHistoryCreditRequestDto::getTimeElapsed).setResizable(true).setFlexGrow(1)
-                .setSortable(true).setHeader("Horas transcurridas").setTextAlign(ColumnTextAlign.CENTER);
+                .setSortable(true).setHeader("Hrs trab. Etapa").setTextAlign(ColumnTextAlign.CENTER);
         grid.addColumn(StageHistoryCreditRequestDto::getHoursLeft).setResizable(true).setFlexGrow(1)
-                .setSortable(true).setHeader("Horas restantes").setTextAlign(ColumnTextAlign.CENTER);
+                .setSortable(true).setHeader("Hrs. restantes").setTextAlign(ColumnTextAlign.CENTER);
         grid.addColumn(new ComponentRenderer<>(this::createButtonAssing))
                 .setFlexGrow(1).setResizable(true);
         grid.getClassNames().add("my-grid-theme");
@@ -181,7 +186,7 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
 
     private Component createButtonAssing(StageHistoryCreditRequestDto stageHistoryCreditRequestDto){
         Button btn = new Button();
-        if(stageHistoryCreditRequestDto.getOfficer()!=null) {
+        if(stageHistoryCreditRequestDto.getUserTask()!=null) {
             btn.setText("Asignada");
             btn.setEnabled(false);
         }else{

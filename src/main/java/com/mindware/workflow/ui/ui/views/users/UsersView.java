@@ -78,7 +78,7 @@ public class UsersView extends ViewFrame implements RouterLayout {
 
     private HorizontalLayout createTopBar(){
         filterText = new TextField();
-        filterText.setPlaceholder("Filtro por Login, Nombre, Estado, Rol");
+        filterText.setPlaceholder("Filtro por Login, Nombre, Estado, Rol, Cargo");
         filterText.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
         filterText.addValueChangeListener(event -> dataProvider.setFilter(event.getValue()));
 
@@ -127,6 +127,8 @@ public class UsersView extends ViewFrame implements RouterLayout {
                 .setTextAlign(ColumnTextAlign.END);
         grid.addColumn(Users::getRol).setFlexGrow(1)
                 .setHeader("Rol").setSortable(true);
+        grid.addColumn(Users::getPosition).setFlexGrow(1)
+                .setHeader("Cargo").setSortable(true).setResizable(true);
         grid.addColumn(new ComponentRenderer<>(this::createDate)).setFlexGrow(1)
                 .setHeader("Fecha cambio password").setWidth(UIUtils.COLUMN_WIDTH_S)
                 .setTextAlign(ColumnTextAlign.CENTER);

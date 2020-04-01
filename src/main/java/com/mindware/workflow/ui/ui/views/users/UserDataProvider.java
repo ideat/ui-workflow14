@@ -24,6 +24,7 @@ public class UserDataProvider extends ListDataProvider<Users> {
                 || passesFilter(users.getLogin(),filterText)
                 || passesFilter(users.getState(),filterText)
                 || passesFilter(users.getRol(),filterText)
+                || passesFilter(users.getPosition(),filterText)
         );
     }
     private boolean passesFilter(Object object, String filterText) {

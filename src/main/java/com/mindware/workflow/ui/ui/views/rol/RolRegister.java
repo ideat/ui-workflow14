@@ -27,6 +27,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
@@ -196,7 +197,11 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
         description.setWidthFull();
 //        description.setReadOnly(true);
 
-        horizontalLayout.add(name,description);
+        ComboBox<String> scope = new ComboBox<>("Alcance");
+        scope.setItems("LOCAL","NACIONAL");
+        scope.setWidthFull();
+
+        horizontalLayout.add(name,scope,description);
 
         layoutOptions = new VerticalLayout();
         layoutOptions.setHeight("100%");
@@ -204,6 +209,7 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
 
         binder.forField(name).asRequired("Nombre Rol es requerido").bind(Rol::getName,Rol::setName);
         binder.forField(description).bind(Rol::getDescription,Rol::setDescription);
+        binder.forField(scope).asRequired("Alcance es requerido").bind(Rol::getScope,Rol::setScope);
 
         Grid<Option> grid = new Grid<>();
         grid.setWidthFull();

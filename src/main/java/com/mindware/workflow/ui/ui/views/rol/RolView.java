@@ -79,6 +79,8 @@ public class RolView extends ViewFrame implements RouterLayout {
 
         grid.addColumn(Rol::getName).setFlexGrow(0).setHeader("Nombre Rol")
                 .setSortable(true).setResizable(true).setWidth(UIUtils.COLUMN_WIDTH_M);
+        grid.addColumn(Rol::getScope).setFlexGrow(1).setHeader("Alcance")
+                .setSortable(true).setResizable(true);
         grid.addColumn(Rol::getDescription).setFlexGrow(1).setHeader("Descripcion del Rol")
                 .setResizable(true);
 

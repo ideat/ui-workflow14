@@ -168,6 +168,9 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
         contentDocumentSubmitted = (FlexBoxLayout) createContent(createDocumentsSubmitted());
         contentGenericItems = (FlexBoxLayout) createContent(createGenericItems());
 
+        contentDocumentSubmitted.setVisible(false);
+        contentGenericItems.setVisible(false);
+
         DetailsDrawerFooter footer = new DetailsDrawerFooter();
         footer.saveState(true && GrantOptions.grantedOption("Informe Legal"));
         footer.addSaveListener(e -> {

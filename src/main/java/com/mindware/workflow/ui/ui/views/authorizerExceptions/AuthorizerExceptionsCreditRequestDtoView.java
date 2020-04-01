@@ -4,8 +4,10 @@ import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.exceptions.Authorizer;
 import com.mindware.workflow.ui.backend.entity.exceptions.AuthorizerExceptionsCreditRequestDto;
+import com.mindware.workflow.ui.backend.entity.exceptions.ExceptionsCreditRequest;
 import com.mindware.workflow.ui.backend.rest.exceptions.AuthorizerExceptionsCreditRequestDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.exceptions.AuthorizerRestTemplate;
+import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsCreditRequestRestTemplate;
 import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.ui.MainLayout;
@@ -18,7 +20,10 @@ import com.mindware.workflow.ui.ui.util.css.BoxSizing;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
 import com.mindware.workflow.ui.ui.views.ViewFrame;
 import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -40,7 +45,6 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
     private AuthorizerExceptionsCreditRequestDtoDataProvider dataProvider;
     private List<AuthorizerExceptionsCreditRequestDto> authorizerExceptionsCreditRequestDtoList;
     private AuthorizerExceptionsCreditRequestDtoRestTemplate restTemplate;
-
     private TextField filterText;
 
     @Override
@@ -131,9 +135,47 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
                 .setFlexGrow(1).setSortable(true).setResizable(true).setAutoWidth(true);
         grid.addColumn(AuthorizerExceptionsCreditRequestDto::getTotalExceptionsProposal).setHeader("Ex. Prop.")
                 .setFlexGrow(1).setSortable(true).setResizable(true).setAutoWidth(true);
-
+        grid.addColumn(new ComponentRenderer<>(this::createButtonPrint)).setResizable(true)
+                .setFlexGrow(1).setAutoWidth(true);
 
         return grid;
+    }
+
+    private Component createButtonPrint(AuthorizerExceptionsCreditRequestDto authorizerExceptionsCreditRequestDto){
+        Button btn = new Button();
+        btn.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
+        btn.setIcon(VaadinIcon.PRINT.create());
+        btn.addClickListener(e ->{
+            ExceptionsCreditRequestRestTemplate exceptionsCreditRequestRestTemplate = new ExceptionsCreditRequestRestTemplate();
+            List<ExceptionsCreditRequest> exceptionsCreditRequestList =
+                    exceptionsCreditRequestRestTemplate.getByNumberRequest(authorizerExceptionsCreditRequestDto.getNumberRequest());
+            boolean allowPrint = true;
+            for(ExceptionsCreditRequest ec:exceptionsCreditRequestList){
+                if(!ec.getState().equals("APROBADA")){
+                  allowPrint = false;
+                }
+            }
+            if(allowPrint){
+                Map<String,List<String>> paramAuthException = new HashMap<>();
+                List<String> origin = new ArrayList<>();
+                origin.add("authorizer-exception");
+                List<String> path = new ArrayList<>();
+                path.add("authorizer-exception");
+                List<String> numberRequestList = new ArrayList<>();
+                numberRequestList.add(authorizerExceptionsCreditRequestDto.getNumberRequest().toString());
+
+
+                List<String> titleReport = new ArrayList<>();
+                titleReport.add("Autorizacion Excepciones ");
+                paramAuthException.put("path",path);
+                paramAuthException.put("title",titleReport);
+                paramAuthException.put("origin",origin);
+                paramAuthException.put("number-request",numberRequestList);
+                QueryParameters qp = new QueryParameters(paramAuthException);
+                UI.getCurrent().navigate("report-preview",qp);
+            }
+        });
+        return btn;
     }
 
     private Component createAmount(AuthorizerExceptionsCreditRequestDto authorizerExceptionsCreditRequestDto){

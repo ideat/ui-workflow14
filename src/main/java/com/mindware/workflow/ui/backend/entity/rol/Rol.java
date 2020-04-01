@@ -25,4 +25,6 @@ public class Rol {
     @NotNull(message = "'Estado' no puede ser omitido")
     private String states;
 
+    @NotNull(message = "Alcance es no puede ser omitido")
+    private String scope;
 }

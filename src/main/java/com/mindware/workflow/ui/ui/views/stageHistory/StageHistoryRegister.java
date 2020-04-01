@@ -98,7 +98,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         MainLayout.get().getAppBar().reset();
         AppBar appBar = MainLayout.get().getAppBar();
         appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-        appBar.getContextIcon().addClickListener(e -> UI.getCurrent().navigate(StageHistoryView.class));
+        appBar.getContextIcon().addClickListener(e -> UI.getCurrent().navigate(StageHistoryGlobalView.class));
         return appBar;
     }
 

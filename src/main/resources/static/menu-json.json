@@ -152,5 +152,26 @@
     "name": "Autorizar Excepciones",
     "read": "false",
     "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Clientes",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Propuestas",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Monitoreo",
+    "read": "false",
+    "write": "false"
   }]
 

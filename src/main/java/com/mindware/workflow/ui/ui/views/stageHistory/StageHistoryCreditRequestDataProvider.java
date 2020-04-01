@@ -23,7 +23,7 @@ public class StageHistoryCreditRequestDataProvider  extends ListDataProvider<Sta
         setFilter(StageHistoryCreditRequestDto ->
                 passesFilter(StageHistoryCreditRequestDto.getFullName(),filter)
               || passesFilter(StageHistoryCreditRequestDto.getNumberRequest(),filter)
-              || passesFilter(StageHistoryCreditRequestDto.getOfficer(),filter)
+              || passesFilter(StageHistoryCreditRequestDto.getUserTask(),filter)
               || passesFilter(StageHistoryCreditRequestDto.getCity(),filter)
         );
     }

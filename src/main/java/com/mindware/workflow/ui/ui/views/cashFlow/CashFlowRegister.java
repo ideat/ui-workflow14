@@ -150,9 +150,6 @@ public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<
             List<String> path = new ArrayList<>();
             path.add("register-cashflow");
 
-
-
-
             List<String> titleReport = new ArrayList<>();
             titleReport.add("Flujo de Caja Mensual ");
             paramCashFlow.put("path",path);
@@ -172,7 +169,6 @@ public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<
         btnCreate.addClickListener(event -> {
             cashFlowItems = cashFlowRestTemplate.getGenerateCashFlow(numberRequest,idCreditRequestApplicant);
             createGrid();
-
         });
         layout.add(btnPrint);
 

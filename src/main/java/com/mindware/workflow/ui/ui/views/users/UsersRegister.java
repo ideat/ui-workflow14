@@ -3,8 +3,10 @@ package com.mindware.workflow.ui.ui.views.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
+import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
@@ -18,11 +20,9 @@ import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawerHeader;
 import com.mindware.workflow.ui.ui.components.navigation.bar.AppBar;
 import com.mindware.workflow.ui.ui.layout.size.Horizontal;
 import com.mindware.workflow.ui.ui.layout.size.Right;
-import com.mindware.workflow.ui.ui.util.LumoStyles;
 import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.FlexDirection;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
-import com.mindware.workflow.ui.ui.views.rol.RolView;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -194,6 +194,24 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         email.setRequired(true);
         email.setRequiredIndicatorVisible(true);
 
+        ComboBox<String> position = new ComboBox<>();
+        position.setWidth("100%");
+        position.setItems(getPositions());
+        position.setRequiredIndicatorVisible(true);
+        position.setRequired(true);
+
+        RadioButtonGroup<String> supervisor = new RadioButtonGroup<>();
+        supervisor.setItems("SI","NO");
+        supervisor.setValue(Optional.ofNullable(users.getSupervisor()).orElse("").equals("SI") ? "SI":"NO");
+
+        ComboBox<String> scope = new ComboBox<>();
+        scope.setItems("AGENCIA","LOCAL","NACIONAL");
+        scope.setWidth("60%");
+
+        FlexBoxLayout layoutSupervision = new FlexBoxLayout(supervisor,scope);
+        layoutSupervision.setFlexGrow(1,scope);
+        layoutSupervision.setSpacing(Right.S);
+
         Button btnReset = new Button("Reset Password");
         btnReset.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
         btnReset.setWidth("100%");
@@ -219,7 +237,10 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         binder.forField(email).asRequired("Email es requerido")
                 .withValidator(new EmailValidator("Correo invalido"))
                 .bind(Users::getEmail,Users::setEmail);
-
+        binder.forField(position).asRequired("Cargo es requerido").bind(Users::getPosition,Users::setPosition);
+        binder.forField(supervisor).asRequired("Indicar si es supervisor o no, es requerido")
+                .bind(Users::getSupervisor,Users::setSupervisor);
+        binder.forField(scope).bind(Users::getScope,Users::setScope);
         binder.addStatusChangeListener(event ->{
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges() ;
@@ -244,6 +265,8 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         formLayout.addFormItem(layoutSearch,"Oficina");
         formLayout.addFormItem(rols,"Rol");
         formLayout.addFormItem(numDaysValidity,"Dias validez password");
+        formLayout.addFormItem(position,"Cargo");
+        formLayout.addFormItem(layoutSupervision,"Supervisor?");
         formLayout.addFormItem(email,"Correo electronico");
         formLayout.addFormItem(btnReset,"");
 
@@ -284,7 +307,7 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
     private Grid searchOffice(){
         OfficeRestTemplate rest = new OfficeRestTemplate();
         List<Office> officeList = new ArrayList<>(rest.getAllOffice());
-        officeList.removeIf(e -> e.getInternalCode() == (users.getCodeOffice()==null?0:users.getCodeOffice()));
+//        officeList.removeIf(e -> e.getInternalCode() == (users.getCodeOffice()==null?0:users.getCodeOffice()));
 
         ListDataProvider<Office> data = new ListDataProvider<>(officeList);
 
@@ -354,5 +377,16 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         if(!provinceFilter.getValue().trim().equals("")){
             dataProvider.addFilter(office -> StringUtils.containsIgnoreCase(office.getProvince(),provinceFilter.getValue()));
         }
+    }
+
+    private List<String> getPositions(){
+        ParameterRestTemplate parameterRestTemplate = new ParameterRestTemplate();
+        List<Parameter> parameterList = parameterRestTemplate.getParametersByCategory("PUESTOS");
+        List<String> listPositions = new ArrayList<>();
+        for(Parameter p:parameterList){
+            listPositions.add(p.getValue());
+        }
+
+        return listPositions;
     }
 }

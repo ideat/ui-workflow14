@@ -28,17 +28,25 @@ public class StageHistoryCreditRequestDto {
 
     private String currency;
 
-    private String officer;//login user create creditrequest
+    private String userTask;//login user create creditrequest
 
     private Instant startDateTime;
 
+    private Instant initDateTime;
+
+    private Instant finishedDateTime;
+
     private Integer timeElapsed;
+
+    private Integer timeToBeAssigned;
 
     private String city;
 
     private String productCredit;
 
     private Integer totalHours;
+
+    private Integer totalHoursStage;
 
     private Integer hoursLeft;
 

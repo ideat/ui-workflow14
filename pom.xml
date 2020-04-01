@@ -20,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
 
-        <vaadin.version>14.1.20</vaadin.version>
+        <vaadin.version>14.1.21</vaadin.version>
         <jetty.version>9.4.15.v20190215</jetty.version>
     </properties>
 
@@ -149,6 +149,23 @@
             <artifactId>vaadin-spring-boot-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>de.nils_bauer</groupId>
+            <artifactId>pure-timeline-flow</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.appreciated</groupId>
+            <artifactId>vaadin-paper-menu-button</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.flowingcode.vaadin.addons</groupId>
+            <artifactId>orgchart-addon</artifactId>
+            <version>4.0.2</version>
+        </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>

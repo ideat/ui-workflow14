@@ -84,4 +84,74 @@ public class StageHistoryCreditRequestDtoRestTemplate {
         ResponseEntity<StageHistoryCreditRequestDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,StageHistoryCreditRequestDto[].class);
         return Arrays.asList(response.getBody());
     }
+
+    public List<StageHistoryCreditRequestDto> getDetailByUserRol(String user, String rol, String state){
+        final String uri = "http://localhost:8080/rest/v1/stageHistoryCreditRequest/getDetailByUserRol";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("user",user);
+        headers.set("rol",rol);
+        headers.set("state",state);
+
+        HttpEntity<StageHistoryCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<StageHistoryCreditRequestDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,StageHistoryCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<StageHistoryCreditRequestDto> getResumByUserRol(String user, String rol, String state, String city){
+        final String uri = "http://localhost:8080/rest/v1/stageHistoryCreditRequest/getResumByUserRol";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("user",user);
+        headers.set("rol",rol);
+        headers.set("state",state);
+        headers.set("city",city);
+        HttpEntity<StageHistoryCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<StageHistoryCreditRequestDto[]> response = restTemplate
+                .exchange(uri, HttpMethod.GET,entity,StageHistoryCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<StageHistoryCreditRequestDto> getGlobalDetailByCity(String city){
+        final String uri = "http://localhost:8080/rest/v1/stageHistoryCreditRequest/getGlobalDetailByCity";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("city",city);
+        HttpEntity<StageHistoryCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<StageHistoryCreditRequestDto[]> response = restTemplate
+                .exchange(uri, HttpMethod.GET,entity,StageHistoryCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<StageHistoryCreditRequestDto> getGlobalDetailByUser(String loginUser){
+        final String uri = "http://localhost:8080/rest/v1/stageHistoryCreditRequest/getGlobalDetailByUser";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("user",loginUser);
+        HttpEntity<StageHistoryCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<StageHistoryCreditRequestDto[]> response = restTemplate
+                .exchange(uri, HttpMethod.GET,entity,StageHistoryCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<StageHistoryCreditRequestDto> getGlobalDetail(){
+        final String uri = "http://localhost:8080/rest/v1/stageHistoryCreditRequest/getGlobalDetail";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        HttpEntity<StageHistoryCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<StageHistoryCreditRequestDto[]> response = restTemplate
+                .exchange(uri, HttpMethod.GET,entity,StageHistoryCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<StageHistoryCreditRequestDto> getDetailByNumberRequest(Integer numberRequest){
+        final String uri = "http://localhost:8080/rest/v1/stageHistoryCreditRequest/getDetailByNumberRequest";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("number-request",numberRequest.toString());
+        HttpEntity<StageHistoryCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<StageHistoryCreditRequestDto[]> response = restTemplate
+                .exchange(uri, HttpMethod.GET,entity,StageHistoryCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
 }

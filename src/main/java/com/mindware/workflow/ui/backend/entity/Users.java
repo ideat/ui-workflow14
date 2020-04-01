@@ -44,6 +44,12 @@ public class Users {
 
     private LocalDate dateCreation;
 
+    private String position;
+
+    private String supervisor;
+
+    private String scope;
+
     public String getInitials(){
         return (names.substring(0,1)+lastNames.substring(0,1).toUpperCase());
     }
