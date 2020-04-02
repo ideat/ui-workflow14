@@ -13,6 +13,7 @@ import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.ui.views.applicant.ApplicantView;
 import com.mindware.workflow.ui.ui.views.authorizerExceptions.AuthorizerExceptionsCreditRequestDtoView;
 import com.mindware.workflow.ui.ui.views.cashFlow.CashFlowView;
+import com.mindware.workflow.ui.ui.views.comercial.client.ClientView;
 import com.mindware.workflow.ui.ui.views.config.authorizer.UserAuthorizerView;
 import com.mindware.workflow.ui.ui.views.config.exceptions.ExceptionsView;
 import com.mindware.workflow.ui.ui.views.config.office.OfficeView;
@@ -207,7 +208,7 @@ public class MainLayout extends FlexBoxLayout
 		if(assignedOption("Clientes")){
 			NaviItem mercadeo = menu.addNaviItem(VaadinIcon.SITEMAP,"Mercadeo",null);
 			if(assignedOption("Clientes")){
-				menu.addNaviItem(mercadeo, "Clientes", Home.class);
+				menu.addNaviItem(mercadeo, "Clientes", ClientView.class);
 			}
 			if(assignedOption("Propuestas")){
 				menu.addNaviItem(mercadeo,"Propuestas",Home.class);
