@@ -50,6 +50,7 @@ public class CreditRequestApplicantDto {
     private String provinceSpouse;
     private String blockSpouse;
     private String typeHomeSpouse;
+    private String cityOffice;
 
     public String getFullName(){
         return firstName + " " + lastName;

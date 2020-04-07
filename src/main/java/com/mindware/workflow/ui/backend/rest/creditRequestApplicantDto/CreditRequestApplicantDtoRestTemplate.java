@@ -1,7 +1,7 @@
 package com.mindware.workflow.ui.backend.rest.creditRequestApplicantDto;
 
 import com.mindware.workflow.ui.backend.entity.dto.CreditRequestApplicantDto;
-import com.mindware.workflow.ui.backend.entity.dto.CreditRequestApplicantDtoT;
+//import com.mindware.workflow.ui.backend.entity.dto.CreditRequestApplicantDtoT;
 import com.mindware.workflow.ui.backend.util.HeaderJwt;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,16 +22,16 @@ public class CreditRequestApplicantDtoRestTemplate {
         restTemplate = new RestTemplate();
     }
 
-    private List<CreditRequestApplicantDtoT> creditRequestApplicantDtoList = new ArrayList<>();
+    private List<CreditRequestApplicantDto> creditRequestApplicantDtoList = new ArrayList<>();
 
     public List<CreditRequestApplicantDto> getAll(){
         final String uri = "http://localhost:8080/rest/v1/creditrequestapplicant/getAll";
-        HttpEntity<CreditRequestApplicantDtoT[]> entity = new HttpEntity<>(HeaderJwt.getHeader());
-        ResponseEntity<CreditRequestApplicantDtoT[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,CreditRequestApplicantDtoT[].class);
-        CreditRequestApplicantDtoT[] creditRequestApplicantDtos = response.getBody();
+        HttpEntity<CreditRequestApplicantDto[]> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<CreditRequestApplicantDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,CreditRequestApplicantDto[].class);
+        CreditRequestApplicantDto[] creditRequestApplicantDtos = response.getBody();
         List<CreditRequestApplicantDto> list = new ArrayList<>();
         creditRequestApplicantDtoList = Arrays.asList(creditRequestApplicantDtos);
-        for(CreditRequestApplicantDtoT c : creditRequestApplicantDtoList){
+        for(CreditRequestApplicantDto c : creditRequestApplicantDtoList){
             CreditRequestApplicantDto creditRequestApplicantDto = new CreditRequestApplicantDto();
             creditRequestApplicantDto.setCurrency(c.getCurrency());
             creditRequestApplicantDto.setFirstName(c.getFirstName());
@@ -41,7 +41,7 @@ public class CreditRequestApplicantDtoRestTemplate {
             creditRequestApplicantDto.setNumberRequest(c.getNumberRequest());
             creditRequestApplicantDto.setAmount(c.getAmount());
             creditRequestApplicantDto.setRequestDate(c.getRequestDate());
-            creditRequestApplicantDto.setState( CreditRequestApplicantDto.State.valueOf(c.getState()));
+            creditRequestApplicantDto.setState( CreditRequestApplicantDto.State.valueOf(c.getState().getName()));
             creditRequestApplicantDto.setNumberApplicant(c.getNumberApplicant());
             creditRequestApplicantDto.setIdCreditRequest(c.getIdCreditRequest());
             creditRequestApplicantDto.setIdApplicant(c.getIdApplicant());
@@ -54,12 +54,12 @@ public class CreditRequestApplicantDtoRestTemplate {
         return list;
     }
 
-    public List<CreditRequestApplicantDtoT> getByIdUserRegister(String loginUser){
+    public List<CreditRequestApplicantDto> getByIdUserRegister(String loginUser){
         final String uri = "http://localhost:8080/rest/v1/creditrequestapplicant/getByUser";
         HttpHeaders headers = HeaderJwt.getHeader();
-        headers.add("loginuser",loginUser);
-        HttpEntity<CreditRequestApplicantDtoT[]> entity = new HttpEntity<>(headers);
-        ResponseEntity<CreditRequestApplicantDtoT[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,CreditRequestApplicantDtoT[].class);
+        headers.add("login-user",loginUser);
+        HttpEntity<CreditRequestApplicantDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<CreditRequestApplicantDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,CreditRequestApplicantDto[].class);
         creditRequestApplicantDtoList = Arrays.asList(response.getBody());
         return creditRequestApplicantDtoList;
     }
@@ -83,6 +83,19 @@ public class CreditRequestApplicantDtoRestTemplate {
         HttpHeaders headers = HeaderJwt.getHeader();
         headers.add("loginuser",loginUser);
         headers.add("typerelation", typeRelation);
+        HttpEntity<CreditRequestApplicantDto> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<CreditRequestApplicantDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,CreditRequestApplicantDto[].class);
+
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<CreditRequestApplicantDto> getAllByCity(String cityOffice){
+        final String uri = "http://localhost:8080/rest/v1/creditrequestapplicant/getAllByCity";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("city-office",cityOffice);
+
         HttpEntity<CreditRequestApplicantDto> entity = new HttpEntity<>(headers);
 
         ResponseEntity<CreditRequestApplicantDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,CreditRequestApplicantDto[].class);

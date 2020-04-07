@@ -41,11 +41,13 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.codec.DecodingException;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -158,6 +160,7 @@ public class ClientView extends SplitViewFrame {
         HeaderRow hr = grid.appendHeaderRow();
         fullName = new TextField();
         fullName.setWidth("100%");
+        fullName.setValueChangeMode(ValueChangeMode.EAGER);
         fullName.addValueChangeListener(e ->{
             applyFilter(dataProvider);
         });
@@ -165,6 +168,7 @@ public class ClientView extends SplitViewFrame {
 
         idCardComplete=new TextField();
         idCardComplete.setWidth("100%");
+        idCardComplete.setValueChangeMode(ValueChangeMode.EAGER);
         idCardComplete.addValueChangeListener(e->applyFilter(dataProvider));
         hr.getCell(grid.getColumnByKey("idCardComplete")).setComponent(idCardComplete);
 
@@ -182,16 +186,19 @@ public class ClientView extends SplitViewFrame {
 
         cellPhone = new TextField();
         cellPhone.setWidth("100%");
+        cellPhone.setValueChangeMode(ValueChangeMode.EAGER);
         cellPhone.addValueChangeListener(e->applyFilter(dataProvider));
         hr.getCell(grid.getColumnByKey("cellPhone")).setComponent(cellPhone);
 
         email = new TextField();
         email.setWidth("100%");
+        email.setValueChangeMode(ValueChangeMode.EAGER);
         email.addValueChangeListener(e -> applyFilter(dataProvider));
         hr.getCell(grid.getColumnByKey("email")).setComponent(email);
 
         loginUser = new TextField();
         loginUser.setWidth("100%");
+        loginUser.setValueChangeMode(ValueChangeMode.EAGER);
         loginUser.addValueChangeListener(e -> applyFilter(dataProvider));
         hr.getCell(grid.getColumnByKey("loginUser")).setComponent(loginUser);
 
@@ -206,11 +213,11 @@ public class ClientView extends SplitViewFrame {
 
     private void applyFilter(ListDataProvider<Client> dataProvider){
         dataProvider.clearFilters();
-        if(fullName.getValue()!=null){
-            dataProvider.addFilter(client -> StringUtils.containsIgnoreCase(fullName.getValue(),client.getFullName()));
+        if(!fullName.getValue().trim().equals("")){
+            dataProvider.addFilter(client -> StringUtils.containsIgnoreCase(client.getFullName(),fullName.getValue()));
         }
-        if(idCardComplete.getValue()!=null){
-            dataProvider.addFilter(client -> StringUtils.containsIgnoreCase(idCardComplete.getValue(),client.getIdCardComplete()));
+        if(!idCardComplete.getValue().trim().equals("")){
+            dataProvider.addFilter(client -> StringUtils.containsIgnoreCase(client.getIdCardComplete(),idCardComplete.getValue()));
         }
         if(typePerson.getValue()!=null){
             dataProvider.addFilter(client -> Objects.equals(typePerson.getValue(),client.getTypePerson()));
@@ -218,14 +225,14 @@ public class ClientView extends SplitViewFrame {
         if(typeClient.getValue()!=null){
             dataProvider.addFilter(client -> Objects.equals(typeClient.getValue(),client.getTypeClient()));
         }
-        if(cellPhone.getValue()!=null){
-            dataProvider.addFilter(client ->  StringUtils.containsIgnoreCase(cellPhone.getValue(),client.getCellPhone()));
+        if(!cellPhone.getValue().trim().equals("")){
+            dataProvider.addFilter(client ->  StringUtils.containsIgnoreCase(client.getCellPhone(),cellPhone.getValue()));
         }
-        if(email.getValue()!=null){
-            dataProvider.addFilter(client -> StringUtils.containsIgnoreCase(email.getValue(),client.getEmail()));
+        if(!email.getValue().trim().equals("")){
+            dataProvider.addFilter(client -> StringUtils.containsIgnoreCase(client.getEmail(),email.getValue()));
         }
-        if(loginUser.getValue()!=null){
-            dataProvider.addFilter(client -> StringUtils.containsIgnoreCase(loginUser.getValue(),client.getLoginUser()));
+        if(!loginUser.getValue().trim().equals("")){
+            dataProvider.addFilter(client -> StringUtils.containsIgnoreCase(client.getLoginUser(),loginUser.getValue()));
         }
     }
 
@@ -250,6 +257,8 @@ public class ClientView extends SplitViewFrame {
                     detailsDrawer.hide();
                 } catch (JsonProcessingException ex) {
                     ex.printStackTrace();
+
+                    UIUtils.showNotification( ex.getOriginalMessage());
                 }
             }
         });

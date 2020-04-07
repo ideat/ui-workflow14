@@ -42,11 +42,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@CssImport(value = "./styles/views/grid-styles.css",themeFor = "vaadin-grid")
 @Route(value = "stateHistoryView", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Listado de pendientes")
-//@HtmlImport("static/frontend/grid-styles.html")
-//@CssImport(value = "grid-styles.css", themeFor = "vaadin-grid")
 public class StageHistoryView extends SplitViewFrame implements RouterLayout {
 
     private StageHistoryCreditRequestDataProvider dataProvider;
@@ -170,11 +169,11 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
                 .setSortable(true).setHeader("Hrs. restantes").setTextAlign(ColumnTextAlign.CENTER);
         grid.addColumn(new ComponentRenderer<>(this::createButtonAssing))
                 .setFlexGrow(1).setResizable(true);
-        grid.getClassNames().add("my-grid-theme");
+        grid.getClassNames().add("grid-styles");
         grid.setClassNameGenerator(
-                dto -> dto.getHoursLeft()>=24?"fine"
-                        :dto.getHoursLeft()>=15 && dto.getHoursLeft()<24?"warning"
-                        :dto.getHoursLeft()<15?"danger":"");
+                dto -> dto.getHoursLeft()>=24?""
+                        :dto.getHoursLeft()>=15 && dto.getHoursLeft()<24?"line-warning"
+                        :dto.getHoursLeft()<15?"line-error":"");
 
         return grid;
     }

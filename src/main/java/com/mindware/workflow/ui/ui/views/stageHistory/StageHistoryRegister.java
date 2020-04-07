@@ -29,6 +29,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Pre;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -37,6 +38,10 @@ import com.vaadin.flow.router.*;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Route(value = "stage-history-register", layout = MainLayout.class)
@@ -98,7 +103,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         MainLayout.get().getAppBar().reset();
         AppBar appBar = MainLayout.get().getAppBar();
         appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-        appBar.getContextIcon().addClickListener(e -> UI.getCurrent().navigate(StageHistoryGlobalView.class));
+        appBar.getContextIcon().addClickListener(e -> UI.getCurrent().navigate(StageHistoryView.class));
         return appBar;
     }
 
@@ -240,8 +245,9 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
                    restTemplate.update(stageHistory);
                    UIUtils.showNotification("Workflow concluido");
                }
-    }
-});
+            }
+        });
+        footer.addCancelListener(e -> UI.getCurrent().navigate(StageHistoryView.class));
         DetailsDrawer detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
         detailsDrawer.setHeight("90%");
         detailsDrawer.setWidth("100%");
@@ -404,16 +410,25 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         restTemplate.update(stageHistory);
         List<StageHistory> stageHistoryList = restTemplate.getByNumberRequest(stageHistory.getNumberRequest());
         for(String stage : stageToBack) {
-
+            StageHistory aux = stageHistoryList.stream()
+                    .filter(f -> f.getStage().equals(stage))
+                    .collect(Collectors.toList()).get(0);
             StageHistory s = createStageHistory(stageHistory.getComesFrom(), stageHistory.getNextState());
             s.setNumberRequest(stageHistory.getNumberRequest());
             s.setComesFrom(stageHistory.getStage());
             s.setStage(stage);
+            s.setUserTask(aux.getUserTask());
+            s.setInitDateTime(Instant.now());
             s.setObservation(stageHistory.getObservation());
             restTemplate.add(s);
-            PrepareMail.sendMailWorkflowGoBackward(stageHistoryList,stageHistory.getUserTask(),stageHistory.getNumberRequest(),
-                    stageHistory.getComesFrom());
+
         }
+
+
+        PrepareMail.sendMailWorkflowGoBackward(stageHistoryList,stageHistory.getUserTask(),stageHistory.getNumberRequest(),
+                stageHistory.getComesFrom());
+
+        UIUtils.showNotification("Correos enviados");
         UIUtils.showNotification("Estado observado");
         UI.getCurrent().navigate(StageHistoryView.class);
     }

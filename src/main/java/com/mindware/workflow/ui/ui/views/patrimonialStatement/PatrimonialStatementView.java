@@ -510,15 +510,19 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
 
         fieldDate1 = new DatePicker();
         fieldDate1.setLocale(Locale.ENGLISH);
+        fieldDate1.setWidth("100%");
 
         fieldDate2 = new DatePicker();
         fieldDate2.setLocale(Locale.ENGLISH);
+        fieldDate2.setWidth("100%");
 
         fieldDate3 = new DatePicker();
         fieldDate3.setLocale(Locale.ENGLISH);
+        fieldDate3.setWidth("100%");
 
         fieldDate4 = new DatePicker();
         fieldDate4.setLocale(Locale.ENGLISH);
+        fieldDate4.setWidth("100%");
 
         fieldSelection1 = new ComboBox<>();
         fieldSelection1.setWidth("100%");

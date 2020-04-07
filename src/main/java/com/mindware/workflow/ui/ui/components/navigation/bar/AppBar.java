@@ -10,6 +10,7 @@ import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -124,6 +125,10 @@ public class AppBar extends FlexBoxLayout {
 				e -> {
 					UI.getCurrent().navigate("login");
 					VaadinSession.getCurrent().setAttribute("jwt",null);
+				});
+		contextMenu.addItem(VaadinSession.getCurrent().getAttribute("name-user").toString(),
+				e-> {
+
 				});
 	}
 

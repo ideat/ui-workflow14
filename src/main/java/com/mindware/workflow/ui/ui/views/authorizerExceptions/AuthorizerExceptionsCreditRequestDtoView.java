@@ -64,18 +64,18 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
         Office office = officeRestTemplate.getByCode(users.getCodeOffice());
         AuthorizerRestTemplate authorizerRestTemplate = new AuthorizerRestTemplate();
         Authorizer authorizer =  authorizerRestTemplate.getByLoginUser(login);
-        authorizerExceptionsCreditRequestDtoList = new LinkedList<>();
+//        authorizerExceptionsCreditRequestDtoList = new LinkedList<>();
         if(authorizer.getId()==null){
-            authorizerExceptionsCreditRequestDtoList = restTemplate.getByUser(login);
+            authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByUser(login));
         }else{
             if(authorizer.getScope().equals("LOCAL")){
-                authorizerExceptionsCreditRequestDtoList = restTemplate.getByCityCurrencyAmounts(office.getCity(),
-                        "BS", authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs());
+                authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByCityCurrencyAmounts(office.getCity(),
+                        "BS", authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs()));
                 authorizerExceptionsCreditRequestDtoList.addAll(restTemplate.getByCityCurrencyAmounts(office.getCity(),
                         "$US", authorizer.getMinimumAmountSus(),authorizer.getMaximumAmountSus()));
             }else if (authorizer.getScope().equals("NACIONAL")){
-                authorizerExceptionsCreditRequestDtoList = restTemplate.getByCurrencyAmounts("BS",
-                        authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs());
+                authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByCurrencyAmounts("BS",
+                        authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs()));
                 authorizerExceptionsCreditRequestDtoList.addAll(restTemplate.getByCurrencyAmounts("$US",
                         authorizer.getMinimumAmountSus(),authorizer.getMaximumAmountSus()));
             }
@@ -146,6 +146,7 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
         btn.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
         btn.setIcon(VaadinIcon.PRINT.create());
         btn.addClickListener(e ->{
+            String listException = "";
             ExceptionsCreditRequestRestTemplate exceptionsCreditRequestRestTemplate = new ExceptionsCreditRequestRestTemplate();
             List<ExceptionsCreditRequest> exceptionsCreditRequestList =
                     exceptionsCreditRequestRestTemplate.getByNumberRequest(authorizerExceptionsCreditRequestDto.getNumberRequest());
@@ -153,6 +154,7 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
             for(ExceptionsCreditRequest ec:exceptionsCreditRequestList){
                 if(!ec.getState().equals("APROBADA")){
                   allowPrint = false;
+                  listException = listException +"-"+ ec.getCodeException()+"-";
                 }
             }
             if(allowPrint){
@@ -173,6 +175,8 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
                 paramAuthException.put("number-request",numberRequestList);
                 QueryParameters qp = new QueryParameters(paramAuthException);
                 UI.getCurrent().navigate("report-preview",qp);
+            }else{
+                UIUtils.showNotification("Faltan aprobar excecpciones "+listException);
             }
         });
         return btn;

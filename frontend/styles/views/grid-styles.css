@@ -1,0 +1,8 @@
+.line-error {
+    color: black;
+    background-color: red;
+}
+.line-warning {
+    color: black;
+    background-color: yellow;
+}

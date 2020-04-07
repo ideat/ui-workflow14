@@ -173,5 +173,12 @@
     "name": "Monitoreo",
     "read": "false",
     "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Tipo de Cambio",
+    "read": "false",
+    "write": "false"
   }]
 

@@ -16,6 +16,7 @@ import com.mindware.workflow.ui.ui.views.cashFlow.CashFlowView;
 import com.mindware.workflow.ui.ui.views.comercial.client.ClientView;
 import com.mindware.workflow.ui.ui.views.config.authorizer.UserAuthorizerView;
 import com.mindware.workflow.ui.ui.views.config.exceptions.ExceptionsView;
+import com.mindware.workflow.ui.ui.views.config.exchangeRate.ExchangeRateView;
 import com.mindware.workflow.ui.ui.views.config.office.OfficeView;
 import com.mindware.workflow.ui.ui.views.config.office.SignatorieView;
 import com.mindware.workflow.ui.ui.views.config.parameter.ParameterView;
@@ -148,6 +149,9 @@ public class MainLayout extends FlexBoxLayout
 		VaadinSession.getCurrent().setAttribute("email",users.getEmail());
 		VaadinSession.getCurrent().setAttribute("scope-rol",rol.getScope());
 		VaadinSession.getCurrent().setAttribute("city",office.getCity());
+		VaadinSession.getCurrent().setAttribute("name-user",users.getNames());
+		VaadinSession.getCurrent().setAttribute("scope-user",users.getScope());
+		VaadinSession.getCurrent().setAttribute("is-supervisor",users.getSupervisor());
 	}
 
 	private boolean assignedOption(String name){
@@ -297,6 +301,10 @@ public class MainLayout extends FlexBoxLayout
 
 			if(assignedOption("Excepciones")){
 				menu.addNaviItem(configuration, "Excepciones", ExceptionsView.class);
+			}
+
+			if(assignedOption("Tipo de Cambio")){
+				menu.addNaviItem(configuration,"Tipo de Cambio", ExchangeRateView.class);
 			}
 		}
 	}

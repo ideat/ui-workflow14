@@ -19,6 +19,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.VaadinSession;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,8 +76,19 @@ public class CreditPatrimonialStatement extends ViewFrame implements RouterLayou
     }
 
     private Grid createGrid(){
+
         grid = new Grid<>();
-        creditRequestApplicantList = new ArrayList<>(restTemplate.getAll());
+        String isSupervisor = VaadinSession.getCurrent().getAttribute("is-supervisor").toString();
+        String scopeUser = VaadinSession.getCurrent().getAttribute("scope-user").toString();
+        String login = VaadinSession.getCurrent().getAttribute("login").toString();
+        String cityOffice = VaadinSession.getCurrent().getAttribute("city").toString();
+        if(isSupervisor.equals("NO") && (scopeUser.equals("LOCAL") || scopeUser.equals("AGENCIA"))){
+            creditRequestApplicantList = new ArrayList<>(restTemplate.getByIdUserRegister(login));
+        }else if(isSupervisor.equals("SI") && scopeUser.equals("LOCAL")){
+            creditRequestApplicantList = new ArrayList<>(restTemplate.getAllByCity(cityOffice));
+        }else{
+            creditRequestApplicantList = new ArrayList<>(restTemplate.getAll());
+        }
         dataProvider = new CreditRequestApplicantDataProvider(creditRequestApplicantList);
         grid.setSizeFull();
         grid.setDataProvider(dataProvider);

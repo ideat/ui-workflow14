@@ -199,6 +199,9 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
             }
 
         });
+
+        footer.addCancelListener(e ->  UI.getCurrent().navigate(LegalInformationView.class));
+
         setViewHeader(topBar());
         setViewContent(contentIdentificationProperty,contentDocumentSubmitted,contentGenericItems);
         setViewDetails(createDetailDrawer());

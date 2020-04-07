@@ -51,6 +51,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -214,14 +215,18 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         homeaddress.setRequired(true);
 
         TextField idCard = new TextField();
-        idCard.setWidth("100%");
+        idCard.setWidth("70%");
         idCard.setRequired(true);
 
 
         ComboBox<String> idCardExpedition = new ComboBox<>();
         idCardExpedition.setItems(getValueParameter("EXTENSION CARNET"));
-        idCardExpedition.setWidth("100%");
+        idCardExpedition.setWidth("30%");
         idCardExpedition.setRequired(true);
+
+        FlexBoxLayout layoutIdCard = new FlexBoxLayout(idCard,idCardExpedition);
+        layoutIdCard.setFlexGrow(1,idCardExpedition);
+        layoutIdCard.setSpacing(Right.S);
 
         DatePicker dateExpirationIdCard = new DatePicker();
         dateExpirationIdCard.setWidth("100%");
@@ -312,6 +317,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         block.setWidth("100%");
 
         ComboBox<String> typeHome = new ComboBox<>();
+        typeHome.setWidth("100%");
         typeHome.setItems("Casa","Departamento","Otro");
         typeHome.setAllowCustomValue(true);
 
@@ -458,8 +464,10 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         formPersonal.addFormItem(block,"Manzaono/UV");
         formPersonal.addFormItem(typeHome,"Tipo vivienda");
         formPersonal.addFormItem(homeaddress,"Dir. domicilio");
-        formPersonal.addFormItem(idCard,"Nro carnet");
-        formPersonal.addFormItem(idCardExpedition,"Extensión");
+//        formPersonal.addFormItem(idCard,"Nro carnet");
+//        formPersonal.addFormItem(idCardExpedition,"Extensión");
+        FormLayout.FormItem idCardItem = formPersonal.addFormItem(layoutIdCard,"Carnet identidad");
+        UIUtils.setColSpan(1,idCardItem);
         formPersonal.addFormItem(dateExpirationIdCard,"Expiración");
         formPersonal.addFormItem(civilStatus,"Estado civil");
         formPersonal.addFormItem(dependentNumber,"Nro. depen");

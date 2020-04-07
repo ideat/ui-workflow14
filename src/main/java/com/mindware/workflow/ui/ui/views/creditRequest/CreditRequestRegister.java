@@ -978,8 +978,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binder.forField(fixedDay).withValidator(value -> value.intValue()>=0 && value.intValue()<=30, "Dia fijo debe estar entre 0 a 30")
                 .withConverter(new UtilValues.DoubleToIntegerConverter()).bind(CreditRequest::getFixedDay,CreditRequest::setFixedDay);
         binder.forField(typeFee).asRequired("Tipo de cuota es requerido").bind(CreditRequest::getTypeFee,CreditRequest::setTypeFee);
-        binder.forField(baseInterestRate).bind(CreditRequest::getBaseInterestRate,CreditRequest::setBaseInterestRate);
-        binder.forField(initPeriodBaseRate).bind(CreditRequest::getInitPeriodBaseRate,CreditRequest::setInitPeriodBaseRate);
+        binder.forField(baseInterestRate).asRequired("Tasa base es requerida, si no corresponde ingrese '0'").bind(CreditRequest::getBaseInterestRate,CreditRequest::setBaseInterestRate);
+        binder.forField(initPeriodBaseRate).asRequired("Inicio tasa base es requerido, sino corresponde seleccione '0'").bind(CreditRequest::getInitPeriodBaseRate,CreditRequest::setInitPeriodBaseRate);
         binder.forField(caedec).asRequired("Caedec destino es requerido").bind(CreditRequest::getCaedec,CreditRequest::setCaedec);
         binder.forField(requestDate).bind(CreditRequest::getRequestDate,CreditRequest::setRequestDate);
         binder.forField(paymentPlanDate).asRequired("Fecha de inicio plan de pagos es requerida").bind(CreditRequest::getPaymentPlanDate,CreditRequest::setPaymentPlanDate);
@@ -1051,7 +1051,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                    stageHistory.setNumberRequest(result.getNumberRequest());
                    stageHistory.setStage("EVALUACION_CREDITO");
                    stageHistory.setStartDateTime(Instant.now());
-                   stageHistory.setState("pendiente");
+                   stageHistory.setState("PENDIENTE");
                    stageHistory.setInitDateTime(Instant.now());
                    stageHistory.setUserTask(result.getLoginUser());
                    stageHistory.setComesFrom("EVALUACION_CREDITO");

@@ -18,6 +18,7 @@ public class PrepareMail {
     public PrepareMail(){
 
     }
+
     public static void sendMailWorkflowGoForward(String login, Integer numberRequest, String rolNextStage, String type){
         Users user = userRestTemplate.getByIdUser(login);
         List<Users> usersNextStage = userRestTemplate.getByRol(rolNextStage);
@@ -37,6 +38,7 @@ public class PrepareMail {
     }
 
     public static void sendMailWorkflowGoBackward(List<StageHistory> stageHistoryList, String login, Integer numberRequest, String comesFrom){
+
         Users user = userRestTemplate.getByIdUser(login);
         String[] comeFromList = comesFrom.split(",");
 
@@ -68,5 +70,6 @@ public class PrepareMail {
         mail.setMailContent("Se creo su cuenta de usuario en el sisema PROMOCRED, su clave temporal es: " + plainPassword);
         mailRestTemplate.add(mail);
     }
+
 
 }
