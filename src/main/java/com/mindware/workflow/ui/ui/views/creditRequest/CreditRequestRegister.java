@@ -2,7 +2,6 @@ package com.mindware.workflow.ui.ui.views.creditRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mindware.workflow.ui.backend.Payment;
 import com.mindware.workflow.ui.backend.entity.Applicant;
 import com.mindware.workflow.ui.backend.entity.CreditRequestApplicant;
 import com.mindware.workflow.ui.backend.entity.Office;
@@ -102,7 +101,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     private DetailsDrawerFooter footer;
     private ListDataProvider<LinkUp> dataProviderLinkUp;
-
+    private  List<LinkUp> linkUpListAux;
     private TextField txtNameFilter;
     private TextField txtNumberApplicantFilter;
     private TextField txtIdCardFilter;
@@ -651,6 +650,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 e.printStackTrace();
             }
         }
+        linkUpListAux =linkUpList;
         Grid<LinkUp> gridRP = createGridLinkUp("REFERENCIA_PERSONAL");
         gridRP.setHeight("300px");
         Grid<LinkUp> gridVE = createGridLinkUp("VINCULACION_ECONOMICA");
@@ -800,8 +800,28 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                     .setWidth(UIUtils.COLUMN_WIDTH_L).setResizable(true);
 
         }
-
+        gridLinkUp.addColumn(new ComponentRenderer<>(this::createButtonDeleteLinkUp)).setFlexGrow(1);
         return gridLinkUp;
+    }
+
+    private Component createButtonDeleteLinkUp(LinkUp linkUp){
+        Button button = new Button();
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_ERROR);
+        button.setIcon(VaadinIcon.TRASH.create());
+        button.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        button.addClickListener(e ->{
+            linkUpList.removeIf(l -> l.getId().equals(linkUp.getId()));
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                current.setLinkup(mapper.writeValueAsString(linkUpList));
+                footer.saveState(true);
+                UIUtils.showNotification("Registro marcado para borrar, Guarde los cambio en Datos Solicitud");
+            } catch (JsonProcessingException ex) {
+                ex.printStackTrace();
+            }
+            dataProviderLinkUp.refreshAll();
+        });
+        return button;
     }
 
     private DetailsDrawer createCreditRequest(CreditRequest creditRequest){
@@ -997,7 +1017,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
            footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud")
                    && (creditRequest.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString())
-                   || creditRequest.getId()==null));
+                   || creditRequest.getId()==null)|| !linkUpList.equals(linkUpListAux));
         });
 
         formRequest = new FormLayout();
@@ -1612,7 +1632,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binderRelations.addStatusChangeListener(event -> {
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderRelations.hasChanges();
-           footerRelations.saveState(hasChanges && isValid && GrantOptions.grantedOption("Solicitud"));
+            footerRelations.saveState(GrantOptions.grantedOption("Solicitud"));
+//           footerRelations.saveState(hasChanges && isValid && GrantOptions.grantedOption("Solicitud"));
         });
 
         footerRelations.addSaveListener(e ->{

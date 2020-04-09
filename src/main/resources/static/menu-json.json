@@ -180,5 +180,12 @@
     "name": "Tipo de Cambio",
     "read": "false",
     "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Variables de Contratos",
+    "read": "false",
+    "write": "false"
   }]
 

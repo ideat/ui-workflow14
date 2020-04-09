@@ -213,6 +213,7 @@ public class ParameterView extends SplitViewFrame {
         detailsDrawerHeader.setTitle("Parametro: "+ parameter.getValue());
         detailsDrawer.setContent(createDetails(parameter));
         detailsDrawer.show();
+
     }
 
     private FormLayout createDetails(Parameter parameter){

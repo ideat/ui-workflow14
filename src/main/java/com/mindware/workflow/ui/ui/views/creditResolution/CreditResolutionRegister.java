@@ -35,6 +35,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -345,8 +346,23 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
                 .setWidth(UIUtils.COLUMN_WIDTH_XS).setResizable(true);
         grid.addColumn(DirectIndirectDebts::getFinalExpiration).setFlexGrow(0).setHeader("Vcto. final")
                 .setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
+        grid.addColumn(new ComponentRenderer<>(this::createButtonDelete)).setFlexGrow(1);
 
         return grid;
+    }
+
+    private Component createButtonDelete(DirectIndirectDebts directIndirectDebts){
+        Button button = new Button();
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_ERROR);
+        button.setIcon(VaadinIcon.TRASH.create());
+        button.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+        button.addClickListener(e ->{
+            directIndirectDebtsList.removeIf(item -> item.getId().equals(directIndirectDebts.getId()));
+            directIndirectDebtsListDataProvider.refreshAll();
+            UIUtils.showNotification("Registro marcado para borrar, Guarde los Cambios");
+        });
+
+        return button;
     }
 
     private VerticalLayout gridLayoutDebts(Grid<DirectIndirectDebts> grid, String typeDebt){

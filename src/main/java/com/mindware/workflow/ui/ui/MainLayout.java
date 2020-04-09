@@ -22,6 +22,7 @@ import com.mindware.workflow.ui.ui.views.config.office.SignatorieView;
 import com.mindware.workflow.ui.ui.views.config.parameter.ParameterView;
 import com.mindware.workflow.ui.ui.views.config.templateForms.TemplateFormsView;
 import com.mindware.workflow.ui.ui.views.config.workflowProduct.WorflowProductView;
+import com.mindware.workflow.ui.ui.views.contract.ContractVariableView;
 import com.mindware.workflow.ui.ui.views.contract.TemplateContractView;
 import com.mindware.workflow.ui.ui.views.creditRequest.CreditRequestView;
 import com.mindware.workflow.ui.ui.views.creditResolution.CreditResolutionCreditRequestDtoView;
@@ -243,7 +244,8 @@ public class MainLayout extends FlexBoxLayout
 		}
 
 
-		if(assignedOption("Informe Legal") || assignedOption("Contratos")) {
+		if(assignedOption("Informe Legal")
+				|| assignedOption("Contratos") || assignedOption("Variables de Contratos")) {
 			NaviItem legal = menu.addNaviItem(VaadinIcon.BRIEFCASE, "Asesoria Legal", null);
 			if (assignedOption("Informe Legal")) {
 				menu.addNaviItem(legal, "Informe Legal", LegalInformationView.class);
@@ -253,6 +255,9 @@ public class MainLayout extends FlexBoxLayout
 			}
 			if(assignedOption("Plantilla Contratos")){
 				menu.addNaviItem(legal,"Plantilla Contratos", TemplateContractView.class);
+			}
+			if(assignedOption("Variables de Contratos")){
+				menu.addNaviItem(legal,"Variables de Contratos", ContractVariableView.class);
 			}
 		}
 		if(assignedOption("Bandeja Seguimiento")) {
