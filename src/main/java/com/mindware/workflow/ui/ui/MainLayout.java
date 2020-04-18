@@ -22,6 +22,7 @@ import com.mindware.workflow.ui.ui.views.config.office.SignatorieView;
 import com.mindware.workflow.ui.ui.views.config.parameter.ParameterView;
 import com.mindware.workflow.ui.ui.views.config.templateForms.TemplateFormsView;
 import com.mindware.workflow.ui.ui.views.config.workflowProduct.WorflowProductView;
+import com.mindware.workflow.ui.ui.views.contract.ContractCreditRequestDtoView;
 import com.mindware.workflow.ui.ui.views.contract.ContractVariableView;
 import com.mindware.workflow.ui.ui.views.contract.TemplateContractView;
 import com.mindware.workflow.ui.ui.views.creditRequest.CreditRequestView;
@@ -215,12 +216,12 @@ public class MainLayout extends FlexBoxLayout
 			if(assignedOption("Clientes")){
 				menu.addNaviItem(mercadeo, "Clientes", ClientView.class);
 			}
-			if(assignedOption("Propuestas")){
-				menu.addNaviItem(mercadeo,"Propuestas",Home.class);
-			}
-			if(assignedOption("Monitoreo")){
-				menu.addNaviItem(mercadeo,"Monitoreo",Home.class);
-			}
+//			if(assignedOption("Propuestas")){
+//				menu.addNaviItem(mercadeo,"Propuestas",Home.class);
+//			}
+//			if(assignedOption("Monitoreo")){
+//				menu.addNaviItem(mercadeo,"Monitoreo",Home.class);
+//			}
 		}
 
 		if(assignedOption("Solicitantes")) {
@@ -251,7 +252,7 @@ public class MainLayout extends FlexBoxLayout
 				menu.addNaviItem(legal, "Informe Legal", LegalInformationView.class);
 			}
 			if (assignedOption("Contratos")){
-				menu.addNaviItem(legal, "Contratos", Home.class);
+				menu.addNaviItem(legal, "Contratos", ContractCreditRequestDtoView.class);
 			}
 			if(assignedOption("Plantilla Contratos")){
 				menu.addNaviItem(legal,"Plantilla Contratos", TemplateContractView.class);

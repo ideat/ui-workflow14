@@ -29,7 +29,7 @@ import java.util.Map;
 @Route(value = "CreditResolutionView", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Solicitudes para registro de resoluciones")
-public class CreditResolutionCreditRequestDtoView extends SplitViewFrame implements RouterLayout {
+public class CreditResolutionCreditRequestDtoView extends SplitViewFrame {
     private Grid<CreditResolutionCreditRequestDto> grid;
     private CreditResolutionCreditRequestDataProvider dataProvider;
     private List<CreditResolutionCreditRequestDto> creditResolutionCreditRequestDtoList;

@@ -461,7 +461,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         formPersonal.addFormItem(motherLastName,"Apellido materno");
         formPersonal.addFormItem(city, "Ciudad");
         formPersonal.addFormItem(province,"Provincia");
-        formPersonal.addFormItem(block,"Manzaono/UV");
+        formPersonal.addFormItem(block,"Manzano/UV");
         formPersonal.addFormItem(typeHome,"Tipo vivienda");
         formPersonal.addFormItem(homeaddress,"Dir. domicilio");
 //        formPersonal.addFormItem(idCard,"Nro carnet");

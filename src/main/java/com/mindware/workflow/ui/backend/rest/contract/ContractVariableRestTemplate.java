@@ -45,6 +45,15 @@ public class ContractVariableRestTemplate {
         return Arrays.asList(response.getBody());
     }
 
+    public ContractVariable getByName(String nameVariable) {
+        final String uri = "http://localhost:8080/rest/v1/contractVariable/getByName";
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("name",nameVariable);
+        HttpEntity<ContractVariable> entity = new HttpEntity<>(headers);
+        ResponseEntity<ContractVariable> response = restTemplate.exchange(uri,HttpMethod.GET,entity,ContractVariable.class);
+        return response.getBody();
+    }
+
     public void delete(String id){
         final String uri = "http://localhost:8080/rest/v1/contractVariable/delete";
         HttpHeaders headers = HeaderJwt.getHeader();

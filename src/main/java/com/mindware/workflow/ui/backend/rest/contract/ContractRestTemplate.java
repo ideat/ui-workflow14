@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.UUID;
+
 public class ContractRestTemplate {
     private static RestTemplate restTemplate;
 
@@ -42,5 +44,14 @@ public class ContractRestTemplate {
         HttpEntity<Contract> entity  = new HttpEntity<>(headers);
         ResponseEntity<Contract> response = restTemplate.exchange(uri, HttpMethod.GET,entity,Contract.class);
         return response.getBody();
+    }
+
+    public String delete(UUID id){
+        final String uri = "http://localhost:8080/rest/v1/contract/delete";
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("id",id.toString());
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+        ResponseEntity<?> response = restTemplate.exchange(uri,HttpMethod.DELETE,entity,String.class);
+        return response.getBody().toString();
     }
 }

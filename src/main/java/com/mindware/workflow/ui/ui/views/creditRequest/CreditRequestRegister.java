@@ -904,7 +904,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         rateInterest.setErrorMessage("Formato incorrecto");
 
         ComboBox<String> currency = new ComboBox<>();
-        currency.setItems("BS","$US");
+        currency.setItems(getCurrency());
         currency.setRequired(true);
         currency.setWidth("100%");
 
@@ -1222,7 +1222,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         Office office = officeRestTemplate.getByCode(users.getCodeOffice());
         AuthorizerOfficeUserDtoRestTemplate  authorizerOfficeUserDtoRestTemplate = new AuthorizerOfficeUserDtoRestTemplate();
         List<AuthorizersOfficeUserDto> authorizersOfficeUserDtos = new LinkedList<>();
-        if(current.getCurrency().equals("BS")) {
+        if( current.getCurrency().toUpperCase().equals("BS")) {
             authorizersOfficeUserDtos = authorizerOfficeUserDtoRestTemplate.getByAmountBs(current.getAmount(), current.getAmount());
         }else{
             authorizersOfficeUserDtos = authorizerOfficeUserDtoRestTemplate.getByAmountSus(current.getAmount(), current.getAmount());
@@ -1715,5 +1715,15 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             listGuarantee.add(p.getValue());
         }
         return listGuarantee;
+    }
+
+    private List<String> getCurrency(){
+        ParameterRestTemplate rest = new ParameterRestTemplate();
+        List<Parameter> parameters = rest.getParametersByCategory("MONEDA");
+        List<String> listCurrency = new ArrayList<>();
+        for(Parameter p: parameters){
+            listCurrency.add(p.getValue());
+        }
+        return listCurrency;
     }
 }

@@ -75,7 +75,7 @@ public class ParameterView extends SplitViewFrame {
     private String[] param = {"TIPO CREDITO","TIPO GARANTIA","PRODUCTOS","ZONAS","PROFESIONES","CAEDEC","EXTENSION CARNET",
             "ESTADO CIVIL", "GENERO", "NACIONALIDAD", "ACTIVO", "PASIVO","INGRESOS","EGRESOS",
             "CARGOS FINANCIEROS", "OBSERVACIONES","ETAPAS SOLICITUD", "FORMULARIOS-CARTAS","RESOLUCION","ESTADO-WORKFLOW",
-            "VARIABLE-CONTRATOS","PUESTOS"};
+            "VARIABLE-CONTRATOS","PUESTOS","MONEDA"};
 
     public ParameterView(){
         getListParameter();

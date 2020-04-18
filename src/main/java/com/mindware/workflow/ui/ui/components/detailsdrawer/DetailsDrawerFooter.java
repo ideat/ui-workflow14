@@ -15,6 +15,7 @@ public class DetailsDrawerFooter extends FlexBoxLayout {
 
 	private Button save;
 	private Button cancel;
+	private Button print;
 
 	public DetailsDrawerFooter() {
 		setBackgroundColor(LumoStyles.Color.Contrast._5);
@@ -22,9 +23,11 @@ public class DetailsDrawerFooter extends FlexBoxLayout {
 		setSpacing(Right.S);
 		setWidthFull();
 
-		save = UIUtils.createPrimaryButton("Save");
-		cancel = UIUtils.createTertiaryButton("Cancel");
-		add(save, cancel);
+		save = UIUtils.createPrimaryButton("Guardar");
+		cancel = UIUtils.createTertiaryButton("Cancelar");
+		print = UIUtils.createContrastButton("Imprimir");
+		print.setVisible(false);
+		add(save, cancel, print);
 	}
 
 	public void saveState(boolean state){
@@ -39,6 +42,14 @@ public class DetailsDrawerFooter extends FlexBoxLayout {
 	public Registration addCancelListener(
 			ComponentEventListener<ClickEvent<Button>> listener) {
 		return cancel.addClickListener(listener);
+	}
+
+	public void printVisible(boolean visible){
+		print.setVisible(visible);
+	}
+
+	public Registration addPrintListener(ComponentEventListener<ClickEvent<Button>> listener){
+		return print.addClickListener(listener);
 	}
 
 }

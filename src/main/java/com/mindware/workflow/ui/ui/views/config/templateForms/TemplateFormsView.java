@@ -42,6 +42,7 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -51,7 +52,7 @@ import java.util.*;
 @Route(value = "templateForms", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Plantillas de formularios")
-public class TemplateFormsView extends SplitViewFrame {
+public class TemplateFormsView extends SplitViewFrame implements RouterLayout {
 
     private ParameterRestTemplate parameterRestTemplate;
     private TemplateFormRestTemplate restTemplate;

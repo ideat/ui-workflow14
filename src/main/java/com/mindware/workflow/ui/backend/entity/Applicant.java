@@ -115,9 +115,13 @@ public class Applicant {
     }
 
     public String getFullName(){
-        return Optional.ofNullable(this.lastName).orElse("")+" "
-                +Optional.ofNullable(this.motherLastName).orElse("") + " "
-                +Optional.ofNullable(this.secondName).orElse("")+ " "
-                +Optional.ofNullable(this.firstName).orElse("");
+        String ml = Optional.ofNullable(this.motherLastName).orElse("");
+        String mal = Optional.ofNullable(this.marriedLastName).orElse("");
+        return Optional.ofNullable(this.firstName).orElse("")+" "
+                +Optional.ofNullable(this.secondName).orElse("") + " "
+                +Optional.ofNullable(this.lastName).orElse("")+ " "
+                + (!mal.equals("")?"de " + mal:ml);
+
+
     }
 }

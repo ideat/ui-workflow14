@@ -67,6 +67,7 @@ public class ContractVariableView extends SplitViewFrame {
     private ComboBox<String> typeVariableFilter;
     private TextField nameFilter;
     private TextField variableFilter;
+    private static String[] typeVariableConst = {"CONSTANTE","SIMPLE","COMPUESTA"};
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
@@ -134,7 +135,7 @@ public class ContractVariableView extends SplitViewFrame {
         HeaderRow hr = grid.appendHeaderRow();
 
         typeVariableFilter = new ComboBox<>();
-        typeVariableFilter.setItems("SIMPLE","COMPUESTA");
+        typeVariableFilter.setItems(typeVariableConst);
         typeVariableFilter.setWidth("100%");
         typeVariableFilter.addValueChangeListener(e -> applyFilter(dataProvider));
         hr.getCell(grid.getColumnByKey("typeVariable")).setComponent(typeVariableFilter);
@@ -204,7 +205,7 @@ public class ContractVariableView extends SplitViewFrame {
     private FormLayout createDetails(ContractVariable contractVariable){
         ComboBox<String> typeVariable = new ComboBox<>();
         typeVariable.setWidth("100%");
-        typeVariable.setItems("SIMPLE","COMPUESTA");
+        typeVariable.setItems(typeVariableConst);
         typeVariable.setRequiredIndicatorVisible(true);
 
         TextField name = new TextField();
@@ -240,9 +241,11 @@ public class ContractVariableView extends SplitViewFrame {
                 new FormLayout.ResponsiveStep("21em", 2,
                         FormLayout.ResponsiveStep.LabelsPosition.TOP));
 
-        form.addFormItem(typeVariable,"Tipo variable");
-        form.addFormItem(name,"Nombre variable");
+        FormLayout.FormItem typeVariableItem =  form.addFormItem(typeVariable,"Tipo variable");
+        FormLayout.FormItem nameItem =  form.addFormItem(name,"Nombre variable");
         FormLayout.FormItem variableItem = form.addFormItem(variable,"Contenido variable");
+        UIUtils.setColSpan(2,typeVariableItem);
+        UIUtils.setColSpan(2,nameItem);
         UIUtils.setColSpan(2,variableItem);
         return form;
     }
