@@ -191,23 +191,23 @@ public class CreditRequestView extends SplitViewFrame implements RouterLayout {
 
 //        grid.addColumn(badgeRenderer).setHeader("Estado")
 //                .setWidth(UIUtils.COLUMN_WIDTH_S).setFlexGrow(0);
-        grid.addColumn(CreditRequestApplicantDto::getNumberRequest).setFlexGrow(0)
+        grid.addColumn(CreditRequestApplicantDto::getNumberRequest).setFlexGrow(1)
                 .setSortable(true).setResizable(true).setHeader("# Solicitud")
-                .setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createNameInfo))
                 .setFlexGrow(1).setResizable(true).setSortable(true)
                 .setHeader("Solicitante");//.setWidth(UIUtils.COLUMN_WIDTH_XL);
         grid.addColumn(CreditRequestApplicantDto::getCurrency).setHeader("Moneda")
-                .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true)
+                .setSortable(true).setAutoWidth(true).setResizable(true)
                 .setFlexGrow(1);
         grid.addColumn(new ComponentRenderer<>(this::createAmount)).setHeader("Monto")
-                .setSortable(true).setFlexGrow(1).setResizable(true);
-//                .setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setSortable(true).setFlexGrow(1).setResizable(true)
+                .setAutoWidth(true);
         grid.addColumn(TemplateRenderer.<CreditRequestApplicantDto> of("[[item.requestDate]]")
                 .withProperty("requestDate",
                         creditRequestApplicantDto -> UIUtils.formatDate(creditRequestApplicantDto.getRequestDate())))
                 .setHeader("Fecha solicitud").setComparator(CreditRequestApplicantDto::getRequestDate)
-                .setWidth(UIUtils.COLUMN_WIDTH_M).setFlexGrow(1).setSortable(true);
+                .setAutoWidth(true).setFlexGrow(1).setSortable(true);
 
         return grid;
     }

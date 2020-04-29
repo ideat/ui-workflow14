@@ -37,6 +37,8 @@ public class Applicant {
     @NotNull(message = "'Direccion domicilio', no puede omitirse")
     private String homeaddress;
 
+    private String homeAddressReference;
+
     @NotNull(message = "'Carnet de Identidad' no puede ser omitido")
     @Pattern(regexp="\\d{5,10}(-[a-zA-Z_0-9]*)*",message = "'Carnet de Identidad' debe ser una secuencia de entre 5 y 10 dígitos, opcionalmente un caracter seguido de hasta 3 digitos " )
     @NotBlank(message = "'Carnet de Identidad' no puede ser omitido")
@@ -47,6 +49,10 @@ public class Applicant {
     private String idCardExpedition;
 
     private LocalDate dateExpirationIdCard;
+
+    private String idCardComplement;
+
+    private String typeIdCard;
 
     @NotNull(message = "'Estado civil' no puede ser omitido")
     private String civilStatus;
@@ -110,9 +116,11 @@ public class Applicant {
 
     private String savingAccount;
 
-    public String getIdCardComplet(){
-        return this.idCard+this.idCardExpedition;
-    }
+    private Integer externalSystemCode;
+
+//    public String getIdCardComplement(){
+//        return this.idCard+this.idCardExpedition;
+//    }
 
     public String getFullName(){
         String ml = Optional.ofNullable(this.motherLastName).orElse("");
@@ -123,5 +131,11 @@ public class Applicant {
                 + (!mal.equals("")?"de " + mal:ml);
 
 
+    }
+
+    public String getFullIdCard(){
+        return Optional.ofNullable(this.idCard).orElse("")+""
+                +Optional.ofNullable(this.idCardComplement).orElse("")+""
+                +Optional.ofNullable(this.idCardExpedition).orElse("");
     }
 }

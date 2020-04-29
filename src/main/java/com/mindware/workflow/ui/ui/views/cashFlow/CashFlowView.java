@@ -98,30 +98,30 @@ public class CashFlowView extends SplitViewFrame  {
         });
 
         grid.addColumn(CashFlowCreditRequestApplicantDto::getNumberRequest)
-                .setWidth(UIUtils.COLUMN_WIDTH_S)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("# Solicitud");
         grid.addColumn(new ComponentRenderer<>(this::createNameInfo))
-                .setWidth(UIUtils.COLUMN_WIDTH_XL)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("Solicitante");
         grid.addColumn(CashFlowCreditRequestApplicantDto::getCurrency)
-                .setWidth(UIUtils.COLUMN_WIDTH_S)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("Moneda");
         grid.addColumn(new ComponentRenderer<>(this::createAmount)).setHeader("Monto")
-                .setSortable(true).setFlexGrow(0).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setSortable(true).setFlexGrow(1).setResizable(true)
+                .setAutoWidth(true);
         grid.addColumn(CashFlowCreditRequestApplicantDto::getCity).setHeader("Ciudad")
-                .setSortable(true).setFlexGrow(0).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_M);
+                .setSortable(true).setFlexGrow(1).setResizable(true)
+                .setAutoWidth(true);
         grid.addColumn(CashFlowCreditRequestApplicantDto::getOfficial).setHeader("Oficial")
-                .setSortable(true).setFlexGrow(0).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_M);
+                .setSortable(true).setFlexGrow(1).setResizable(true)
+                .setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createHasPaymentPLan))
-                .setFlexGrow(0).setHeader("Plan de Pagos?").setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setFlexGrow(1).setHeader("Plan de Pagos?").setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createHasPatrimonialStatement))
-                .setFlexGrow(0).setHeader("Declaracion Patrimonial?").setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setFlexGrow(1).setHeader("Declaracion Patrimonial?").setAutoWidth(true);
 
         return grid;
     }

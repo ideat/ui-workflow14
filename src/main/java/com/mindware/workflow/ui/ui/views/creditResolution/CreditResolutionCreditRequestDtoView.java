@@ -89,20 +89,20 @@ public class CreditResolutionCreditRequestDtoView extends SplitViewFrame {
         });
         grid.setDataProvider(dataProvider);
         grid.setHeight("100%");
-        grid.addColumn(CreditResolutionCreditRequestDto::getNumberRequest).setFlexGrow(0)
+        grid.addColumn(CreditResolutionCreditRequestDto::getNumberRequest).setFlexGrow(1)
                 .setHeader("Nro solicitud").setSortable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true);
-        grid.addColumn(CreditResolutionCreditRequestDto::getNumberApplicant).setFlexGrow(0)
+                .setAutoWidth(true).setResizable(true);
+        grid.addColumn(CreditResolutionCreditRequestDto::getNumberApplicant).setFlexGrow(1)
                 .setHeader("# Solicitante").setSortable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true);
-        grid.addColumn(new ComponentRenderer<>(this::createApplicantInfo)).setFlexGrow(0)
-                .setHeader("Nombre solicitante").setWidth(UIUtils.COLUMN_WIDTH_XL)
+                .setAutoWidth(true).setResizable(true);
+        grid.addColumn(new ComponentRenderer<>(this::createApplicantInfo)).setFlexGrow(1)
+                .setHeader("Nombre solicitante").setAutoWidth(true)
                 .setResizable(true).setTextAlign(ColumnTextAlign.START);
-        grid.addColumn(CreditResolutionCreditRequestDto::getCity).setFlexGrow(0)
-                .setHeader("Ciudad").setWidth(UIUtils.COLUMN_WIDTH_M)
+        grid.addColumn(CreditResolutionCreditRequestDto::getCity).setFlexGrow(1)
+                .setHeader("Ciudad").setAutoWidth(true)
                 .setResizable(true).setSortable(true);
-        grid.addColumn(CreditResolutionCreditRequestDto::getNameUser).setFlexGrow(0)
-                .setHeader("Oficial").setWidth(UIUtils.COLUMN_WIDTH_M)
+        grid.addColumn(CreditResolutionCreditRequestDto::getNameUser).setFlexGrow(1)
+                .setHeader("Oficial").setAutoWidth(true)
                 .setResizable(true).setSortable(true);
 
         return grid;

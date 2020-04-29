@@ -187,5 +187,12 @@
     "name": "Variables de Contratos",
     "read": "false",
     "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Ciudad-Provincias",
+    "read": "false",
+    "write": "false"
   }]
 

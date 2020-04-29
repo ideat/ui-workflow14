@@ -77,6 +77,19 @@ public class CreditRequestApplicantDtoRestTemplate {
         return Arrays.asList(response.getBody());
     }
 
+    public List<CreditRequestApplicantDto> getByNumberRequest(Integer numberRequest){
+        final String uri = "http://localhost:8080/rest/v1/creditrequestapplicant/getByNumberRequest";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("numberrequest", numberRequest.toString());
+        HttpEntity<CreditRequestApplicantDto> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<CreditRequestApplicantDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,CreditRequestApplicantDto[].class);
+
+        return Arrays.asList(response.getBody());
+    }
+
+
     public List<CreditRequestApplicantDto> getByLoginUserTypeRelation(String loginUser, String typeRelation){
         final String uri = "http://localhost:8080/rest/v1/creditrequestapplicant/getByLoginTypeRelation";
 

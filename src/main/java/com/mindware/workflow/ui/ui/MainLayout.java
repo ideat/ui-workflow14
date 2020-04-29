@@ -15,6 +15,7 @@ import com.mindware.workflow.ui.ui.views.authorizerExceptions.AuthorizerExceptio
 import com.mindware.workflow.ui.ui.views.cashFlow.CashFlowView;
 import com.mindware.workflow.ui.ui.views.comercial.client.ClientView;
 import com.mindware.workflow.ui.ui.views.config.authorizer.UserAuthorizerView;
+import com.mindware.workflow.ui.ui.views.config.cityProvince.CityProvinceView;
 import com.mindware.workflow.ui.ui.views.config.exceptions.ExceptionsView;
 import com.mindware.workflow.ui.ui.views.config.exchangeRate.ExchangeRateView;
 import com.mindware.workflow.ui.ui.views.config.office.OfficeView;
@@ -311,6 +312,10 @@ public class MainLayout extends FlexBoxLayout
 
 			if(assignedOption("Tipo de Cambio")){
 				menu.addNaviItem(configuration,"Tipo de Cambio", ExchangeRateView.class);
+			}
+
+			if(assignedOption("Ciudad-Provincias")){
+				menu.addNaviItem(configuration,"Ciudad-Provincias", CityProvinceView.class);
 			}
 		}
 	}

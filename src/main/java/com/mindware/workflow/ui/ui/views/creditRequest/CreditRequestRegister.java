@@ -366,7 +366,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         FlexBoxLayout content = new FlexBoxLayout(component);
         content.setFlexDirection(FlexDirection.ROW);
         content.setMargin(Vertical.AUTO, Vertical.RESPONSIVE_L);
-        content.setMaxWidth("1024px");
+        content.setWidthFull();
 
         return content;
     }
@@ -422,28 +422,24 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         gridCodebtorGuarantor.setWidthFull();
         Button btnCreatGC = new Button("Agregar");
         btnCreatGC.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnCreatGC.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        btnCreatGC.setEnabled(GrantOptions.grantedOption("Solicitud") && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         btnCreatGC.addClickListener(e ->{
             showSearch();
         });
 
         topLayout.add(btnCreatGC);
         creditRequestApplicantDtoRestTemplate = new CreditRequestApplicantDtoRestTemplate();
-        //FIXME admin change by logged user login
-        creditRequestApplicantDtoList = new ArrayList<>(creditRequestApplicantDtoRestTemplate.getByLoginNumberRequest(VaadinSession.getCurrent().getAttribute("login").toString(),paramNumberRequest));
+
+        creditRequestApplicantDtoList = new ArrayList<>(creditRequestApplicantDtoRestTemplate.getByNumberRequest(paramNumberRequest));
         dataProviderCreditRequestApplicant = new ListDataProvider<>(creditRequestApplicantDtoList);
 
-//        gridCodebtorGuarantor.addThemeVariants(GridVariant.LUMO_COMPACT,GridVariant.MATERIAL_COLUMN_DIVIDERS);
         gridCodebtorGuarantor.setDataProvider(dataProviderCreditRequestApplicant);
 
         gridCodebtorGuarantor.addColumn(CreditRequestApplicantDto::getNumberApplicant).setHeader("Codigo")
-                .setFlexGrow(0).setResizable(true);
+                .setFlexGrow(1).setResizable(true).setAutoWidth(true);
 
         gridCodebtorGuarantor.addColumn(new ComponentRenderer<>(this::createNameInfo)).setHeader("Nombre completo")
-                .setFlexGrow(0).setResizable(true);
-
-//        gridCodebtorGuarantor.addColumn(new ComponentRenderer<>(this::createButtonPatrimonialStatement))
-//                .setFlexGrow(0).setResizable(true);//.setHeader("Declaracion Patrimonial");
+                .setFlexGrow(1).setResizable(true).setAutoWidth(true);
 
         gridCodebtorGuarantor.addColumn(new ComponentRenderer<>(this::createButtonDelete))
                 .setFlexGrow(0).setResizable(true);
@@ -476,18 +472,9 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     }
 
-//    private Component createButtonPatrimonialStatement(CreditRequestApplicantDto creditRequestApplicantDto){
-//        Button btn = UIUtils.createPrimaryButton("Declaracion Patrimonial");
-//        btn.addClickListener(e ->{
-//
-//        });
-//
-//        return btn;
-//    }
-
     private Component createButtonDelete(CreditRequestApplicantDto creditRequestApplicantDto){
         Button btn =UIUtils.createErrorPrimaryButton(VaadinIcon.TRASH);
-        btn.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        btn.setEnabled(GrantOptions.grantedOption("Solicitud") && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         btn.addClickListener(e -> {
             CreditRequestAplicantRestTemplate rest = new CreditRequestAplicantRestTemplate();
             creditRequestApplicantDtoList.remove(creditRequestApplicantDto);
@@ -502,7 +489,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     private Component createButtonDeleteException(ExceptionsCreditRequestDto exceptionsCreditRequestDto){
         Button btn = UIUtils.createErrorPrimaryButton(VaadinIcon.TRASH);
-        btn.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        btn.setEnabled(GrantOptions.grantedOption("Solicitud") && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         btn.addClickListener(e ->{
             ExceptionsCreditRequestRestTemplate rest = new ExceptionsCreditRequestRestTemplate();
             exceptionsCreditRequestDtoList.remove(exceptionsCreditRequestDto);
@@ -904,7 +891,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         rateInterest.setErrorMessage("Formato incorrecto");
 
         ComboBox<String> currency = new ComboBox<>();
-        currency.setItems(getCurrency());
+        currency.setItems(getValueParameter("MONEDA"));
         currency.setRequired(true);
         currency.setWidth("100%");
 
@@ -971,7 +958,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         numberCredit.setWidth("100%");
 
         ComboBox<String> typeGuarantee = new ComboBox<>();
-        typeGuarantee.setItems(getTypeGuarantee());
+        typeGuarantee.setItems(getValueParameter("TIPO GARANTIA"));
         typeGuarantee.setWidth("100%");
 
         TextArea destination = new TextArea();
@@ -1039,7 +1026,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         formRequest.addFormItem(idOffice,"Oficina");
         formRequest.addFormItem(amount,"Monto");
         formRequest.addFormItem(currency,"Moneda");
-        formRequest.addFormItem(rateInterest,"Tasa int.");
+        formRequest.addFormItem(rateInterest,"Tasa interes");
         formRequest.addFormItem(btnCharge,"Cargos financieros");
         formRequest.addFormItem(term,"Plazo");
         formRequest.addFormItem(typeTerm,"Tipo plazo");
@@ -1167,7 +1154,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binderExceptionCreditRequest.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderExceptionCreditRequest.hasChanges();
-           footerException.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud"));
+           footerException.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud") && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         });
 
         footerException.addSaveListener(e ->{
@@ -1246,53 +1233,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         return statusReviewList;
     }
 
-//    private Grid searchExceptions(){
-//        ExceptionsRestTemplate rest = new ExceptionsRestTemplate();
-//        List<Exceptions> exceptionsList = new ArrayList<>(rest.getAll());
-//
-//        ListDataProvider<Exceptions> data = new ListDataProvider<>(exceptionsList);
-//        gridExceptions = new Grid<>();
-//        gridExceptions.setWidthFull();
-//        gridExceptions.setDataProvider(data);
-//
-//        gridExceptions.addColumn(Exceptions::getInternalCode).setHeader("Codigo")
-//                .setSortable(true).setResizable(true).setFlexGrow(1).setKey("code");
-//        gridExceptions.addColumn(Exceptions::getTypeException).setHeader("Tipo excepcion")
-//                .setSortable(true).setResizable(true).setFlexGrow(1).setKey("typeException");
-//        gridExceptions.addColumn(Exceptions::getDescription).setHeader("Excepcion")
-//                .setSortable(true).setResizable(true).setFlexGrow(1).setKey("exception");
-//        gridExceptions.addColumn(Exceptions::getLimitTime).setHeader("Dias")
-//                .setSortable(true).setResizable(true).setFlexGrow(1).setKey("days");
-//        HeaderRow hr = gridExceptions.appendHeaderRow();
-//
-////        gridExceptions.addColumn(new ComponentRenderer<>(this::createSelectExcepcion));
-//
-//        internalCodeException = new TextField();
-//        internalCodeException.setValueChangeMode(ValueChangeMode.EAGER);
-//        internalCodeException.setWidth("100%");
-//        internalCodeException.addValueChangeListener(e -> applyFilterException(data));
-//        hr.getCell(gridExceptions.getColumnByKey("code")).setComponent(internalCodeException);
-//
-//        typeException = new TextField();
-//        typeException.setValueChangeMode(ValueChangeMode.EAGER);
-//        typeException.setWidth("100%");
-//        typeException.addValueChangeListener(e-> applyFilterException(data));
-//        hr.getCell(gridExceptions.getColumnByKey("typeExeption")).setComponent(typeException);
-//
-//        descriptionException = new TextField();
-//        descriptionException.setValueChangeMode(ValueChangeMode.EAGER);
-//        descriptionException.setWidth("100%");
-//        descriptionException.addValueChangeListener(e-> applyFilterException(data));
-//        hr.getCell(gridExceptions.getColumnByKey("exception")).setComponent(descriptionException);
-//
-////        daysException = new TextField();
-////        daysException.setValueChangeMode(ValueChangeMode.EAGER);
-////        daysException.setWidth("100%");
-////        daysException.addValueChangeListener(e-> applyFilterException(data));
-////        hr.getCell(gridExceptions.getColumnByKey("days")).setComponent(daysException);
-//        return gridExceptions;
-//}
-
     private  Grid searchApplicant(){
         ApplicantRestTemplate rest = new ApplicantRestTemplate();
 
@@ -1310,7 +1250,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_S).setKey("number");
         gridApplicant.addColumn(Applicant::getFullName).setHeader("Nombre")
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XL).setKey("name");
-        gridApplicant.addColumn(Applicant::getIdCardComplet).setHeader("Carnet")
+        gridApplicant.addColumn(Applicant::getIdCardComplement).setHeader("Carnet")
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_M).setKey("idcard");
         gridApplicant.addColumn(new ComponentRenderer<>(this::createSelectApplicant)).setWidth(UIUtils.COLUMN_WIDTH_M);
         HeaderRow hr = gridApplicant.appendHeaderRow();
@@ -1489,7 +1429,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getFullName(),txtNameFilter.getValue()));
         }
         if(!txtIdCardFilter.getValue().trim().equals("")){
-            dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getIdCardComplet(),txtIdCardFilter.getValue()));
+            dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getIdCardComplement(),txtIdCardFilter.getValue()));
         }
     }
 
@@ -1564,8 +1504,11 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         ComboBox<String> comboBox1 = new ComboBox();
         comboBox1.setWidth("100%");
         comboBox1.setRequired(true);
-        comboBox1.setItems("PADRE","MADRE","HIJO(A)","TIO(A)","ABUELO(A)","NIETO(A)","HERMANO(A)");
-
+        if(linkUp.getTypeLinkUp().equals(TypeLinkUp.REFERENCIA_PERSONAL)) {
+            comboBox1.setItems(getValueParameter("REFERENCIA PERSONAL"));
+        }else if (linkUp.getTypeLinkUp().equals(TypeLinkUp.VINCULACION_ECONOMICA)){
+            comboBox1.setItems(getValueParameter("VINCULACION ECONOMICA"));
+        }
         ComboBox<String> comboBox2 = new ComboBox();
         comboBox2.setWidth("100%");
         comboBox2.setRequired(true);
@@ -1640,13 +1583,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             if(binderRelations.writeBeanIfValid(currenRelation)){
                 ObjectMapper mapper = new ObjectMapper();
 
-//                if(current.getLinkup().equals("[]")) {
-//                    try {
-//                        linkUpList = new ArrayList<>(Arrays.asList(mapper.readValue(current.getLinkup() ,LinkUp[].class)));
-//                    } catch (IOException ex) {
-//                        ex.printStackTrace();
-//                    }
-//                }
                 if (currenRelation.getId()==null){
                     currenRelation.setId(UUID.randomUUID());
                     linkUpList.add(currenRelation);
@@ -1707,23 +1643,13 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     }
 
-    private List<String> getTypeGuarantee(){
+    private List<String> getValueParameter(String category){
         ParameterRestTemplate rest = new ParameterRestTemplate();
-        List<Parameter> parameters = rest.getParametersByCategory("TIPO GARANTIA");
-        List<String> listGuarantee = new ArrayList<>();
+        List<Parameter> parameters = rest.getParametersByCategory(category);
+        List<String> listValues = new ArrayList<>();
         for(Parameter p:parameters){
-            listGuarantee.add(p.getValue());
+            listValues.add(p.getValue());
         }
-        return listGuarantee;
-    }
-
-    private List<String> getCurrency(){
-        ParameterRestTemplate rest = new ParameterRestTemplate();
-        List<Parameter> parameters = rest.getParametersByCategory("MONEDA");
-        List<String> listCurrency = new ArrayList<>();
-        for(Parameter p: parameters){
-            listCurrency.add(p.getValue());
-        }
-        return listCurrency;
+        return listValues;
     }
 }

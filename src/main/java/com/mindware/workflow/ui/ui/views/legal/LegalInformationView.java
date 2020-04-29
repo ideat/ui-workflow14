@@ -93,32 +93,32 @@ public class LegalInformationView extends SplitViewFrame {
                 });
 
         grid.addColumn(LegalInformationCreditRequestDto::getNumberRequest)
-                .setWidth(UIUtils.COLUMN_WIDTH_S)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("# Solicitud");
         grid.addColumn(new ComponentRenderer<>(this::createNameInfo))
-                .setWidth(UIUtils.COLUMN_WIDTH_XL)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("Solicitante");
         grid.addColumn(LegalInformationCreditRequestDto::getCurrency)
-                .setWidth(UIUtils.COLUMN_WIDTH_S)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("Moneda");
         grid.addColumn(new ComponentRenderer<>(this::createAmount)).setHeader("Monto")
-                .setSortable(true).setFlexGrow(0).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setSortable(true).setFlexGrow(1).setResizable(true)
+                .setAutoWidth(true);
         grid.addColumn(LegalInformationCreditRequestDto::getCity).setHeader("Ciudad")
-                .setSortable(true).setFlexGrow(0).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_M);
+                .setSortable(true).setFlexGrow(1).setResizable(true)
+                .setAutoWidth(true);
         grid.addColumn(LegalInformationCreditRequestDto::getOfficial).setHeader("Oficial")
-                .setSortable(true).setFlexGrow(0).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_M);
+                .setSortable(true).setFlexGrow(1).setResizable(true)
+                .setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createHasGuarantee))
-                .setFlexGrow(0).setHeader("Garantia?").setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setFlexGrow(1).setHeader("Garantia?").setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createHasGuarantor))
-                .setFlexGrow(0).setHeader("Garante?").setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setFlexGrow(1).setHeader("Garante?").setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createHasPatrimonialStatement))
-                .setFlexGrow(0).setHeader("Dec. Patri?").setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setFlexGrow(1).setHeader("Dec. Patri?").setAutoWidth(true);
 
         return grid;
     }

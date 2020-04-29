@@ -5,8 +5,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.Applicant;
 import com.mindware.workflow.ui.backend.entity.CompanyData;
+import com.mindware.workflow.ui.backend.entity.config.CityProvince;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
+import com.mindware.workflow.ui.backend.entity.config.Province;
 import com.mindware.workflow.ui.backend.rest.applicant.ApplicantRestTemplate;
+import com.mindware.workflow.ui.backend.rest.cityProvince.CityProvinceRestTemplate;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
 import com.mindware.workflow.ui.backend.util.UtilValues;
@@ -19,6 +22,7 @@ import com.mindware.workflow.ui.ui.components.navigation.bar.AppBar;
 import com.mindware.workflow.ui.ui.layout.size.Horizontal;
 import com.mindware.workflow.ui.ui.layout.size.Right;
 import com.mindware.workflow.ui.ui.util.UIUtils;
+import com.mindware.workflow.ui.ui.util.css.AlignSelf;
 import com.mindware.workflow.ui.ui.util.css.FlexDirection;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
 import com.vaadin.flow.component.AttachEvent;
@@ -47,11 +51,11 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
-import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -93,6 +97,10 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
     private ComboBox<String> societyType;
 
     private List<CompanyData> companyDataList = new ArrayList<>();
+    private CityProvinceRestTemplate cityProvinceRestTemplate;
+    private CityProvince cityProvince;
+    private List<String> citiesList;
+    private List<String> provinceList;
 
     private ObjectMapper mapper = new ObjectMapper();
     @Override
@@ -108,11 +116,14 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
     public void setParameter(BeforeEvent beforeEvent, String uuid) {
 
         restTemplate = new ApplicantRestTemplate();
-
+        cityProvinceRestTemplate = new CityProvinceRestTemplate();
+        provinceList = new ArrayList<>();
+        citiesList = getAllCities();
         if (uuid.contains("NUEVO")){
             applicant = new Applicant();
             String[] typePerson = uuid.split("-");
             applicant.setTypePerson(typePerson[1]);
+
             setViewContent(createContent());
         }else {
             applicant = restTemplate.getApplicantById(UUID.fromString(uuid));
@@ -120,6 +131,8 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
                 if (applicant.getCompanyData()==null || applicant.getCompanyData().equals(""))
                     applicant.setCompanyData("[]");
                 companyDataList = mapper.readValue(applicant.getCompanyData(),new TypeReference<List<CompanyData>>(){});
+                cityProvince = cityProvinceRestTemplate.getByCity(applicant.getCity());
+                provinceList = getProvinces(cityProvince);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -197,6 +210,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         TextField firstName = new TextField();
         firstName.setWidth("100%");
         firstName.setRequired(true);
+        firstName.setRequiredIndicatorVisible(true);
 
         TextField secondName = new TextField();
         secondName.setWidth("100%");
@@ -214,8 +228,11 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         homeaddress.setWidth("100%");
         homeaddress.setRequired(true);
 
+        TextField homeaddressReference = new TextField();
+        homeaddressReference.setWidth("100%");
+
         TextField idCard = new TextField();
-        idCard.setWidth("70%");
+        idCard.setWidth("40%");
         idCard.setRequired(true);
 
 
@@ -224,8 +241,30 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         idCardExpedition.setWidth("30%");
         idCardExpedition.setRequired(true);
 
-        FlexBoxLayout layoutIdCard = new FlexBoxLayout(idCard,idCardExpedition);
+        TextField idCardComplement = new TextField();
+        idCardComplement.setWidth("30%");
+
+        ComboBox<String> typeIdCard = new ComboBox<>();
+        typeIdCard.setItems(getValueParameter("TIPO DOCUMENTO IDENTIDAD"));
+        typeIdCard.setWidth("100%");
+        typeIdCard.addValueChangeListener(event ->{
+           if(event.getValue().equals("CI")){
+               idCardComplement.setVisible(true);
+               idCardExpedition.setVisible(true);
+           }else{
+               idCardComplement.setVisible(false);
+               idCardExpedition.setVisible(false);
+               idCardComplement.setValue("");
+               idCardExpedition.setValue("");
+           }
+        });
+
+
+
+
+        FlexBoxLayout layoutIdCard = new FlexBoxLayout(idCard, idCardComplement,idCardExpedition);
         layoutIdCard.setFlexGrow(1,idCardExpedition);
+        layoutIdCard.setFlexGrow(1,idCardComplement);
         layoutIdCard.setSpacing(Right.S);
 
         DatePicker dateExpirationIdCard = new DatePicker();
@@ -304,14 +343,22 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         TextField nit = new TextField();
         nit.setWidth("100%");
 
+        ComboBox<String> province = new ComboBox<>();
+        province.setItems(provinceList);
+        province.setWidth("100%");
+
         ComboBox<String> city = new ComboBox<>();
         city.setWidth("100%");
-        city.setItems("ORURO","COCHABAMBA","SANTA CRUZ",
-                "POTOSI","TARIJA","CHUQUISACA","PANDO","LA PAZ");
+        city.setItems(citiesList);
         city.setAllowCustomValue(true);
+        city.addValueChangeListener(event ->{
+            cityProvince = cityProvinceRestTemplate.getByCity(event.getValue());
+            provinceList = getProvinces(cityProvince);
+            province.clear();
+            province.setItems(provinceList);
 
-        TextField province = new TextField();
-        province.setWidth("100%");
+
+        });
 
         TextField block = new TextField();
         block.setWidth("100%");
@@ -349,8 +396,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         office.setWidth("100%");
 
         cityCompany = new ComboBox<>();
-        cityCompany.setItems("ORURO","COCHABAMBA","SANTA CRUZ",
-                "POTOSI","TARIJA","CHUQUISACA","PANDO","LA PAZ");
+        cityCompany.setItems(citiesList);
         cityCompany.setAllowCustomValue(true);
         cityCompany.setWidth("100%");
 
@@ -404,8 +450,12 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         binder.forField(lastName).bind(Applicant::getLastName, Applicant::setLastName);
         binder.forField(motherLastName).bind(Applicant::getMotherLastName,Applicant::setMotherLastName);
         binder.forField(homeaddress).asRequired("Direccion domicilio es requerido").bind(Applicant::getHomeaddress,Applicant::setHomeaddress);
+        binder.forField(homeaddressReference).bind(Applicant::getHomeAddressReference,Applicant::setHomeAddressReference);
         binder.forField(idCard).asRequired("Carnet es requerido").bind(Applicant::getIdCard,Applicant::setIdCard);
         binder.forField(idCardExpedition).asRequired("Extension carnet es requerida").bind(Applicant::getIdCardExpedition,Applicant::setIdCardExpedition);
+        binder.forField(idCardComplement).bind(Applicant::getIdCardComplement,Applicant::setIdCardComplement);
+        binder.forField(typeIdCard).asRequired("Tipo documento identidad es requerido")
+                .bind(Applicant::getTypeIdCard,Applicant::setTypeIdCard);
         binder.forField(dateExpirationIdCard).asRequired("Fecha expiracion carnet es requerida")
                 .bind(Applicant::getDateExpirationIdCard,Applicant::setDateExpirationIdCard);
         binder.forField(civilStatus).asRequired("Estado civil es requerido").bind(Applicant::getCivilStatus,Applicant::setCivilStatus);
@@ -463,21 +513,24 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         formPersonal.addFormItem(province,"Provincia");
         formPersonal.addFormItem(block,"Manzano/UV");
         formPersonal.addFormItem(typeHome,"Tipo vivienda");
-        formPersonal.addFormItem(homeaddress,"Dir. domicilio");
+        formPersonal.addFormItem(homeaddress,"Direccion domicilio");
+        formPersonal.addFormItem(homeaddressReference,"Referencias direccion");
 //        formPersonal.addFormItem(idCard,"Nro carnet");
 //        formPersonal.addFormItem(idCardExpedition,"Extensión");
-        FormLayout.FormItem idCardItem = formPersonal.addFormItem(layoutIdCard,"Carnet identidad");
+        formPersonal.addFormItem(typeIdCard,"Tipo documento identidad");
+        FormLayout.FormItem idCardItem = formPersonal.addFormItem(layoutIdCard,"Doc. identificacion/Complemento/Expedicion");
         UIUtils.setColSpan(1,idCardItem);
+
         formPersonal.addFormItem(dateExpirationIdCard,"Expiración");
         formPersonal.addFormItem(civilStatus,"Estado civil");
-        formPersonal.addFormItem(dependentNumber,"Nro. depen");
-        formPersonal.addFormItem(birthdate,"Nacimiento");
+        formPersonal.addFormItem(dependentNumber,"Numero dependientes");
+        formPersonal.addFormItem(birthdate,"Fecha Nacimiento");
         formPersonal.addFormItem(gender,"Genero");
         formPersonal.addFormItem(profession,"Ocupación");
         formPersonal.addFormItem(nationality,"Nacionalidad");
         formPersonal.addFormItem(caedec,"CAEDEC");
         formPersonal.addFormItem(cellphone,"Celular");
-        formPersonal.addFormItem(homephone,"Telf. dom.");
+        formPersonal.addFormItem(homephone,"Telfono domicilio");
         formPersonal.addFormItem(customerFrom,"Cliente desde");
         FormLayout.FormItem numberAplicantSpouseItem = formPersonal.addFormItem(searchApplicant,"Seleccionar Conyuge");
         formPersonal.addFormItem(savingAccount,"Caja Ahorro");
@@ -495,8 +548,8 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
                         FormLayout.ResponsiveStep.LabelsPosition.TOP)
         );
 
-        formWork.addFormItem(workphone,"Telf. trabajo");
-        formWork.addFormItem(workcellphone,"Celular trab.");
+        formWork.addFormItem(workphone,"Telfefono trabajo");
+        formWork.addFormItem(workcellphone,"Celular de trabajo");
         formWork.addFormItem(workaddress,"Direccion trabajo");
         formWork.addFormItem(nameCompanyWork,"Nombre empresa");
         formWork.addFormItem(workingtime,"Antiguedad (meses)");
@@ -514,7 +567,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
                         FormLayout.ResponsiveStep.LabelsPosition.TOP)
         );
         formCompany.addFormItem(addressCompany,"Direccion");
-        formCompany.addFormItem(building,"Edif/Cond");
+        formCompany.addFormItem(building,"Edificio/Condominio");
         formCompany.addFormItem(cityCompany,"Ciudad");
         formCompany.addFormItem(provinceCompany,"Provincia");
         formCompany.addFormItem(blockCompany,"Manzano/UV");
@@ -634,7 +687,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_S).setKey("number");
         gridApplicant.addColumn(Applicant::getFullName).setHeader("Nombre")
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XL).setKey("name");
-        gridApplicant.addColumn(Applicant::getIdCardComplet).setHeader("Carnet")
+        gridApplicant.addColumn(Applicant::getIdCardComplement).setHeader("Carnet")
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_M).setKey("idcard");
         gridApplicant.addColumn(new ComponentRenderer<>(this::createSelectApplicant)).setWidth(UIUtils.COLUMN_WIDTH_M);
         HeaderRow hr = gridApplicant.appendHeaderRow();
@@ -688,7 +741,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
             dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getFullName(),txtNameFilter.getValue()));
         }
         if(!txtIdCardFilter.getValue().trim().equals("")){
-            dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getIdCardComplet(),txtIdCardFilter.getValue()));
+            dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getIdCardComplement(),txtIdCardFilter.getValue()));
         }
     }
 
@@ -717,6 +770,28 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
                 return 0.0;
             return model.doubleValue();
         }
+    }
 
+    private List<String> getAllCities(){
+
+        List<CityProvince> cityProvinceList = cityProvinceRestTemplate.getAll();
+        List<String> citiesList = new ArrayList<>();
+        for(CityProvince cityProvince:cityProvinceList){
+            citiesList.add(cityProvince.getCity());
+        }
+        return citiesList;
+    }
+
+    @SneakyThrows
+    private List<String> getProvinces(CityProvince cityProvince){
+        String provinces = cityProvince.getProvinces();
+        ObjectMapper mapper = new ObjectMapper();
+        List<Province>listProvinces = mapper.readValue(provinces, new TypeReference<List<Province>>() {});
+        provinceList.clear();
+        for(Province province:listProvinces){
+            provinceList.add(province.getName());
+        }
+
+        return provinceList;
     }
 }

@@ -19,7 +19,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -29,7 +28,6 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouterLayout;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -128,19 +126,19 @@ public class ApplicantView extends ViewFrame {
         grid.setSizeFull();
 
         grid.addColumn(new ComponentRenderer<>(this::createInfoApplicant))
-                .setHeader("Solicitante").setWidth(UIUtils.COLUMN_WIDTH_XXL)
-                .setSortable(true).setResizable(true).setFlexGrow(0);
-        grid.addColumn(Applicant::getNumberApplicant).setFlexGrow(0).setHeader("# Aplicante")
-                .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_S);
-        grid.addColumn(Applicant::getIdCardComplet).setFlexGrow(0).setHeader("Carnet")
-                .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
+                .setHeader("Solicitante").setAutoWidth(true)
+                .setSortable(true).setResizable(true).setFlexGrow(1);
+        grid.addColumn(Applicant::getNumberApplicant).setFlexGrow(1).setHeader("# Aplicante")
+                .setSortable(true).setAutoWidth(true);
+        grid.addColumn(Applicant::getFullIdCard).setFlexGrow(1).setHeader("Carnet")
+                .setSortable(true).setAutoWidth(true).setResizable(true);
         grid.addColumn(new ComponentRenderer<>(this::createInfoContact)).setHeader("Contacto")
-                .setWidth(UIUtils.COLUMN_WIDTH_L).setFlexGrow(0);
-        grid.addColumn(Applicant::getProfession).setFlexGrow(0).setSortable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_M).setHeader("Ocupacion").setSortable(true);
+                .setAutoWidth(true).setFlexGrow(1);
+        grid.addColumn(Applicant::getProfession).setFlexGrow(1).setSortable(true)
+                .setAutoWidth(true).setHeader("Ocupacion").setSortable(true);
         grid.addColumn(new LocalDateRenderer<>(Applicant::getRegisterDate, DateTimeFormatter.ofPattern("MMM dd, YYYY")))
                 .setComparator(Applicant::getRegisterDate).setFlexGrow(0).setHeader("Registro")
-                .setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true).setSortable(true);
+                .setAutoWidth(true).setResizable(true).setSortable(true);
 
         return grid;
     }

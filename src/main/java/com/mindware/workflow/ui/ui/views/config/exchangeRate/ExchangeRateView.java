@@ -216,7 +216,7 @@ public class ExchangeRateView extends SplitViewFrame {
         ComboBox<String> currency = new ComboBox<>();
         currency.setWidth("100%");
         currency.setRequiredIndicatorVisible(true);
-        currency.setItems("SUS","UFV");
+        currency.setItems(getCurrencyList());
 
         NumberField exchange = new NumberField();
         exchange.setWidth("100%");
@@ -267,5 +267,16 @@ public class ExchangeRateView extends SplitViewFrame {
         formLayout.addFormItem(state,"Estado");
         return formLayout;
 
+    }
+
+    private List<String> getCurrencyList(){
+        ParameterRestTemplate parameterRestTemplate = new ParameterRestTemplate();
+        List<Parameter> parameterList = parameterRestTemplate.getParametersByCategory("MONEDA");
+        List<String> result = new ArrayList<>();
+        for(Parameter p:parameterList){
+            result.add(p.getValue());
+        }
+
+        return result;
     }
 }

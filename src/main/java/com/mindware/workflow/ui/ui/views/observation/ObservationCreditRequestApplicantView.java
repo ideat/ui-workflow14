@@ -115,23 +115,23 @@ public class ObservationCreditRequestApplicantView extends ViewFrame {
                     return badge;
                 });
         grid.addColumn(badgeRenderer).setHeader("Estado")
-                .setWidth(UIUtils.COLUMN_WIDTH_M)
-                .setFlexGrow(0).setSortable(true).setResizable(true);
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true);
         grid.addColumn(ObservationCreditRequestApplicant::getNumberRequest)
-                .setWidth(UIUtils.COLUMN_WIDTH_S)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("# Solicitud");
         grid.addColumn(new ComponentRenderer<>(this::createNameInfo))
-                .setWidth(UIUtils.COLUMN_WIDTH_XL)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("Solicitante");
         grid.addColumn(ObservationCreditRequestApplicant::getCurrency)
-                .setWidth(UIUtils.COLUMN_WIDTH_S)
-                .setFlexGrow(0).setSortable(true).setResizable(true)
+                .setAutoWidth(true)
+                .setFlexGrow(1).setSortable(true).setResizable(true)
                 .setHeader("Moneda");
         grid.addColumn(new ComponentRenderer<>(this::createAmount)).setHeader("Monto")
-                .setSortable(true).setFlexGrow(0).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setSortable(true).setFlexGrow(1).setResizable(true)
+                .setAutoWidth(true);
         return grid;
     }
 

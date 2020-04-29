@@ -1,6 +1,7 @@
 package com.mindware.workflow.ui.ui.views.comercial.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.flowingcode.vaadin.addons.errorwindow.ErrorWindow;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.comercial.client.Client;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
@@ -22,7 +23,6 @@ import com.mindware.workflow.ui.ui.util.LumoStyles;
 import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.BoxSizing;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
-import com.mindware.workflow.ui.ui.views.ViewFrame;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
@@ -47,12 +47,9 @@ import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.codec.DecodingException;
 
-import javax.swing.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -257,8 +254,10 @@ public class ClientView extends SplitViewFrame {
                     detailsDrawer.hide();
                 } catch (JsonProcessingException ex) {
                     ex.printStackTrace();
+                    ErrorWindow w = new ErrorWindow(ex,"Error al guardar el cliente, Show Error Details detalla el Error");
 
-                    UIUtils.showNotification( ex.getOriginalMessage());
+                    w.open();
+
                 }
             }
         });
@@ -274,7 +273,7 @@ public class ClientView extends SplitViewFrame {
 
     private void showDetails(Client client){
         current = client;
-        detailsDrawerHeader.setTitle("Cliente: "+ client.getFullName());
+        detailsDrawerHeader.setTitle("Cliente: "+ (client.getFullName().contains("null")?"Nuevo":client.getFullName()));
         detailsDrawer.setContent(createDetails(client));
         detailsDrawer.show();
         binder.readBean(current);

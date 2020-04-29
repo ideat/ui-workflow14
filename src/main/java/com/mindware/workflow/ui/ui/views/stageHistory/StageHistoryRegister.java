@@ -37,6 +37,8 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -233,6 +235,9 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
                if(states.isGoForward()){
                    createGoForwardStage(stageHistory, nextState);
                }else if(states.isGoBackward()){
+                    if(stageHistory.getInitDateTime()==null && stageHistory.getUserTask()!=null) {
+                        stageHistory.setInitDateTime(Instant.now());
+                    }
                     stageHistory.setObservation(observation.getValue());
                     stageHistory.setAnswer(answer.getValue());
                     if(stageObservation.getSelectedItems().size()>0 && !observation.isEmpty()) {

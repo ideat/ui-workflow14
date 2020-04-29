@@ -92,16 +92,16 @@ public class TemplateObservationView extends SplitViewFrame {
                 .ifPresent(this::showDetails));
 
         grid.addColumn(TemplateObservation::getTask)
-                .setFlexGrow(0).setHeader("Informe").setSortable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true);
+                .setFlexGrow(1).setHeader("Informe").setSortable(true)
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(TemplateObservation::getCategory)
-                .setFlexGrow(0).setHeader("Categoria").setSortable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_XXL).setResizable(true);
+                .setFlexGrow(1).setHeader("Categoria").setSortable(true)
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(TemplateObservation::getCondition).setHeader("Condicion")
-                .setWidth(UIUtils.COLUMN_WIDTH_XL).setResizable(true);
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(TemplateObservation::getSequence)
-                .setFlexGrow(0).setHeader("Orden").setSortable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
+                .setFlexGrow(1).setHeader("Orden").setSortable(true)
+                .setAutoWidth(true).setResizable(true);
 //        grid.addColumn(TemplateRenderer.<TemplateObservation> of("[[item.requestDate]]")
 //                .withProperty("registerDate",
 //                        templateObservation -> UIUtils.formatDate(templateObservation.getRegisterDate())))

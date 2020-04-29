@@ -77,12 +77,12 @@ public class RolView extends ViewFrame implements RouterLayout {
             UI.getCurrent().navigate(RolRegister.class,e.getFirstSelectedItem().get().getId().toString());
         });
 
-        grid.addColumn(Rol::getName).setFlexGrow(0).setHeader("Nombre Rol")
-                .setSortable(true).setResizable(true).setWidth(UIUtils.COLUMN_WIDTH_M);
+        grid.addColumn(Rol::getName).setFlexGrow(1).setHeader("Nombre Rol")
+                .setSortable(true).setResizable(true).setAutoWidth(true);
         grid.addColumn(Rol::getScope).setFlexGrow(1).setHeader("Alcance")
-                .setSortable(true).setResizable(true);
+                .setSortable(true).setResizable(true).setAutoWidth(true);
         grid.addColumn(Rol::getDescription).setFlexGrow(1).setHeader("Descripcion del Rol")
-                .setResizable(true);
+                .setResizable(true).setAutoWidth(true);
 
         layout.add(btnNew,grid);
 
