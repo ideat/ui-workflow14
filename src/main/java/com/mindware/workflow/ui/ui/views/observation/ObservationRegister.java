@@ -103,25 +103,28 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
         Button btnPrint = new Button("Imprimir");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
         btnPrint.addClickListener(e ->{
-            Map<String, List<String>> paramObs = new HashMap<>();
-            List<String> origin = new ArrayList<>();
-            origin.add("Observation Analisis Crediticio");
-            List<String> path = new ArrayList<>();
-            path.add("register-observation");
+            if (observation.getId()!=null) {
+                Map<String, List<String>> paramObs = new HashMap<>();
+                List<String> origin = new ArrayList<>();
+                origin.add("Observation Analisis Crediticio");
+                List<String> path = new ArrayList<>();
+                path.add("register-observation");
 
-            List<String>  task = new ArrayList<>();
-            List<String> titleReport = new ArrayList<>();
-            titleReport.add("Observaciones " );
-            paramObs.put("number-applicant", param.get("number-applicant"));
-            paramObs.put("number-request",param.get("number-request"));
-            paramObs.put("task",param.get("task"));
-            paramObs.put("title", titleReport);
-            paramObs.put("origin",origin);
-            paramObs.put("path",path);
+                List<String> task = new ArrayList<>();
+                List<String> titleReport = new ArrayList<>();
+                titleReport.add("Observaciones ");
+                paramObs.put("number-applicant", param.get("number-applicant"));
+                paramObs.put("number-request", param.get("number-request"));
+                paramObs.put("task", param.get("task"));
+                paramObs.put("title", titleReport);
+                paramObs.put("origin", origin);
+                paramObs.put("path", path);
 
-            QueryParameters qp = new QueryParameters(paramObs);
-            UI.getCurrent().navigate("report-preview",qp);
-
+                QueryParameters qp = new QueryParameters(paramObs);
+                UI.getCurrent().navigate("report-preview", qp);
+            }else{
+                UIUtils.showNotification("Registre Observaciones");
+            }
         });
         topBar.add(btnPrint);
         Accordion accordion = new Accordion();
@@ -286,7 +289,7 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
 
                observation.setNumberRequest(Integer.parseInt(param.get("number-request").get(0)));
                observation.setTask(param.get("task").get(0));
-               observationRestTemplate.add(observation);
+               observation= observationRestTemplate.add(observation);
 
                detailsDrawerGlobal.hide();
            }

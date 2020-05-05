@@ -150,24 +150,24 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
                     return badge;
                 });
 
-        grid.addColumn(badgeRenderer).setResizable(true).setHeader("Estado").setFlexGrow(1);
+        grid.addColumn(badgeRenderer).setResizable(true).setHeader("Estado").setFlexGrow(1).setAutoWidth(true);
         grid.addColumn(StageHistoryCreditRequestDto::getNumberRequest).setFlexGrow(1)
-                .setSortable(true).setResizable(true).setHeader("Nro solicitud");
+                .setSortable(true).setResizable(true).setHeader("Nro solicitud").setAutoWidth(true);
         grid.addColumn(StageHistoryCreditRequestDto::getFullName).setFlexGrow(1)
-                .setResizable(true).setHeader("Solicitante");
+                .setResizable(true).setHeader("Solicitante").setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createAmount)).setHeader("Monto")
-                .setSortable(true).setFlexGrow(1).setResizable(true);
-        grid.addColumn(StageHistoryCreditRequestDto::getCurrency)
+                .setSortable(true).setFlexGrow(1).setResizable(true).setAutoWidth(true);
+        grid.addColumn(StageHistoryCreditRequestDto::getCurrency).setAutoWidth(true)
                 .setResizable(true).setHeader("Moneda").setTextAlign(ColumnTextAlign.CENTER);
-        grid.addColumn(StageHistoryCreditRequestDto::getTotalHoursStage).setFlexGrow(1)
+        grid.addColumn(StageHistoryCreditRequestDto::getTotalHoursStage).setFlexGrow(1).setAutoWidth(true)
                 .setSortable(true).setHeader("Total hrs Etapa").setTextAlign(ColumnTextAlign.CENTER);
         grid.addColumn(StageHistoryCreditRequestDto::getTimeToBeAssigned).setFlexGrow(1)
-                .setTextAlign(ColumnTextAlign.CENTER).setHeader("Hrs. iniciar etapa");
+                .setTextAlign(ColumnTextAlign.CENTER).setHeader("Hrs. iniciar etapa").setAutoWidth(true);
         grid.addColumn(StageHistoryCreditRequestDto::getTimeElapsed).setResizable(true).setFlexGrow(1)
-                .setSortable(true).setHeader("Hrs trab. Etapa").setTextAlign(ColumnTextAlign.CENTER);
+                .setSortable(true).setHeader("Hrs trab. Etapa").setTextAlign(ColumnTextAlign.CENTER).setAutoWidth(true);
         grid.addColumn(StageHistoryCreditRequestDto::getHoursLeft).setResizable(true).setFlexGrow(1)
-                .setSortable(true).setHeader("Hrs. restantes").setTextAlign(ColumnTextAlign.CENTER);
-        grid.addColumn(new ComponentRenderer<>(this::createButtonAssing))
+                .setSortable(true).setHeader("Hrs. restantes").setTextAlign(ColumnTextAlign.CENTER).setAutoWidth(true);
+        grid.addColumn(new ComponentRenderer<>(this::createButtonAssing)).setAutoWidth(true)
                 .setFlexGrow(1).setResizable(true);
         grid.getClassNames().add("grid-styles");
         grid.setClassNameGenerator(

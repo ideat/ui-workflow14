@@ -617,8 +617,9 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
+                detailsDrawer.hide();
             }
-            detailsDrawer.hide();
+
         });
 
        footer.addCancelListener(e -> detailsDrawer.hide());

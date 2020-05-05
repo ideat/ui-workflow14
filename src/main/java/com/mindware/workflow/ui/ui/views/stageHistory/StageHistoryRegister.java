@@ -29,7 +29,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Pre;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -37,13 +36,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.*;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Route(value = "stage-history-register", layout = MainLayout.class)
@@ -63,6 +56,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
 
     private String comesFromStage = "";
     private String initState="";
+
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String parameter) {
@@ -229,15 +223,19 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         UIUtils.setColSpan(4,answerItem);
 
         footer.addSaveListener(e ->{
-
+//            if(stageHistory.getInitDateTime()==null && stageHistory.getUserTask()!=null) {
+//                stageHistory.setInitDateTime(Instant.now());
+//            }
            if(binder.writeBeanIfValid(stageHistory)){
                States states = statesList.stream().filter(s -> s.getState().equals(nextState.getValue())).findFirst().get();
                if(states.isGoForward()){
-                   createGoForwardStage(stageHistory, nextState);
+                   if(initState.equals("OBSERVADO")){
+                       createGoForwardStageResponseObservation(stageHistory,comesFromStage);
+                   }else {
+                       createGoForwardStage(stageHistory, nextState);
+                   }
                }else if(states.isGoBackward()){
-                    if(stageHistory.getInitDateTime()==null && stageHistory.getUserTask()!=null) {
-                        stageHistory.setInitDateTime(Instant.now());
-                    }
+
                     stageHistory.setObservation(observation.getValue());
                     stageHistory.setAnswer(answer.getValue());
                     if(stageObservation.getSelectedItems().size()>0 && !observation.isEmpty()) {
@@ -262,6 +260,29 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         return detailsDrawer;
     }
 
+    private void createGoForwardStageResponseObservation(StageHistory stageHistory, String nextStage){
+        stageHistory.setFinishedDateTime(Instant.now());
+        List<StageHistory> stageHistoryList = restTemplate.getByNumberRequest(stageHistory.getNumberRequest());
+        StageHistory aux = stageHistoryList.stream()
+                .filter(f -> f.getStage().equals(nextStage))
+                .collect(Collectors.toList()).get(0);
+        restTemplate.update(stageHistory);
+        StageHistory s = createNewStageHistory(stageHistory.getComesFrom(), stageHistory.getNextState());
+        s.setNumberRequest(stageHistory.getNumberRequest());
+        s.setComesFrom(stageHistory.getStage());
+        s.setStage(nextStage);
+        s.setUserTask(aux.getUserTask());
+        s.setInitDateTime(Instant.now());
+        s.setAnswer(stageHistory.getAnswer());
+        s.setObservation(stageHistory.getObservation());
+        restTemplate.add(s);
+
+        PrepareMail.sendMailWorkflowUser(stageHistory.getUserTask(),stageHistory.getNumberRequest(),aux.getUserTask());
+        UIUtils.showNotification("Correo enviado");
+        UIUtils.showNotification("Estado concluido");
+        UI.getCurrent().navigate(StageHistoryView.class);
+    }
+
     private void createGoForwardStage(StageHistory stageHistory, ComboBox<String> nextState) {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -274,12 +295,11 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
              restTemplate.update(stageHistory);
              List<StageHistory> stageHistoryList = restTemplate.getByNumberRequest(stageHistory.getNumberRequest());
 
-
              if (verifyAllStageFinished(stageHistoryList,stageHistory.getStage(),requestStages)) {
                  List<RequestStage> nextRequestStages = getNextStage(stageHistory, requestStages);
                  String comesFrom = getAllStagesForNextStage(stageHistoryList,stageHistory.getStage(),requestStages);
                  for (RequestStage r : nextRequestStages) {
-                     StageHistory s = createStageHistory(r.getStage(),nextState.getValue());
+                     StageHistory s = createNewStageHistory(r.getStage(),nextState.getValue());
                      s.setNumberRequest(stageHistory.getNumberRequest());
                      s.setComesFrom(comesFrom);
                      restTemplate.add(s);
@@ -344,7 +364,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
             try {
                 List<States> statesList = mapper.readValue(r.getStates(), new TypeReference<List<States>>() {});
                 States states = statesList.stream().filter(st -> st.getState().equals(s.getState())).findFirst().get();
-                if(!states.isFinishState()) {
+                if(!states.isFinishState() || states.getState().equals("OBSERVADO")) {
                     finished = false;
                 }
             } catch (JsonProcessingException e) {
@@ -364,7 +384,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
     }
 
 
-    private StageHistory createStageHistory(String stage, String state){
+    private StageHistory createNewStageHistory(String stage, String state){
         StageHistory stageHistory = new StageHistory();
         stageHistory.setState(state);
         stageHistory.setStartDateTime(Instant.now());
@@ -418,7 +438,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
             StageHistory aux = stageHistoryList.stream()
                     .filter(f -> f.getStage().equals(stage))
                     .collect(Collectors.toList()).get(0);
-            StageHistory s = createStageHistory(stageHistory.getComesFrom(), stageHistory.getNextState());
+            StageHistory s = createNewStageHistory(stageHistory.getComesFrom(), stageHistory.getNextState());
             s.setNumberRequest(stageHistory.getNumberRequest());
             s.setComesFrom(stageHistory.getStage());
             s.setStage(stage);

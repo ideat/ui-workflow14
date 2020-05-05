@@ -86,7 +86,7 @@ public class UtilValues {
         public Result<Instant> convertToModel(String presentation, ValueContext valueContext) {
             DateTimeFormatter f = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss",Locale.UK);
             LocalDateTime ldt = LocalDateTime.parse(presentation,f);
-            ZoneId z = ZoneId.of("America/Argentina/Buenos_Aires");
+            ZoneId z = ZoneId.systemDefault();
             ZonedDateTime zdt = ldt.atZone( z ) ;
 
             return Result.ok(zdt.toInstant());
