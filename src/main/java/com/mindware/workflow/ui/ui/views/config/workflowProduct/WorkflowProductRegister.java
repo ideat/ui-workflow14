@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 @Route(value ="workflow-product-register",layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Registro del Flujo por Producto")
-public class WorkflowProductRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class WorkflowProductRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
     private WorkflowProductRestTemplate restTemplate;
     private ParameterRestTemplate parameterRestTemplate;
     private RolRestTemplate rolRestTemplate;

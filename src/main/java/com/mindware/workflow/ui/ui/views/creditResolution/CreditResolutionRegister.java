@@ -53,7 +53,7 @@ import java.util.*;
 @Route(value = "credit-resolution-register", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Registro Resolucion de Credito")
-public class CreditResolutionRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class CreditResolutionRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
 
     private Map<String, List<String>> param;
     private CreditResolutionRestTemplate creditResolutionRestTemplate;

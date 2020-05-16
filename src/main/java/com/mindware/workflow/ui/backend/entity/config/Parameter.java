@@ -18,6 +18,6 @@ public class Parameter {
 
     private String description;
 
-
+    private String externalCode;
 
 }

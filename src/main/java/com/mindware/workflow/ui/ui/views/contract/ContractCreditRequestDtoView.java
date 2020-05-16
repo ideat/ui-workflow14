@@ -24,10 +24,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.ParentLayout;
-import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -41,7 +38,7 @@ import java.util.Map;
 @Route(value = "contract-creditrequest", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Operaciones en fase de formalizacion y generacion de contrato")
-public class ContractCreditRequestDtoView extends SplitViewFrame {
+public class ContractCreditRequestDtoView extends SplitViewFrame implements RouterLayout {
     private Grid<ContractCreditRequestDto> grid;
     private ContractCreditRequestDtoDataProvider dataProvider;
     private List<ContractCreditRequestDto> contractCreditRequestDtoList;

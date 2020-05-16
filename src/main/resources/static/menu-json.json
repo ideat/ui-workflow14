@@ -194,5 +194,12 @@
     "name": "Ciudad-Provincias",
     "read": "false",
     "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Indicador Tamaño Empresa",
+    "read": "false",
+    "write": "false"
   }]
 

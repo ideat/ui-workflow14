@@ -39,6 +39,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 
+import com.vaadin.flow.router.RouterLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 
@@ -49,7 +50,7 @@ import java.util.Objects;
 @Route(value = "contract-variable", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Variables de contratos")
-public class ContractVariableView extends SplitViewFrame {
+public class ContractVariableView extends SplitViewFrame implements RouterLayout {
     private Grid<ContractVariable> grid;
 
     private DetailsDrawer detailsDrawer;

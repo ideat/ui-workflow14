@@ -25,7 +25,7 @@ import java.util.Map;
 
 @Route(value = "stage-hitory-timeline", layout = MainLayout.class)
 
-public class StageHistoryTimelineView extends SplitViewFrame implements HasUrlParameter<String> {
+public class StageHistoryTimelineView extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
     private StageHistoryCreditRequestDtoRestTemplate restTemplate = new StageHistoryCreditRequestDtoRestTemplate();
     private List<StageHistoryCreditRequestDto> stageHistoryCreditRequestDtoList = new ArrayList<>();
     private Map<String, List<String>> paramStage;

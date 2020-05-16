@@ -46,4 +46,21 @@ public class CreditRequestRestTemplate {
         return response.getBody();
     }
 
+    public CreditRequest getByNumberRequest(Integer numberRequest){
+        final String uri = "http://localhost:8080/rest/v1/creditrequest/getByNumberRequest/{numberRequest}";
+        Map<String,Integer> params = new HashMap<>();
+        params.put("numberRequest",numberRequest);
+
+        HttpEntity<CreditRequest> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<CreditRequest> respose = restTemplate.exchange(uri,HttpMethod.GET,entity,CreditRequest.class,params);
+        return respose.getBody();
+
+    }
+
+    public void updateCompanySizeIndicator(CreditRequest creditRequest){
+        final String uri = "http://localhost:8080/rest/v1/creditrequest/updateCompanySizeIndicator";
+
+        HttpEntity<CreditRequest> entity = new HttpEntity<>(creditRequest,HeaderJwt.getHeader());
+        restTemplate.put(uri,entity);
+    }
 }

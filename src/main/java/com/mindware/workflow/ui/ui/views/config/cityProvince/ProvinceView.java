@@ -43,7 +43,7 @@ import java.util.UUID;
 
 @Route(value = "province", layout = MainLayout.class)
 @PageTitle("Provincias")
-public class ProvinceView extends SplitViewFrame implements HasUrlParameter<String> {
+public class ProvinceView extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
     private CityProvinceRestTemplate restTemplate;
 
     private ObjectMapper mapper;

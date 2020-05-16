@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 @Route(value = "stage-history-register", layout = MainLayout.class)
 @PageTitle("Registro de etapa de la solicitud")
-public class StageHistoryRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class StageHistoryRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
 
     private Map<String, List<String>> paramStage;
     private StageHistoryRestTemplate restTemplate;

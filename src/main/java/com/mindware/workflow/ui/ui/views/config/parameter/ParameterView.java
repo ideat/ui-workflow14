@@ -38,6 +38,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
 @Route(value = "parameter", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Parametros")
-public class ParameterView extends SplitViewFrame {
+public class ParameterView extends SplitViewFrame implements RouterLayout {
 
     private Grid<Parameter> grid;
 
@@ -67,6 +68,8 @@ public class ParameterView extends SplitViewFrame {
     private ListDataProvider<Parameter> dataProvider;
 
     private ComboBox<String> cmbCategoryFilter;
+
+    private TextField externalCodeFilter;
 
     private TextField txtValueFilter;
 
@@ -136,14 +139,16 @@ public class ParameterView extends SplitViewFrame {
 
         grid.setDataProvider(dataProvider);
 
-        grid.addColumn(Parameter::getCategory).setFlexGrow(0).setFrozen(false)
+        grid.addColumn(Parameter::getCategory).setFlexGrow(1).setFrozen(false)
                 .setHeader("Categoria").setSortable(true).setKey("category").setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_XL).setTextAlign(ColumnTextAlign.START);
-        grid.addColumn(Parameter::getValue).setFlexGrow(0).setKey("value")
+                .setAutoWidth(true).setTextAlign(ColumnTextAlign.START);
+        grid.addColumn(Parameter::getValue).setFlexGrow(1).setKey("value")
                 .setHeader("Valor").setSortable(true).setFrozen(false).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_XL).setTextAlign(ColumnTextAlign.START);
-        grid.addColumn(Parameter::getDescription).setFlexGrow(0).setKey("description")
-                .setHeader("Descripcion").setWidth("400px").setResizable(true)
+                .setAutoWidth(true).setTextAlign(ColumnTextAlign.START);
+        grid.addColumn(Parameter::getExternalCode).setResizable(true).setHeader("Codigo Externo")
+                .setAutoWidth(true).setTextAlign(ColumnTextAlign.CENTER).setFlexGrow(1).setKey("externalCode");
+        grid.addColumn(Parameter::getDescription).setFlexGrow(1).setKey("description")
+                .setHeader("Descripcion").setAutoWidth(true).setResizable(true)
                 .setTextAlign(ColumnTextAlign.START);
 
         HeaderRow hr = grid.appendHeaderRow();
@@ -163,6 +168,14 @@ public class ParameterView extends SplitViewFrame {
             applyFilter(dataProvider);
         });
         hr.getCell(grid.getColumnByKey("value")).setComponent(txtValueFilter);
+
+        externalCodeFilter = new TextField();
+        externalCodeFilter.setValueChangeMode(ValueChangeMode.EAGER);
+        externalCodeFilter.setWidth("100%");
+        externalCodeFilter.addValueChangeListener(e ->{
+           applyFilter(dataProvider);
+        });
+        hr.getCell(grid.getColumnByKey("externalCode")).setComponent(externalCodeFilter);
 
         txtDescriptionFilter = new TextField();
         txtDescriptionFilter.setValueChangeMode(ValueChangeMode.EAGER);
@@ -235,10 +248,16 @@ public class ParameterView extends SplitViewFrame {
         txtDescription.setRequired(true);
         txtDescription.setWidth("100%");
 
+        TextField externalCode = new TextField();
+        externalCode.setValue(Optional.ofNullable(parameter.getExternalCode()).orElse(""));
+        externalCode.setRequired(true);
+        externalCode.setWidth("100%");
+
         binder = new BeanValidationBinder<>(Parameter.class);
         binder.forField(cmbCategory).asRequired("Categoria es requerida").bind(Parameter::getCategory,Parameter::setCategory);
         binder.forField(txtValue).asRequired("Valor es requerido").bind(Parameter::getValue,Parameter::setValue);
         binder.forField(txtDescription).asRequired("Descripcion es requerida").bind(Parameter::getDescription,Parameter::setDescription);
+        binder.forField(externalCode).bind(Parameter::getExternalCode,Parameter::setExternalCode);
 
         binder.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
@@ -256,6 +275,7 @@ public class ParameterView extends SplitViewFrame {
                         FormLayout.ResponsiveStep.LabelsPosition.TOP));
         form.addFormItem(cmbCategory,"Categoria");
         form.addFormItem(txtValue,"Valor");
+        form.addFormItem(externalCode,"Codigo externo");
         FormLayout.FormItem descriptionItem = form.addFormItem(txtDescription,"Descripcion");
         UIUtils.setColSpan(2,descriptionItem);
         return form;
@@ -274,6 +294,9 @@ public class ParameterView extends SplitViewFrame {
         if(!txtDescriptionFilter.getValue().trim().equals("")){
 //            dataProvider.addFilter(parameter -> Objects.equals(txtDescriptionFilter.getValue(),parameter.getDescription()));
             dataProvider.addFilter(parameter -> StringUtils.containsIgnoreCase(parameter.getDescription(),txtDescriptionFilter.getValue()));
+        }
+        if(externalCodeFilter.getValue().trim().equals("")){
+            dataProvider.addFilter(parameter -> StringUtils.containsIgnoreCase(parameter.getExternalCode(),externalCodeFilter.getValue()));
         }
 
     }

@@ -33,7 +33,7 @@ import java.util.Map;
 @Route(value = "observacionCreditoApplicant", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Solicitudes de credito - Observaciones")
-public class ObservationCreditRequestApplicantView extends ViewFrame {
+public class ObservationCreditRequestApplicantView extends ViewFrame implements RouterLayout{
     private Grid<ObservationCreditRequestApplicant> grid;
     private ObservationCreditRequestApplicantDataProvider dataProvider;
     private List<ObservationCreditRequestApplicant> observationCreditRequestApplicantList;

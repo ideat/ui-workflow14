@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 @Route(value = "patrimonial-statement", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Declaracion Patrimonial")
-public class PatrimonialStatementView extends SplitViewFrame implements HasUrlParameter<String> {
+public class PatrimonialStatementView extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
 
     private TemplateFormRestTemplate templateFormRestTemplate;
 

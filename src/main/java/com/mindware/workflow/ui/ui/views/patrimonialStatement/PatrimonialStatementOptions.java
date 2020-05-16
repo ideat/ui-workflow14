@@ -44,7 +44,7 @@ import java.util.*;
 @Route(value = "patrimonial-statement-options", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Opciones Registro Declaracion Patrimonial")
-public class PatrimonialStatementOptions extends SplitViewFrame implements HasUrlParameter<String> {
+public class PatrimonialStatementOptions extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
 
     private PatrimonialStatementRestTemplate patrimonialStatementRestTemplate;
     private CreditRequestApplicant creditRequestApplicant;

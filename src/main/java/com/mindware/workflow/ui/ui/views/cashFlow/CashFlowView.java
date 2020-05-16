@@ -31,7 +31,7 @@ import java.util.Map;
 @Route(value = "cashFlowCreditRequestApplicantView", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Lista de solicitudes relacionadas a flujos de caja")
-public class CashFlowView extends SplitViewFrame  {
+public class CashFlowView extends SplitViewFrame implements RouterLayout  {
     private Grid<CashFlowCreditRequestApplicantDto> grid;
     private CashFlowCreditRequestApplicantDtoDataProvider dataProvider;
     private List<CashFlowCreditRequestApplicantDto> cashFlowCreditRequestApplicantDtoList;

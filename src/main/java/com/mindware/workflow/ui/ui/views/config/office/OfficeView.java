@@ -44,6 +44,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
 @Route(value="oficinas", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Oficinas")
-public class OfficeView extends SplitViewFrame {
+public class OfficeView extends SplitViewFrame implements RouterLayout {
 
     private Grid<Office> grid;
     private Grid<Signatories> gridSignatories;

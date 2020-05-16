@@ -48,7 +48,7 @@ import java.util.Map;
 @Route(value = "contract-register", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Registro de contrato a una solicitud")
-public class ContractRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class ContractRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
 
     private Map<String, List<String>> param;
     private ContractRestTemplate restTemplate;

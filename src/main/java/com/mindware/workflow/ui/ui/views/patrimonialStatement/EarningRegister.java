@@ -56,7 +56,7 @@ import java.util.stream.Stream;
 
 @Route(value = "earning", layout = MainLayout.class)
 @PageTitle("Ingresos")
-public class EarningRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class EarningRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
 
     private Grid<SalesHistory> gridSalesHistory;
     private Grid<SalesProjection> gridProjectionSales;

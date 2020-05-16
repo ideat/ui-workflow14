@@ -27,6 +27,7 @@ import com.mindware.workflow.ui.ui.views.contract.ContractCreditRequestDtoView;
 import com.mindware.workflow.ui.ui.views.contract.ContractVariableView;
 import com.mindware.workflow.ui.ui.views.contract.TemplateContractView;
 import com.mindware.workflow.ui.ui.views.creditRequest.CreditRequestView;
+import com.mindware.workflow.ui.ui.views.creditRequestCompanySizeIndicator.CreditRequestCompanySizeIndicatorView;
 import com.mindware.workflow.ui.ui.views.creditResolution.CreditResolutionCreditRequestDtoView;
 import com.mindware.workflow.ui.ui.views.legal.LegalInformationView;
 import com.mindware.workflow.ui.ui.views.observation.ObservationCreditRequestApplicantView;
@@ -234,6 +235,10 @@ public class MainLayout extends FlexBoxLayout
 		if(assignedOption("Declaracion Patrimonial")) {
 			menu.addNaviItem(VaadinIcon.COIN_PILES, "Declaracion Patrimonial", CreditPatrimonialStatement.class);
 		}
+		if(assignedOption("Indicador Tamaño Empresa")) {
+			menu.addNaviItem(VaadinIcon.COIN_PILES, "Indicador Tamaño Empresa", CreditRequestCompanySizeIndicatorView.class);
+		}
+
 		if(assignedOption("Flujo de Caja")) {
 			menu.addNaviItem(VaadinIcon.MONEY, "Flujo de Caja", CashFlowView.class);
 		}
@@ -271,6 +276,7 @@ public class MainLayout extends FlexBoxLayout
 		if(assignedOption("Autorizar Excepciones")){
 			menu.addNaviItem(VaadinIcon.SPECIALIST, "Autorizar Excepciones", AuthorizerExceptionsCreditRequestDtoView.class);
 		}
+
 
 		if(assignedOption("Oficinas") || assignedOption("Responsables")
 				|| assignedOption("Parametros") || assignedOption("Plantillas")

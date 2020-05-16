@@ -36,6 +36,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ import java.util.List;
 @Route(value = "templateObservation", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Plantillas de Observaciones")
-public class TemplateObservationView extends SplitViewFrame {
+public class TemplateObservationView extends SplitViewFrame implements RouterLayout {
     private Grid<TemplateObservation> grid;
     private DetailsDrawer detailsDrawer;
     private DetailsDrawerHeader detailsDrawerHeader;

@@ -23,10 +23,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.ParentLayout;
-import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.util.ArrayList;
@@ -37,7 +34,7 @@ import java.util.Map;
 @Route(value = "userAuthorizerView", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Usuarios Autorizadores")
-public class UserAuthorizerView extends SplitViewFrame {
+public class UserAuthorizerView extends SplitViewFrame implements RouterLayout {
 
     private Grid<UserAuthorizer> grid;
     private UserAuthorizerDataProvider dataProvider;

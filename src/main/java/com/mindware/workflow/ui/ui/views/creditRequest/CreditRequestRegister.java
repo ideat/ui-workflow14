@@ -7,10 +7,7 @@ import com.mindware.workflow.ui.backend.entity.CreditRequestApplicant;
 import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
-import com.mindware.workflow.ui.backend.entity.creditRequest.Charge;
-import com.mindware.workflow.ui.backend.entity.creditRequest.CreditRequest;
-import com.mindware.workflow.ui.backend.entity.creditRequest.LinkUp;
-import com.mindware.workflow.ui.backend.entity.creditRequest.PaymentPlan;
+import com.mindware.workflow.ui.backend.entity.creditRequest.*;
 import com.mindware.workflow.ui.backend.entity.dto.CreditRequestApplicantDto;
 import com.mindware.workflow.ui.backend.entity.exceptions.*;
 import com.mindware.workflow.ui.backend.entity.stageHistory.StageHistory;
@@ -129,7 +126,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private ListDataProvider<Charge> dataCharge;
     private Grid<CreditRequestApplicantDto> gridCodebtorGuarantor;
     private Grid<ExceptionsCreditRequestDto> gridExceptionsCreditRequestDto;
-    private Grid<Exceptions> gridExceptions;
 
     private DetailsDrawer detailsDrawer;
     private DetailsDrawerHeader detailsDrawerHeader;
@@ -140,6 +136,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private FlexBoxLayout contentPaymentPlan;
     private FlexBoxLayout contentCodebtor;
     private FlexBoxLayout contentExceptionsCreditRequest;
+
 
     private List<String> listTabs = new ArrayList<>();
 
@@ -255,8 +252,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     }
 
-
-
     private AppBar initAppBar(){
         MainLayout.get().getAppBar().reset();
         AppBar appBar = MainLayout.get().getAppBar();
@@ -357,10 +352,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         appBar.getContextIcon().addClickListener( e -> UI.getCurrent().navigate(CreditRequestView.class));
         return appBar;
     }
-
-
-
-
 
     private Component createContent(DetailsDrawer component){
         FlexBoxLayout content = new FlexBoxLayout(component);

@@ -39,6 +39,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
@@ -49,7 +50,7 @@ import java.util.UUID;
 @Route(value = "template-contract", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Plantillas de Contratos")
-public class TemplateContractView extends SplitViewFrame {
+public class TemplateContractView extends SplitViewFrame implements RouterLayout {
 
     @Value("${temp_file}")
     private String tempFile;

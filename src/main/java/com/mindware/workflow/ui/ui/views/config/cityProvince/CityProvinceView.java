@@ -34,10 +34,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.ParentLayout;
-import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +44,7 @@ import java.util.Map;
 @Route(value = "cityProvince", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Ciudades")
-public class CityProvinceView extends SplitViewFrame {
+public class CityProvinceView extends SplitViewFrame implements RouterLayout {
     private Grid<CityProvince> grid;
     private ListDataProvider<CityProvince> dataProvider;
 

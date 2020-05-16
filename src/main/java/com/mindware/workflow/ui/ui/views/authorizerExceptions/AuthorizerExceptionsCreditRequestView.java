@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 @Route(value = "authorizer-exceptions-creditrequest", layout = MainLayout.class)
 @PageTitle("Lista excepciones de la solicitud")
-public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implements HasUrlParameter<String> {
+public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
 
     private Map<String, List<String>> params;
 

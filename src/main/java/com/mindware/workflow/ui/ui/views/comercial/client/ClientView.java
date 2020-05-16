@@ -45,6 +45,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinSession;
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,7 +57,7 @@ import java.util.Objects;
 @Route(value = "client", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Clientes para mercadeo")
-public class ClientView extends SplitViewFrame {
+public class ClientView extends SplitViewFrame implements RouterLayout {
 
     private Grid<Client> grid;
     private DetailsDrawer detailsDrawer;

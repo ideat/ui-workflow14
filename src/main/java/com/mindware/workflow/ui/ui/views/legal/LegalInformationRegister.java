@@ -49,7 +49,7 @@ import java.util.*;
 @Route(value = "register-legal-information", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Registro Informe Legal")
-public class LegalInformationRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class LegalInformationRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
     private Map<String, List<String>> param;
     private LegalInformationRestTemplate legalInformationRestTemplate;
 

@@ -28,6 +28,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinSession;
 import de.nils_bauer.PureTimeline;
 import de.nils_bauer.PureTimelineItem;
@@ -43,7 +44,7 @@ import java.util.Locale;
 @Route(value = "historyGlobal", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Listado global de workflow")
-public class StageHistoryGlobalView extends SplitViewFrame {
+public class StageHistoryGlobalView extends SplitViewFrame implements RouterLayout {
 
     private StageHistoryCreditRequestDataProvider dataProvider;
     private StageHistoryCreditRequestDtoRestTemplate restTemplate = new StageHistoryCreditRequestDtoRestTemplate();

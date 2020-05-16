@@ -28,10 +28,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.ParentLayout;
-import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.util.*;
@@ -39,7 +36,7 @@ import java.util.*;
 @Route(value = "authorizer-exception", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Solicitudes con excepciones")
-public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame {
+public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame implements RouterLayout {
 
     private Grid<AuthorizerExceptionsCreditRequestDto> grid;
     private AuthorizerExceptionsCreditRequestDtoDataProvider dataProvider;

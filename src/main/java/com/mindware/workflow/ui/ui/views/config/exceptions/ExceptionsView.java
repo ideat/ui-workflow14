@@ -31,6 +31,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ import java.util.List;
 @Route(value = "exceptionsView", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Lista de solicitudes para registrar excepciones")
-public class ExceptionsView extends ViewFrame {
+public class ExceptionsView extends ViewFrame implements RouterLayout {
     private ExceptionsDataProvider dataProvider;
 
     private List<Exceptions> exceptionsList;

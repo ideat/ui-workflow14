@@ -2,6 +2,7 @@ package com.mindware.workflow.ui.ui.views.report;
 
 import com.mindware.workflow.ui.backend.rest.applicantStatement.ApplicantStatementRestTemplate;
 import com.mindware.workflow.ui.backend.rest.cashFlow.CashFlowCreditRequestReportRestTemplate;
+import com.mindware.workflow.ui.backend.rest.creditRequestCompanySizeIndicatorDto.CreditRequestCompanySizeIndicatorDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.creditResolution.CreditResolutionRestTemplate;
 import com.mindware.workflow.ui.backend.rest.exceptions.AuthorizationExceptionReportDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.legal.LegalInformationReportDtoRestTemplate;
@@ -205,6 +206,10 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             file = restTemplate.report(param.get("number-request").get(0));
             previousPage = param.get("path").get(0);
 
+        }else if(param.get("origin").get(0).equals("creditrequest-company-size-indicator")){
+            CreditRequestCompanySizeIndicatorDtoRestTemplate restTemplate = new CreditRequestCompanySizeIndicatorDtoRestTemplate();
+            file = restTemplate.report(param.get("number-request").get(0));
+            previousPage = param.get("path").get(0);
         }
 
         qp = new QueryParameters(paramPrev);

@@ -42,6 +42,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.NativeButtonRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 
 import java.io.IOException;
 import java.util.*;
@@ -49,7 +50,7 @@ import java.util.stream.Collectors;
 
 @Route(value = "signatorie", layout = MainLayout.class)
 @PageTitle("Responsables Oficinas")
-public class SignatorieView extends SplitViewFrame {
+public class SignatorieView extends SplitViewFrame  {
 
     private Grid<Office> grid;
     private Grid<Signatories> gridSignatories;

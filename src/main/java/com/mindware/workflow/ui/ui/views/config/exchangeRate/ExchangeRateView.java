@@ -42,6 +42,7 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
@@ -55,7 +56,7 @@ import java.util.Optional;
 @Route(value = "exchange-rate", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Tipo de cambio")
-public class ExchangeRateView extends SplitViewFrame {
+public class ExchangeRateView extends SplitViewFrame implements RouterLayout {
 
     private Grid<ExchangeRate> grid;
     private DetailsDrawer detailsDrawer;

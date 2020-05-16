@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Route(value = "exceptions-register", layout = MainLayout.class)
 @PageTitle("Registro Excepciones")
-public class ExceptionsRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class ExceptionsRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout{
     private Exceptions exceptions;
     private BeanValidationBinder<Exceptions> binder;
     private List<Exceptions> exceptionsList = new ArrayList<>();

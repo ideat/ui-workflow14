@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 @Route(value = "register-observation", layout = MainLayout.class)
 @PageTitle("Observaciones")
-public class ObservationRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class ObservationRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
     private ListDataProvider<TemplateObservation> templateObservationListDataProvider;
     private List<TemplateObservation> templateObservationList = new ArrayList<>();
     private Map<String,List<String>> param = new HashMap<>();

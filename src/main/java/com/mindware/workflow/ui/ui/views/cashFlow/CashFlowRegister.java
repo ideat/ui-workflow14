@@ -39,7 +39,7 @@ import java.util.*;
 @Route(value = "register-cashflow",layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Registro Flujo de Caja")
-public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<String> {
+public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<String>, RouterLayout {
     private Map<String, List<String>> param;
     private PaymentPlanRestTemplate paymentPlanRestTemplate = new PaymentPlanRestTemplate();
     private PatrimonialStatementRestTemplate patrimonialStatementRestTemplate = new PatrimonialStatementRestTemplate();

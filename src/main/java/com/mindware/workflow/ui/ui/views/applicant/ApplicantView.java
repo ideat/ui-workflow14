@@ -28,6 +28,7 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import java.util.List;
 @Route(value = "applicant", layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle("Aplicante")
-public class ApplicantView extends ViewFrame {
+public class ApplicantView extends ViewFrame implements RouterLayout {
     private Grid<Applicant> grid;
 
     private ApplicantDataProvider dataProvider;
