@@ -13,16 +13,15 @@ import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawer;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawerFooter;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawerHeader;
+import com.mindware.workflow.ui.ui.components.navigation.bar.AppBar;
 import com.mindware.workflow.ui.ui.layout.size.Horizontal;
 import com.mindware.workflow.ui.ui.layout.size.Top;
 import com.mindware.workflow.ui.ui.util.LumoStyles;
 import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.BoxSizing;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
+import com.mindware.workflow.ui.ui.views.config.workflowProduct.WorflowProductView;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -84,12 +83,22 @@ public class ProvinceView extends SplitViewFrame implements HasUrlParameter<Stri
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         dataProvider = new ListDataProvider<>(provinceList);
-
+        AppBar appBar = initBar();
+        appBar.setTitle(param.get("city").get(0));
         setViewHeader(createTopBar());
         setViewContent(createContent());
         setViewDetails(createDetailsDrawer());
     }
 
+    private AppBar initBar(){
+        AppBar appBar = MainLayout.get().getAppBar();
+        appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
+        appBar.getContextIcon().addClickListener(e->{
+            UI.getCurrent().navigate(CityProvinceView.class);
+        });
+
+        return appBar;
+    }
 
     private HorizontalLayout createTopBar(){
         btnNew = new Button("Nueva Provincia");

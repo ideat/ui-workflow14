@@ -267,12 +267,14 @@ public class MainLayout extends FlexBoxLayout
 				menu.addNaviItem(legal,"Variables de Contratos", ContractVariableView.class);
 			}
 		}
-		if(assignedOption("Bandeja Seguimiento")) {
-			menu.addNaviItem(VaadinIcon.OUTBOX, "Bandeja Seguimiento", StageHistoryGlobalView.class);
-		}
 		if(assignedOption("Bandeja Pendientes")) {
 			menu.addNaviItem(VaadinIcon.INBOX, "Bandeja Pendientes", StageHistoryView.class);
 		}
+
+		if(assignedOption("Bandeja Seguimiento")) {
+			menu.addNaviItem(VaadinIcon.OUTBOX, "Bandeja Seguimiento", StageHistoryGlobalView.class);
+		}
+
 		if(assignedOption("Autorizar Excepciones")){
 			menu.addNaviItem(VaadinIcon.SPECIALIST, "Autorizar Excepciones", AuthorizerExceptionsCreditRequestDtoView.class);
 		}

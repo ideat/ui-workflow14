@@ -3,6 +3,7 @@ package com.mindware.workflow.ui.ui.views.legal;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flowingcode.vaadin.addons.errorwindow.ErrorWindow;
 import com.mindware.workflow.ui.backend.entity.legal.*;
 import com.mindware.workflow.ui.backend.rest.legal.LegalInformationRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
@@ -191,11 +192,21 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
                         legalInformation.setCreationDate(LocalDate.now());
                         legalInformation.setCreatedBy(VaadinSession.getCurrent().getAttribute("login").toString());
                     }
+                    try {
+                        legalInformationRestTemplate.add(legalInformation);
+                        UIUtils.showNotification("Informe Legal Registrado");
+                        UI.getCurrent().navigate(LegalInformationView.class);
+                    }catch (Exception ex){
+                        ErrorWindow w = new ErrorWindow(ex,
+                                "Error al guardar el informe legal, Show Error Details detalla el Error");
+                        w.open();
+                    }
 
-                    legalInformationRestTemplate.add(legalInformation);
-                    UIUtils.showNotification("Informe Legal Registrado");
-                    UI.getCurrent().navigate(LegalInformationView.class);
+                }else{
+                    UIUtils.showNotification("Datos incompletos, Registre informacion de los propietarios");
                 }
+            }else{
+                UIUtils.showNotification("Datos incompletos, registre los DOCUMENTOS PRESENTADOS");
             }
 
         });
@@ -585,9 +596,9 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
         grid.setWidthFull();
         grid.setHeight("400px");
 
-        grid.addColumn(Owners::getFullName).setFlexGrow(0).setHeader("Propietario").setWidth(UIUtils.COLUMN_WIDTH_L);
-        grid.addColumn(Owners::getIdCardComplete).setFlexGrow(0).setHeader("C.I.").setWidth(UIUtils.COLUMN_WIDTH_S);
-        grid.addColumn(Owners::getMaritalStatus).setFlexGrow(0).setHeader("Estado Civil").setWidth(UIUtils.COLUMN_WIDTH_M);
+        grid.addColumn(Owners::getFullName).setFlexGrow(1).setHeader("Propietario").setAutoWidth(true);
+        grid.addColumn(Owners::getIdCardComplete).setFlexGrow(1).setHeader("C.I.").setAutoWidth(true);
+        grid.addColumn(Owners::getMaritalStatus).setFlexGrow(1).setHeader("Estado Civil").setAutoWidth(true);
 
         grid.addSelectionListener(e -> {
            if(e.getFirstSelectedItem().isPresent()) {

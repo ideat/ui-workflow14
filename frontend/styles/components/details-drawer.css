@@ -51,11 +51,11 @@
 
 @media(min-width: 720px) {
   .details-drawer[position="bottom"] {
-    height: 400px;
+    height: 500px;
   }
 
   .details-drawer:not([open])[position="bottom"] {
-    margin-bottom: -400px;
+    margin-bottom: -500px;
   }
 
   .details-drawer[position="right"] {

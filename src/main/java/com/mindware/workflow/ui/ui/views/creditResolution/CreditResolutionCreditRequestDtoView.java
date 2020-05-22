@@ -60,9 +60,14 @@ public class CreditResolutionCreditRequestDtoView extends SplitViewFrame impleme
     private void getListCreditResolutionCreditRequest(){
         String rol = VaadinSession.getCurrent().getAttribute("rol").toString();
         String login = VaadinSession.getCurrent().getAttribute("login").toString();
+        String rolScope = VaadinSession.getCurrent().getAttribute("scope-rol").toString();
+        String city = VaadinSession.getCurrent().getAttribute("city").toString();
         if(rol.equals("OFICIAL")){
             creditResolutionCreditRequestDtoList = new ArrayList<>(restTemplate.getByLogin(login));
-        }else {
+        }if(rolScope.equals("LOCAL")) {
+            creditResolutionCreditRequestDtoList = new ArrayList<>(restTemplate.getByCity(city));
+        }
+        else {
             creditResolutionCreditRequestDtoList = new ArrayList<>(restTemplate.getAll());
         }
         dataProvider = new CreditResolutionCreditRequestDataProvider(creditResolutionCreditRequestDtoList);

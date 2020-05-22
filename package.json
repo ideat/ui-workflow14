@@ -7,15 +7,33 @@
     "@vaadin/flow-deps": "./target/frontend"
   },
   "devDependencies": {
+    "compression-webpack-plugin": "3.0.1",
+    "copy-webpack-plugin": "5.1.0",
+    "raw-loader": "3.0.0",
+    "terser": "4.6.7",
     "webpack": "4.42.0",
+    "webpack-babel-multi-target-plugin": "2.3.3",
     "webpack-cli": "3.3.10",
     "webpack-dev-server": "3.9.0",
-    "webpack-babel-multi-target-plugin": "2.3.3",
-    "copy-webpack-plugin": "5.1.0",
-    "webpack-merge": "4.2.2",
-    "raw-loader": "3.0.0",
-    "compression-webpack-plugin": "3.0.1",
-    "terser": "4.6.7"
+    "webpack-merge": "4.2.2"
   },
-  "vaadinAppPackageHash": "416b8bf0bdd262831c8bf25a694cf51b9b23ea64e2e64a16c4794f0f9b5f941a"
+  "vaadinAppPackageHash": "563782bf5e2772645fe6f62c3c39ba3c13904cd19d098cc610946073b5245d75",
+  "vaadin": {
+    "dependencies": {
+      "@polymer/polymer": "3.2.0",
+      "@webcomponents/webcomponentsjs": "^2.2.10"
+    },
+    "devDependencies": {
+      "webpack-babel-multi-target-plugin": "2.3.3",
+      "copy-webpack-plugin": "5.1.1",
+      "compression-webpack-plugin": "3.1.0",
+      "raw-loader": "3.1.0",
+      "webpack-cli": "3.3.11",
+      "webpack": "4.42.0",
+      "terser": "4.6.7",
+      "webpack-merge": "4.2.2",
+      "webpack-dev-server": "3.10.3"
+    },
+    "hash": ""
+  }
 }

@@ -129,14 +129,16 @@ public class CityProvinceView extends SplitViewFrame implements RouterLayout {
             ObjectMapper mapper = new ObjectMapper();
             Map<String,List<String>> param = new HashMap<>();
             List<String> provinces = new ArrayList<>();
+            List<String> city = new ArrayList<>();
             try {
                 String jsonCityProvince = mapper.writeValueAsString(cityProvince);
                 provinces.add(jsonCityProvince);
             } catch (JsonProcessingException jsonProcessingException) {
                 jsonProcessingException.printStackTrace();
             }
-
+            city.add(cityProvince.getCity());
             param.put("city-provinces",provinces);
+            param.put("city",city);
 
             QueryParameters qp = new QueryParameters(param);
 

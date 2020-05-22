@@ -205,9 +205,9 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
         grid.addColumn(TemplateObservation::getCondition).setResizable(true)
                 .setWidth(UIUtils.COLUMN_WIDTH_L).setHeader("Condicion").setSortable(true);
         grid.addColumn(TemplateObservation::getObservation).setResizable(true)
-                .setWidth(UIUtils.COLUMN_WIDTH_L).setHeader("Observacion");
-        grid.addColumn(TemplateObservation::getAnswer).setHeader("Respuesta")
-                .setWidth(UIUtils.COLUMN_WIDTH_L).setResizable(true);
+                .setWidth(UIUtils.COLUMN_WIDTH_L).setHeader("Observacion").setAutoWidth(true);
+//        grid.addColumn(TemplateObservation::getAnswer).setHeader("Respuesta") //TODO consultar si se tendra la respuesta
+//                .setWidth(UIUtils.COLUMN_WIDTH_L).setResizable(true);
 
         return grid;
 

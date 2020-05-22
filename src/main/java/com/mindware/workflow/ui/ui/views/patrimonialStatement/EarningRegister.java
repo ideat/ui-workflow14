@@ -114,6 +114,9 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
     private List<String> itemsCostProducts;
     private ComboBox<String> cmbProduct;
     private NumberField txtPriceSaleProduct;
+    private Grid<ProductionSalesInventory> gridRawMaterial;
+    private Grid<ProductionSalesInventory> gridProcess;
+    private Grid<ProductionSalesInventory> gridFinished;
 
     @Override
     protected void onAttach(AttachEvent attachEvent){
@@ -451,11 +454,11 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         accordion.setWidthFull();
         accordion.setSizeFull();
 
-        Grid<ProductionSalesInventory> gridRawMaterial = createGridProductionInventory("insumo");
+        gridRawMaterial = createGridProductionInventory("insumo");
         gridRawMaterial.setHeight("300px");
-        Grid<ProductionSalesInventory> gridProcess = createGridProductionInventory("proceso");
+        gridProcess = createGridProductionInventory("proceso");
         gridProcess.setHeight("300px");
-        Grid<ProductionSalesInventory> gridFinished = createGridProductionInventory("terminado");
+        gridFinished = createGridProductionInventory("terminado");
         gridFinished.setHeight("300px");
 
         gridRawMaterial.addSelectionListener(e ->{
@@ -467,13 +470,17 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         });
 
         gridProcess.addSelectionListener(e ->{
-           e.getFirstSelectedItem().ifPresent(this::showProductSalesInventory);
-           binderProductSalesInventory.readBean(e.getFirstSelectedItem().get());
+            if(!e.getFirstSelectedItem().equals(Optional.empty())) {
+                e.getFirstSelectedItem().ifPresent(this::showProductSalesInventory);
+                binderProductSalesInventory.readBean(e.getFirstSelectedItem().get());
+            }
         });
 
         gridFinished.addSelectionListener(e -> {
-           e.getFirstSelectedItem().ifPresent(this::showProductSalesInventory);
-           binderProductSalesInventory.readBean(e.getFirstSelectedItem().get());
+            if(!e.getFirstSelectedItem().equals(Optional.empty())) {
+                e.getFirstSelectedItem().ifPresent(this::showProductSalesInventory);
+                binderProductSalesInventory.readBean(e.getFirstSelectedItem().get());
+            }
         });
 
 
@@ -703,6 +710,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
                }
                productionSalesInventoryList.removeIf(value -> value.getId().equals(productionSalesInventory.getId()));
                productionSalesInventoryList.add(productionSalesInventory);
+
                productionSalesInventoryDataProvider.refreshAll();
                ObjectMapper mapper = new ObjectMapper();
                try {
@@ -1156,16 +1164,16 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         button.setIcon(VaadinIcon.TRASH.create());
         button.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
         button.addClickListener(e ->{
-            if(p.getClass().getName().equals("com.mindware.workflow.backend.entity.patrimonialStatement.ProductSalesBuys")) {
+            if(p.getClass().getName().equals("com.mindware.workflow.ui.backend.entity.patrimonialStatement.ProductSalesBuys")) {
                 productSalesBuysList.removeIf(productSalesBuys1 -> productSalesBuys1.equals(p));
                 productSalesBuysListProvider.refreshAll();
-            }else if(p.getClass().getName().equals("com.mindware.workflow.backend.entity.patrimonialStatement.OperativeExpenses")){
+            }else if(p.getClass().getName().equals("com.mindware.workflow.ui.backend.entity.patrimonialStatement.OperativeExpenses")){
                 operativeExpensesList.removeIf(operativeExpenses -> operativeExpenses.equals(p));
                 operativeExpensesListProvider.refreshAll();
-            }else if(p.getClass().getName().equals("com.mindware.workflow.backend.entity.patrimonialStatement.CostProduct")){
+            }else if(p.getClass().getName().equals("com.mindware.workflow.ui.backend.entity.patrimonialStatement.CostProduct")){
                 costProductList.removeIf(costProduct -> costProduct.equals(p));
                 costProductListProvider.refreshAll();
-            }else if(p.getClass().getName().equals("com.mindware.workflow.backend.entity.patrimonialStatement.ProductionSalesInventory")){
+            }else if(p.getClass().getName().equals("com.mindware.workflow.ui.backend.entity.patrimonialStatement.ProductionSalesInventory")){
                 productionSalesInventoryList.removeIf(productionSalesInventory -> productionSalesInventory.equals(p));
                 productionSalesInventoryDataProvider.refreshAll();
                 ObjectMapper mapper = new ObjectMapper();
