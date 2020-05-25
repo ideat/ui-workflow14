@@ -231,7 +231,7 @@ public class ContractRegister extends SplitViewFrame implements HasUrlParameter<
         });
 
         footer.addCancelListener(e ->{
-
+            UI.getCurrent().navigate(ContractCreditRequestDtoView.class);
         });
 
         DetailsDrawer detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
@@ -245,7 +245,7 @@ public class ContractRegister extends SplitViewFrame implements HasUrlParameter<
 
     private void showSearch(){
 
-        detailsDrawerHeader.setTitle("Seleccionar Conyuge");
+        detailsDrawerHeader.setTitle("Seleccionar Contrato");
         detailsDrawer.setContent(searchTemplateContract());
         detailsDrawer.show();
     }
