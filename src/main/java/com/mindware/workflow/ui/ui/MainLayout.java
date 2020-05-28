@@ -418,7 +418,9 @@ public class MainLayout extends FlexBoxLayout
 
 	@Override
 	public void showRouterLayoutContent(HasElement content) {
-		this.viewContainer.getElement().appendChild(content.getElement());
+		if(content!=null) {
+			this.viewContainer.getElement().appendChild(content.getElement());
+		}
 	}
 
 	public NaviDrawer getNaviDrawer() {

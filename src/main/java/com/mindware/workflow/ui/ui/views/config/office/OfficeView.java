@@ -1,10 +1,15 @@
 package com.mindware.workflow.ui.ui.views.config.office;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.Signatories;
+import com.mindware.workflow.ui.backend.entity.config.CityProvince;
+import com.mindware.workflow.ui.backend.entity.config.Province;
+import com.mindware.workflow.ui.backend.rest.cityProvince.CityProvinceRestTemplate;
 import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.components.ListItem;
@@ -45,6 +50,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
+import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,6 +79,8 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
 
     private OfficeRestTemplate restTemplate = new OfficeRestTemplate();
 
+    private CityProvinceRestTemplate cityProvinceRestTemplate = new CityProvinceRestTemplate();
+
     private Binder<Office> binder;
 
     private DetailsDrawerFooter footer;
@@ -86,6 +94,9 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
     private List<Office> officeList;
 
     private OfficeDataProvider dataProvider;
+
+    private List<String> listProvinces;
+    private ComboBox<String> cmbProvince;
 
     public OfficeView(){
 
@@ -108,6 +119,7 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
 
 
     private void getListOffice(){
+        listProvinces = new ArrayList<>();
         officeList = new ArrayList<>(restTemplate.getAllOffice()) ;
         dataProvider = new OfficeDataProvider(officeList);
 //        return dataProvider;
@@ -125,10 +137,10 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
         grid.setHeight("100%");
 
         grid.addColumn(Office::getInternalCode).setFlexGrow(0)
-                .setHeader("Codigo").setSortable(true).setFrozen(true)
+                .setHeader("Codigo oficina").setSortable(true).setFrozen(true)
                 .setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
         grid.addColumn(new ComponentRenderer<>(this::createOfficeInfo))
-                .setHeader("Nombre").setWidth(UIUtils.COLUMN_WIDTH_XS)
+                .setHeader("Nombre oficina").setWidth(UIUtils.COLUMN_WIDTH_XS)
                 .setTextAlign(ColumnTextAlign.START).setResizable(true);
         grid.addColumn(new ComponentRenderer<>(this::createOfficeLocation)).setFlexGrow(0)
                 .setHeader("Ciudad").setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true)
@@ -219,7 +231,13 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
         footer.addSaveListener(e -> {
             if (current!=null && binder.writeBeanIfValid(current)) {
                 if (cmbTypeOffice.getValue().equals("AGENCIA") || cmbTypeOffice.getValue().equals("AGENCIA MOVIL")) {
-                    current.setIdRoot(cmbRoot.getValue().getIdRoot());
+                    try {
+                        current.setIdRoot(cmbRoot.getValue().getIdRoot());
+                    }catch (Exception ex){
+                        UIUtils.showNotification("Error: seleccione oficina principal");
+                        cmbRoot.focus();
+                        return;
+                    }
                 }
                 if (current.getId()==null)
                     current.setSignatorie("[]");
@@ -276,6 +294,9 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
     }
 
     private FormLayout createDetails(Office office){
+        if (office.getCity()!=null) {
+            listProvinces = getProvinces(office.getCity());
+        }
         TextField txtName = new TextField();
         txtName.setValue(Optional.ofNullable(office.getName()).orElse(""));
         txtName.setWidth("100%");
@@ -291,16 +312,22 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
         txtAddress.setWidth("100%");
 
         ComboBox<String> cmbCity = new ComboBox<>();
-        cmbCity.setItems("COCHABAMBA","LA PAZ","SANTA CRUZ","ORURO",
-                "POTOSI","CHUQUISACA","PANDO","BENI","TARIJA");
+        cmbCity.setItems(getAllCities());
         cmbCity.setValue(Optional.ofNullable(office.getCity()).orElse(""));
         cmbCity.setWidth("100%");
         cmbCity.setRequired(true);
+        cmbCity.addValueChangeListener(e ->{
+            listProvinces = getProvinces(e.getValue());
+            cmbProvince.clear();
+            cmbProvince.setItems(listProvinces);
+        });
 
-        TextField txtProvince = new TextField();
-        txtProvince.setValue(Optional.ofNullable(office.getProvince()).orElse(""));
-        txtProvince.setWidth("100%");
-        txtProvince.setRequired(true);
+
+        cmbProvince = new ComboBox<>();
+        cmbProvince.setItems(listProvinces);
+        cmbProvince.setValue(Optional.ofNullable(office.getProvince()).orElse(""));
+        cmbProvince.setWidth("100%");
+        cmbProvince.setRequired(true);
 
         TextField txtPhone = new TextField();
         txtPhone.setValue(Optional.ofNullable(office.getPhone()).orElse(""));
@@ -317,7 +344,12 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
             }else{
                 footer.saveState(true && GrantOptions.grantedOption("Oficinas"));
             }
-            current.setIdRoot(event.getValue().getIdRoot());
+            if(event.getValue()!=null) {
+                current.setIdRoot(event.getValue().getIdRoot());
+            }else{
+                UIUtils.showNotification("Error: seleccione la oficina principal");
+                cmbRoot.focus();
+            }
         });
         cmbRoot.setValue(findOfficeById().orElse(null));
 
@@ -343,7 +375,7 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
         binder.forField(txtInternalCode).asRequired("Codigo Interno no puede ser omitido").withConverter(new StringToIntegerConverter("De ingresar un numero")).bind(Office::getInternalCode,Office::setInternalCode);
         binder.forField(txtAddress).asRequired("Direccion no puede ser omitida").bind(Office::getAddress,Office::setAddress);
         binder.forField(cmbCity).asRequired("Ciudad no puede ser omitida").bind(Office::getCity,Office::setCity);
-        binder.forField(txtProvince).asRequired("Provincia no puede ser omitida").bind(Office::getProvince,Office::setProvince);
+        binder.forField(cmbProvince).asRequired("Provincia no puede ser omitida").bind(Office::getProvince,Office::setProvince);
         binder.forField(txtPhone).asRequired("Telefono no puede ser omitido").bind(Office::getPhone,Office::setPhone);
 //        binder.forMemberField(cmbRoot).bind("idRoot");
         binder.forField(cmbTypeOffice).asRequired("Tipo oficina no puede ser omitdo").bind("typeOffice");
@@ -367,7 +399,7 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
         form.addFormItem(txtAddress,"Dirección");
         form.addFormItem(txtPhone,"Telefono");
         form.addFormItem(cmbCity,"Ciudad");
-        form.addFormItem(txtProvince,"Provincia");
+        form.addFormItem(cmbProvince,"Provincia");
         form.addFormItem(cmbTypeOffice,"Tipo oficina");
         form.addFormItem(cmbRoot,"Oficina principal");
 
@@ -408,6 +440,32 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
         }
         return icon;
     }
+
+    private List<String> getAllCities(){
+
+        List<CityProvince> cityProvinceList = cityProvinceRestTemplate.getAll();
+        List<String> citiesList = new ArrayList<>();
+        for(CityProvince cityProvince:cityProvinceList){
+            citiesList.add(cityProvince.getCity());
+        }
+        return citiesList;
+    }
+
+    @SneakyThrows
+    private List<String> getProvinces(String city){
+        List<String> provinceList = new ArrayList<>();
+        CityProvince cityProvince = cityProvinceRestTemplate.getByCity(city);
+        String provinces = cityProvince.getProvinces();
+        ObjectMapper mapper = new ObjectMapper();
+        List<Province>listProvinces = mapper.readValue(provinces, new TypeReference<List<Province>>() {});
+        provinceList.clear();
+        for(Province province:listProvinces){
+            provinceList.add(province.getName());
+        }
+
+        return provinceList;
+    }
+
 
 
 }

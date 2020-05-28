@@ -1,6 +1,7 @@
 package com.mindware.workflow.ui.ui.views.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flowingcode.vaadin.addons.errorwindow.ErrorWindow;
 import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
@@ -240,7 +241,7 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         binder.forField(position).asRequired("Cargo es requerido").bind(Users::getPosition,Users::setPosition);
         binder.forField(supervisor).asRequired("Indicar si es supervisor o no, es requerido")
                 .bind(Users::getSupervisor,Users::setSupervisor);
-        binder.forField(scope).bind(Users::getScope,Users::setScope);
+        binder.forField(scope).asRequired("Alcance del usuario es requerido").bind(Users::getScope,Users::setScope);
         binder.addStatusChangeListener(event ->{
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges() ;
@@ -274,14 +275,19 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         footer.addSaveListener(e ->{
             if(binder.writeBeanIfValid(users)){
                 users.setPassword(UtilValues.generateRandomPassword());
-                restTemplate.add(users);
-                UIUtils.showNotification("Usuario Registrado");
-                if(users.getId()==null){
-                    PrepareMail.sendMailCreateUser(users, users.getPassword()
-                            , VaadinSession.getCurrent().getAttribute("login").toString()
-                            , VaadinSession.getCurrent().getAttribute("email").toString());
+                try {
+                    restTemplate.add(users);
+                    UIUtils.showNotification("Usuario Registrado");
+                    if(users.getId()==null){
+                        PrepareMail.sendMailCreateUser(users, users.getPassword()
+                                , VaadinSession.getCurrent().getAttribute("login").toString()
+                                , VaadinSession.getCurrent().getAttribute("email").toString());
+                    }
+                    UI.getCurrent().navigate(UsersView.class);
+                }catch (Exception ex){
+                    ErrorWindow w = new ErrorWindow(ex, "Error al guardar,  Show Error Details detalla el Error");
+                    w.open();
                 }
-                UI.getCurrent().navigate(UsersView.class);
             }
         });
         footer.addCancelListener(e ->{

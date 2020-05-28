@@ -142,7 +142,7 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
     private AppBar initAppBar(){
         AppBar appBar = MainLayout.get().getAppBar();
         appBar.addTab("PERMISOS");
-        appBar.addTab("ESTADOS DEL WORKFLOW");
+//        appBar.addTab("ESTADOS DEL WORKFLOW");
         appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
         appBar.getContextIcon().addClickListener(e ->{
             UI.getCurrent().navigate(RolView.class);
@@ -260,10 +260,10 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
         editor.addCloseListener(e -> editButtons.stream()
                 .forEach(button -> button.setEnabled(!editor.isOpen())));
 
-        Button save = new Button("Save", e -> editor.save());
+        Button save = new Button("Guardar", e -> editor.save());
         save.addClassName("save");
 
-        Button cancel = new Button("Cancel", e -> editor.cancel());
+        Button cancel = new Button("Cancelar", e -> editor.cancel());
         cancel.addClassName("cancel");
 
         grid.getElement().addEventListener("keyup", event -> editor.cancel())
@@ -338,10 +338,10 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
         editorStates.addCloseListener(e -> editButtonsStates.stream()
                 .forEach(button -> button.setEnabled(!editorStates.isOpen())));
 
-        Button saveStates = new Button("Save", e -> editorStates.save());
+        Button saveStates = new Button("Guardar", e -> editorStates.save());
         saveStates.addClassName("save");
 
-        Button cancelStates = new Button("Cancel", e -> editorStates.cancel());
+        Button cancelStates = new Button("Cancelar", e -> editorStates.cancel());
         cancelStates.addClassName("cancel");
 
         gridStates.getElement().addEventListener("keyup", event -> editorStates.cancel())

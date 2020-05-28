@@ -70,7 +70,7 @@ public class UserAuthorizerView extends SplitViewFrame implements RouterLayout {
 
     private HorizontalLayout createTopBar(){
         filterText = new TextField();
-        filterText.setPlaceholder("Filtro por Nro solicitud, Solicitante, Moneda, Fecha solicitud");
+        filterText.setPlaceholder("Filtro por Nombre, Ciudad, Alcance");
         filterText.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
         filterText.addValueChangeListener(event -> dataProvider.setFilter(event.getValue()));
 
