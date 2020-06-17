@@ -298,6 +298,11 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                     .setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_M).setHeader("Detalle");
         }
 
+        if(category.equals("INGRESOS") && element.contains("SUELDO")){
+            grid.addColumn(new ComponentRenderer<>(this::createButtonDetailSalary))
+                    .setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_M).setHeader("Detalle");
+        }
+
         grid.addColumn(new ComponentRenderer<>(this::createButtonDelete))
                 .setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_S);
 
@@ -348,6 +353,33 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
         return btn;
     }
 
+    private Component createButtonDetailSalary(PatrimonialStatement patrimonialStatement){
+        Button btn = new Button();
+        btn.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        btn.setIcon(VaadinIcon.CALC_BOOK.create());
+        btn.addClickListener(e ->{
+            Map<String,List<String>> p = new HashMap<>();
+            List<String> idCreditRequestApplicantList = new ArrayList<>();
+            idCreditRequestApplicantList.add(creditRequestApplicant.getId().toString());
+            List<String> activity = new ArrayList<>();
+            activity.add(patrimonialStatement.getFieldText1());
+            List<String> idPatrimonialStatement = new ArrayList<>();
+            idPatrimonialStatement.add(patrimonialStatement.getId().toString());
+
+            p.put(("id-patrimonial-statement"),idPatrimonialStatement);
+            p.put("id-credit-request-applicant",idCreditRequestApplicantList);
+            p.put("element",param.get("element"));
+            p.put("id-applicant",param.get("id-applicant"));
+            p.put("category",param.get("category"));
+            p.put("activity", activity);
+
+            QueryParameters qp = new QueryParameters(p);
+            UI.getCurrent().navigate("salary-analysis",qp);
+
+        });
+
+        return btn;
+    }
 
     private Component createAmount(PatrimonialStatement patrimonialStatement){
         if(patrimonialStatement.getFieldDouble1()==null){

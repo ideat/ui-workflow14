@@ -16,7 +16,6 @@ import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawerHeader;
 import com.mindware.workflow.ui.ui.components.navigation.bar.AppBar;
 import com.mindware.workflow.ui.ui.layout.size.Horizontal;
 import com.mindware.workflow.ui.ui.layout.size.Top;
-import com.mindware.workflow.ui.ui.layout.size.Vertical;
 import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.BoxSizing;
 import com.mindware.workflow.ui.ui.util.css.FlexDirection;

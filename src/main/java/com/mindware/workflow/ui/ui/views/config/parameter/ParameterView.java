@@ -79,7 +79,7 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
             "ESTADO CIVIL", "GENERO", "NACIONALIDAD", "ACTIVO", "PASIVO","INGRESOS","EGRESOS",
             "CARGOS FINANCIEROS","ETAPAS SOLICITUD","ESTADO-WORKFLOW",
             "PUESTOS","MONEDA","REFERENCIA PERSONAL","VINCULACION ECONOMICA",
-            "TIPO DOCUMENTO IDENTIDAD"};
+            "TIPO DOCUMENTO IDENTIDAD","PLANIFICACION-EJECUCION","DESCUENTO SUELDOS","PORCENTAJE VIVIENDA"};
 
     public ParameterView(){
         getListParameter();
