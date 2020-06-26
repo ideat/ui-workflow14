@@ -5,6 +5,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
 public class PatrimonialStatementDtoRestTemplate {
@@ -84,6 +85,19 @@ public class PatrimonialStatementDtoRestTemplate {
 
         HttpEntity<byte[]> entity = new HttpEntity<>(headers);
         ResponseEntity<byte[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,byte[].class);
+        return response.getBody();
+    }
+
+    public byte[] reportVaeDependent(String idApplicant,  String idCreditRequestApplicant
+                                    , String numberRequest){
+        final String uri = "http://localhost:8080/rest/v1/vaeDependentReport";
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("id-applicant",idApplicant);
+        headers.set("id-creditrequest-applicant",idCreditRequestApplicant);
+        headers.set("number-request",numberRequest);
+
+        HttpEntity<byte[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);
         return response.getBody();
     }
 

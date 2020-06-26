@@ -210,6 +210,21 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             CreditRequestCompanySizeIndicatorDtoRestTemplate restTemplate = new CreditRequestCompanySizeIndicatorDtoRestTemplate();
             file = restTemplate.report(param.get("number-request").get(0));
             previousPage = param.get("path").get(0);
+        }else if(param.get("origin").get(0).equals("VAE Dependiente")){
+            PatrimonialStatementDtoRestTemplate restTemplate = new PatrimonialStatementDtoRestTemplate();
+            file = restTemplate.reportVaeDependent(param.get("id-applicant").get(0),param.get("id-credit-request-applicant").get(0)
+                        , param.get("number-request").get(0));
+            previousPage = param.get("path").get(0);
+
+            paramPrev.put("type-relation", param.get("type-relation"));
+            paramPrev.put("id-applicant", param.get("id-applicant"));
+            paramPrev.put("id-credit-request", param.get("id-credit-request"));
+            paramPrev.put("full-name", param.get("full-name"));
+            paramPrev.put("number-applicant", param.get("number-applicant"));
+            paramPrev.put("number-request", param.get("number-request"));
+            paramPrev.put("id-credit-request-applicant", param.get("id-credit-request-applicant"));
+            paramPrev.put("element",param.get("element"));
+            paramPrev.put("category",param.get("category"));
         }
 
         qp = new QueryParameters(paramPrev);

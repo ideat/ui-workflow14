@@ -71,8 +71,6 @@ public class SalaryAnalisysRegister extends SplitViewFrame implements HasUrlPara
 
     private FlexBoxLayout flexBoxLayout;
 
-
-
     private QueryParameters qp;
     private Integer priority;
 
@@ -83,7 +81,7 @@ public class SalaryAnalisysRegister extends SplitViewFrame implements HasUrlPara
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
         typeClient = new ComboBox<>("Tipo Cliente");
         typeClient.setWidth("300px");
-        typeClient.setItems("CLIENTE","CODEUDOR 1","CODEUDOR 2","CODEUDOR 3","CODEUDOR 4");
+        typeClient.setItems("CLIENTE","CONYUGE","CODEUDOR 1","CODEUDOR 2","CODEUDOR 3","CODEUDOR 4");
 
 
         parameterRestTemplate = new ParameterRestTemplate();

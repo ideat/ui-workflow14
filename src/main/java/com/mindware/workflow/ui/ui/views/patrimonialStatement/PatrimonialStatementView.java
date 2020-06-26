@@ -45,6 +45,8 @@ import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.*;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -241,9 +243,44 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
         });
         btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
 
+        Button btnPrint = new Button("Imprimir VAE");
+        btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
+        btnPrint.addClickShortcut(Key.KEY_P,KeyModifier.ALT);
+
+        btnPrint.addClickListener(e ->{
+            Path paths = Paths.get(System.getProperties().get("user.home").toString());
+            Map<String, List<String>> paramPso = new HashMap<>();
+            List<String> path = new ArrayList<>();
+            List<String> origin = new ArrayList<>();
+
+            origin.add("VAE Dependiente");
+
+            path.add("patrimonial-statement");
+
+            paramPso.put("path", path);
+            paramPso.put("origin", origin);
+            paramPso.put("type-relation", param.get("type-relation"));
+            paramPso.put("id-applicant", param.get("id-applicant"));
+            paramPso.put("id-credit-request", param.get("id-credit-request"));
+            paramPso.put("full-name", param.get("full-name"));
+            paramPso.put("number-applicant", param.get("number-applicant"));
+            paramPso.put("number-request", param.get("number-request"));
+            paramPso.put("id-credit-request-applicant", param.get("id-credit-request-applicant"));
+            paramPso.put("element",param.get("element"));
+            paramPso.put("category",param.get("category"));
+
+            QueryParameters qp = new QueryParameters(paramPso);
+            UI.getCurrent().navigate("report-preview",qp);
+
+        });
+
         HorizontalLayout topLayout = new HorizontalLayout();
         topLayout.setWidth("100%");
         topLayout.add(btnNew);
+        if(element.equals("SUELDOS-HONORARIOS")){
+            topLayout.add(btnPrint);
+        }
+
         topLayout.setVerticalComponentAlignment(FlexComponent.Alignment.START,btnNew);
         topLayout.setPadding(true);
         return topLayout;
