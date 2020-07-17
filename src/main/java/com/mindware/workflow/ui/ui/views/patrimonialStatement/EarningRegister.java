@@ -116,6 +116,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
     private Grid<ProductionSalesInventory> gridRawMaterial;
     private Grid<ProductionSalesInventory> gridProcess;
     private Grid<ProductionSalesInventory> gridFinished;
+    private NumberField frecuency;
 
     @Override
     protected void onAttach(AttachEvent attachEvent){
@@ -144,6 +145,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
         patrimonialStatementList = new ArrayList<>();
+        frecuency = new NumberField();
         Location location = beforeEvent.getLocation();
         QueryParameters qp =  location.getQueryParameters();
         param = qp.getParameters();
@@ -162,6 +164,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         String operativeExpenses = patrimonialStatementCommerce.getFieldText5();
         String costProduct = patrimonialStatementCommerce.getFieldText6();
         String productionInventory = patrimonialStatementCommerce.getFieldText7();
+        frecuency.setValue(patrimonialStatementCommerce.getFieldInteger1().doubleValue());
 
         ObjectMapper mapper = new ObjectMapper();
         if(historySales==null ||  historySales.equals("") || historySales.equals("[]")){
@@ -1474,29 +1477,31 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         DetailsDrawerFooter footer = new DetailsDrawerFooter();
         footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial"));
         footer.addSaveListener(e ->{
+            if(frecuency.getValue()!=null || !frecuency.isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    String jsonSalesProjection = mapper.writeValueAsString(averageList);
+                    String jsonProductSales = mapper.writeValueAsString(productSalesBuysList);
+                    String jsonOperativeExpenses = mapper.writeValueAsString(operativeExpensesList);
+                    patrimonialStatementCommerce.setFieldText3(jsonSalesProjection);
+                    patrimonialStatementCommerce.setFieldText4(jsonProductSales);
+                    patrimonialStatementCommerce.setFieldText5(jsonOperativeExpenses);
+                    patrimonialStatementCommerce.setFieldInteger1(frecuency.getValue().intValue());
+                } catch (JsonProcessingException ex) {
+                    ex.printStackTrace();
+                }
 
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                String jsonSalesProjection = mapper.writeValueAsString(averageList);
-                String jsonProductSales = mapper.writeValueAsString(productSalesBuysList);
-                String jsonOperativeExpenses = mapper.writeValueAsString(operativeExpensesList);
-                patrimonialStatementCommerce.setFieldText3(jsonSalesProjection);
-                patrimonialStatementCommerce.setFieldText4(jsonProductSales);
-                patrimonialStatementCommerce.setFieldText5(jsonOperativeExpenses);
-            } catch (JsonProcessingException ex) {
-                ex.printStackTrace();
+                restTemplate.add(patrimonialStatementCommerce);
+                PatrimonialStatementDtoRestTemplate rest = new PatrimonialStatementDtoRestTemplate();
+                Double earning = rest.getOperativeEarningVae(patrimonialStatementCommerce.getId().toString(),
+                        param.get("id-applicant").get(0));
+                patrimonialStatementCommerce.setFieldDouble1(earning);
+                restTemplate.add(patrimonialStatementCommerce);
+
+                UIUtils.showNotification("Datos VAE-Independiente guardado");
+            }else{
+                UIUtils.showNotification("Ingrese la frecuencia diaria, si no corresponde ingrese 0");
             }
-
-            restTemplate.add(patrimonialStatementCommerce);
-            PatrimonialStatementDtoRestTemplate rest = new PatrimonialStatementDtoRestTemplate();
-            Double earning = rest.getOperativeEarningVae(patrimonialStatementCommerce.getId().toString(),
-                    param.get("id-applicant").get(0));
-            patrimonialStatementCommerce.setFieldDouble1(earning);
-            restTemplate.add(patrimonialStatementCommerce);
-
-
-
-            UIUtils.showNotification("Datos VAE-Independiente guardado");
 
         });
         footer.addCancelListener(e ->{
@@ -1514,6 +1519,15 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         layout.setHeightFull();
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setWidthFull();
+
+
+//        frecuency = new NumberField();
+        frecuency.setWidth("150px");
+        frecuency.setPlaceholder("Frecuencia diaria");
+
         Button btnPrint = new Button("Imprimir");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
         btnPrint.addClickListener(event -> {
@@ -1542,9 +1556,11 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
 
         });
 
+        horizontalLayout.add(btnPrint,frecuency);
+
         horizontalLayoutEstimatedSales = layoutEstimatedSales();
         verticalLayoutProductSales = layoutAnalysisSales();
-        layout.add(btnPrint, createTabsVaeIndependent(), horizontalLayoutEstimatedSales, verticalLayoutProductSales);
+        layout.add(horizontalLayout, createTabsVaeIndependent(), horizontalLayoutEstimatedSales, verticalLayoutProductSales);
         if (salesProjectionList.size()>0){
             salesProjectionProvider = new ListDataProvider<>(salesProjectionList);
             gridProjectionSales.setDataProvider(salesProjectionProvider);

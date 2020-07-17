@@ -297,9 +297,9 @@ public class CreditRequestCompanySizeIndicatorView extends SplitViewFrame implem
         Double indicator = 0.0;
 
        if(typeCompany.getValue().equals("PRODUCCION")){
-           indicator = Math.pow((annualSale.getValue()/350000000.0)*(patrimony.getValue()/21000000.0)*(numberEmployees.getValue()/100.0),(1.0/3.0));
+           indicator = Math.pow((annualSale.getValue()/35000000.0)*(patrimony.getValue()/21000000.0)*(numberEmployees.getValue()/100.0),(1.0/3.0));
        }else if(typeCompany.getValue().equals("COMERCIO")){
-           indicator = Math.pow((annualSale.getValue()/350000000.0)*(patrimony.getValue()/21000000.0)*(numberEmployees.getValue()/100.0),(1.0/3.0));
+           indicator = Math.pow((annualSale.getValue()/35000000.0)*(patrimony.getValue()/21000000.0)*(numberEmployees.getValue()/100.0),(1.0/3.0));
        }else if(typeCompany.getValue().equals("SERVICIO")){
            indicator = Math.pow((Math.round((annualSale.getValue()/28000000.0)*10000.0)/10000.0)
                    *(Math.round((patrimony.getValue()/14000000.0)*10000.0)/10000.0)

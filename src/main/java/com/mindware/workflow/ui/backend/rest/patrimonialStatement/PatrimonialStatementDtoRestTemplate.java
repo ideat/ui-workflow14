@@ -54,6 +54,19 @@ public class PatrimonialStatementDtoRestTemplate {
         return Double.parseDouble(result);
     }
 
+    public Double getSalaryVaeDependent(String idApplicant, String idPatrimonialStatement, String typeClient){
+        final String uri = "http://localhost:8080/rest/v1/salaryVaeDependent";
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("id-applicant",idApplicant);
+        headers.set("id-patrimonial-statement",idPatrimonialStatement);
+        headers.set("type-client",typeClient);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(uri,HttpMethod.GET,entity,String.class);
+        String result = response.getBody();
+        return Double.parseDouble(result);
+
+    }
+
     public byte[] reportCostProduct(String product,String idPatrimonialStatement, String idApplicant){
         final String uri = "http://localhost:8080/rest/v1/costProductReport";
         HttpHeaders headers = HeaderJwt.getHeader();

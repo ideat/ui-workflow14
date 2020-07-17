@@ -43,7 +43,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
+import lombok.SneakyThrows;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -70,6 +73,7 @@ public class TemplateFormsView extends SplitViewFrame implements RouterLayout {
 //    private Binder<TemplateForm> binder;
     private List<Parameter> parameterList = new ArrayList<>();
     private TemplateForm current;
+    private List<TemplateForm> templateFormList;
 
     public TemplateFormsView(){
         restTemplate = new TemplateFormRestTemplate();
@@ -117,14 +121,18 @@ public class TemplateFormsView extends SplitViewFrame implements RouterLayout {
 
     }
 
+    @SneakyThrows
     private void verifyNewParamters(){
+        ObjectMapper mapper = new ObjectMapper();
         for(Parameter p : parameterList){
             Optional<TemplateForm> t = restTemplate.getByNameAndCategory(p.getValue(),p.getCategory());
             if (!t.isPresent()){
+
+                String json = mapper.writeValueAsString(initFieldStructure());
                 TemplateForm templateForm = new TemplateForm();
                 templateForm.setName(p.getValue());
                 templateForm.setCategory(p.getCategory());
-                templateForm.setFieldsStructure("[]");
+                templateForm.setFieldsStructure(json);
                 restTemplate.add(templateForm);
             }
         }
@@ -318,8 +326,8 @@ public class TemplateFormsView extends SplitViewFrame implements RouterLayout {
         Class clase;
         Field[] fields = {};
         try {
-            clase = Class.forName("com.mindware.workflow.backend.entity.patrimonialStatement.PatrimonialStatement");
-            fields = clase.getFields();
+            clase = Class.forName("com.mindware.workflow.ui.backend.entity.patrimonialStatement.PatrimonialStatement");
+            fields = clase.getDeclaredFields();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -327,13 +335,15 @@ public class TemplateFormsView extends SplitViewFrame implements RouterLayout {
 
         List<FieldsStructure> fieldsStructureList = new ArrayList<>();
         for(int i=0; i< fields.length;i++){
-            FieldsStructure fieldsStructure = new FieldsStructure();
-            fieldsStructure.setComponentName(fields[i].getName());
-            fieldsStructure.setComponentLabel("Etiqueta");
-            fieldsStructure.setVisible(false);
-            fieldsStructure.setRequired(false);
-            fieldsStructure.setPosition(0);
-            fieldsStructureList.add(fieldsStructure);
+            if(fields[i].getName().startsWith("field")) {
+                FieldsStructure fieldsStructure = new FieldsStructure();
+                fieldsStructure.setComponentName(fields[i].getName());
+                fieldsStructure.setComponentLabel("Etiqueta");
+                fieldsStructure.setVisible(false);
+                fieldsStructure.setRequired(false);
+                fieldsStructure.setPosition(0);
+                fieldsStructureList.add(fieldsStructure);
+            }
         }
         return fieldsStructureList;
     }

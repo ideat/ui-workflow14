@@ -155,6 +155,7 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             paramPrev.put("number-applicant", param.get("number-applicant"));
             paramPrev.put("number-request", param.get("number-request"));
             paramPrev.put("id-credit-request-applicant", param.get("id-credit-request-applicant"));
+            paramPrev.put("currency",param.get("currency"));
         }else if(param.get("origin").get(0).equals("Declaracion Jurada de Bienes e Ingresos")){
             ApplicantStatementRestTemplate restTemplate = new ApplicantStatementRestTemplate();
             previousPage = param.get("path").get(0);
@@ -167,6 +168,7 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             paramPrev.put("number-applicant",param.get("number-applicant"));
             paramPrev.put("number-request",param.get("number-request"));
             paramPrev.put("id-credit-request-applicant",param.get("id-credit-request-applicant"));
+            paramPrev.put("currency",param.get("currency"));
         }else if(param.get("origin").get(0).equals("Observation Analisis Crediticio")){
             ObservationRestTemplate restTemplate = new ObservationRestTemplate();
             previousPage = param.get("path").get(0);
@@ -225,6 +227,7 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             paramPrev.put("id-credit-request-applicant", param.get("id-credit-request-applicant"));
             paramPrev.put("element",param.get("element"));
             paramPrev.put("category",param.get("category"));
+            paramPrev.put("currency",param.get("currency"));
         }
 
         qp = new QueryParameters(paramPrev);

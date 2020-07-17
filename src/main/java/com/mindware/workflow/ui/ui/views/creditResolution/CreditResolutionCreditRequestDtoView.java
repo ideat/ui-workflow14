@@ -88,6 +88,9 @@ public class CreditResolutionCreditRequestDtoView extends SplitViewFrame impleme
             List<String> numberApplicant = new ArrayList<>();
             numberApplicant.add(event.getFirstSelectedItem().get().getNumberApplicant().toString());
             param.put("number-applicant",numberApplicant);
+            List<String> amount = new ArrayList<>();
+            amount.add(event.getFirstSelectedItem().get().getAmount().toString());
+            param.put("amount",amount);
 
             QueryParameters qp = new QueryParameters(param);
             UI.getCurrent().navigate("credit-resolution-register",qp);

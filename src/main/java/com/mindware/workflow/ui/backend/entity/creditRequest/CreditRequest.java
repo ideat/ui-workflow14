@@ -83,4 +83,6 @@ public class CreditRequest {
     private String typeGuarantee;
 
     private String companySizeIndicator;
+
+    private String operationType;
 }

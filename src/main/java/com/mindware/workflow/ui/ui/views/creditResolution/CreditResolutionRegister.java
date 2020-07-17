@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.creditResolution.CreditResolution;
 import com.mindware.workflow.ui.backend.entity.creditResolution.DirectIndirectDebts;
+import com.mindware.workflow.ui.backend.entity.creditResolution.Disbursements;
 import com.mindware.workflow.ui.backend.entity.creditResolution.Exceptions;
 import com.mindware.workflow.ui.backend.entity.exceptions.ExceptionsCreditRequest;
 import com.mindware.workflow.ui.backend.rest.creditResolution.CreditResolutionRestTemplate;
@@ -26,6 +27,7 @@ import com.mindware.workflow.ui.ui.util.css.FlexDirection;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
@@ -44,6 +46,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.validator.DoubleRangeValidator;
 import com.vaadin.flow.router.*;
 
 import java.io.IOException;
@@ -65,12 +68,15 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
     private DetailsDrawer detailsDrawer;
     private DetailsDrawerHeader detailsDrawerHeader;
 
+    private BeanValidationBinder<Disbursements> binderDisbursements;
     private BeanValidationBinder<DirectIndirectDebts> binderDirectIndirectDebts;
     private BeanValidationBinder<CreditResolution> binderCreditResolution;
     private BeanValidationBinder<Exceptions> binderExceptions;
     private ListDataProvider<DirectIndirectDebts> directIndirectDebtsListDataProvider;
     private ListDataProvider<Exceptions> exceptionsListDataProvider;
+    private ListDataProvider<Disbursements> disbursementsListDataProvider;
 
+    private List<Disbursements> disbursementsList;
     private List<DirectIndirectDebts> directIndirectDebtsList;
     private List<Exceptions> exceptionsList;
     private CreditResolution creditResolution;
@@ -98,6 +104,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         creditResolution = creditResolutionRestTemplate.getByNumberRequest(numberRequest);
         String directIndirectDebtsDebts = creditResolution.getDirectIndirectDebts();
         String exceptions = creditResolution.getExceptions();
+        String disbursement = creditResolution.getNumberDisbursements();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -107,6 +114,16 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
             try {
                 directIndirectDebtsList = mapper.readValue(directIndirectDebtsDebts, new TypeReference<List<DirectIndirectDebts>>() {});
             } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(disbursement==null || disbursement.equals("") || disbursement.equals("[]")){
+            disbursementsList = new ArrayList<>();
+        }else{
+            try {
+                disbursementsList = mapper.readValue(disbursement, new TypeReference<List<Disbursements>>() {});
+            } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
         }
@@ -216,20 +233,24 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
         btnSave.addClickListener(click ->{
-            if(binderCreditResolution.writeBeanIfValid(creditResolution)) {
-                ObjectMapper mapper = new ObjectMapper();
+            if(validateDisbursement()) {
+                if (binderCreditResolution.writeBeanIfValid(creditResolution)) {
+                    ObjectMapper mapper = new ObjectMapper();
 
-                try {
-                    String jsonException = mapper.writeValueAsString(exceptionsList);
-                    String jsonDirectIndirectDebts = mapper.writeValueAsString(directIndirectDebtsList);
-                    creditResolution.setExceptions(jsonException);
-                    creditResolution.setDirectIndirectDebts(jsonDirectIndirectDebts);
-                    creditResolution.setNumberRequest(Integer.parseInt(param.get("number-request").get(0)));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
+                    try {
+                        String jsonException = mapper.writeValueAsString(exceptionsList);
+                        String jsonDirectIndirectDebts = mapper.writeValueAsString(directIndirectDebtsList);
+                        String jsonDisbursement = mapper.writeValueAsString(disbursementsList);
+                        creditResolution.setExceptions(jsonException);
+                        creditResolution.setDirectIndirectDebts(jsonDirectIndirectDebts);
+                        creditResolution.setNumberRequest(Integer.parseInt(param.get("number-request").get(0)));
+                        creditResolution.setNumberDisbursements(jsonDisbursement);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    creditResolutionRestTemplate.add(creditResolution);
+                    UIUtils.showNotification("Datos resolucion registrados");
                 }
-                creditResolutionRestTemplate.add(creditResolution);
-                UIUtils.showNotification("Datos resolucion registrados");
             }
         });
 
@@ -242,6 +263,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
 
         directIndirectDebtsListDataProvider = new ListDataProvider<>(directIndirectDebtsList);
         exceptionsListDataProvider = new ListDataProvider<>(exceptionsList);
+        disbursementsListDataProvider = new ListDataProvider<>(disbursementsList);
 
         Grid<DirectIndirectDebts> gridIndirectDebts = createGridDebts();
         gridIndirectDebts.setHeight("200px");
@@ -249,6 +271,8 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         gridDirectDebts.setHeight("200px");
         Grid<Exceptions> gridExceptions = createGridExceptions();
         gridExceptions.setHeight("200px");
+        Grid<Disbursements> gridDisbursements = createGridDisbursements();
+        gridDisbursements.setHeight("200px");
 
         gridDirectDebts.addSelectionListener(e -> {
             if(e.getFirstSelectedItem().isPresent()) {
@@ -271,20 +295,30 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
             }
         });
 
+        gridDisbursements.addSelectionListener(e ->{
+           if(e.getFirstSelectedItem().isPresent()){
+               e.getFirstSelectedItem().ifPresent(this::showDisbursements);
+               binderDisbursements.readBean(e.getFirstSelectedItem().get());
+           }
+        });
 
         gridDirectDebts.setDataProvider(directIndirectDebtsListDataProvider);
         gridIndirectDebts.setDataProvider(directIndirectDebtsListDataProvider);
         gridExceptions.setDataProvider(exceptionsListDataProvider);
+        gridDisbursements.setDataProvider(disbursementsListDataProvider);
 
         VerticalLayout layoutDirectDebts = gridLayoutDebts(gridDirectDebts,"direct");
         VerticalLayout layoutIndirectDebts = gridLayoutDebts(gridIndirectDebts,"indirect");
         VerticalLayout layoutExceptions = gridLayoutExceptions(gridExceptions);
+        VerticalLayout layoutDisbursements = gridLayoutDisbursements(gridDisbursements);
 
         FormLayout formLayout = formCreditDestination();
 
         accordion.add("Deudas directas",layoutDirectDebts);
         accordion.add("Deudas indirectas",layoutIndirectDebts);
         accordion.add("Excepciones",layoutExceptions);
+        accordion.add("Desembolsos",layoutDisbursements);
+
 
         accordion.addOpenedChangeListener(e -> {
             if(e.getOpenedIndex().isPresent()) {
@@ -304,11 +338,27 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         layout.add(topBar,formLayout,accordion);
 
         DetailsDrawer detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
-        detailsDrawer.setHeight("90%");
+        detailsDrawer.setHeightFull();
         detailsDrawer.setWidthFull();
         detailsDrawer.setContent(layout);
 
         return detailsDrawer;
+    }
+
+    private boolean validateDisbursement(){
+        if(disbursementsList.isEmpty()){
+            UIUtils.showNotification("Registre los desembolsos a realizarse");
+            return false;
+        }else{
+            Double amount = Double.parseDouble(param.get("amount").get(0));
+            Double totalDisbursement = disbursementsList.stream()
+                    .mapToDouble(Disbursements::getAmount).sum();
+            boolean result = totalDisbursement.equals(amount);
+            if(!result){
+                UIUtils.showNotification("Monto de la solicitud no coincide con los desembolsos, verifique");
+            }
+            return result;
+        }
     }
 
     private Grid<Exceptions> createGridExceptions(){
@@ -387,6 +437,22 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         return layout;
     }
 
+    private VerticalLayout gridLayoutDisbursements(Grid<Disbursements> grid){
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+        Button btnNew = new Button("Nuevo");
+        btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        btnNew.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+        btnNew.addClickListener(event ->{
+           Disbursements disbursements = new Disbursements();
+           showDisbursements(disbursements);
+        });
+
+        layout.add(btnNew,grid);
+
+        return layout;
+    }
+
     private VerticalLayout gridLayoutExceptions(Grid<Exceptions> grid){
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
@@ -403,6 +469,8 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
 
         return layout;
     }
+
+
 
     private FormLayout formCreditDestination(){
         FormLayout formLayout = new FormLayout();
@@ -512,6 +580,131 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
     private Component createAmount(DirectIndirectDebts directIndirectDebts){
         Double amount = directIndirectDebts.getAmount();
         return UIUtils.createAmountLabel(amount);
+    }
+
+    private Component createAmountDisbursement(Disbursements disbursements){
+        Double amount = disbursements.getAmount();
+        return UIUtils.createAmountLabel(amount);
+    }
+
+    private Grid createGridDisbursements(){
+        Grid<Disbursements> grid = new Grid<>();
+        grid.setWidthFull();
+        grid.addThemeVariants(GridVariant.LUMO_COMPACT);
+
+        grid.addColumn(Disbursements::getDescription)
+                .setFlexGrow(0)
+                .setHeader("Descripcion")
+                .setAutoWidth(true)
+                .setResizable(true);
+        grid.addColumn(new ComponentRenderer<>(this::createAmountDisbursement))
+                .setFlexGrow(0)
+                .setHeader("Monto desembolso")
+                .setAutoWidth(true)
+                .setResizable(true);
+        grid.addColumn(Disbursements::getConditions)
+                .setFlexGrow(0)
+                .setHeader("Condiciones")
+                .setAutoWidth(true)
+                .setResizable(true);
+        grid.addColumn(new ComponentRenderer<>(this::createButtonDeleteDisbursement))
+                .setFlexGrow(0);
+        return grid;
+    }
+
+    private Component createButtonDeleteDisbursement(Disbursements disbursements){
+        Button button = new Button();
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_ERROR);
+        button.setIcon(VaadinIcon.TRASH.create());
+        button.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+        button.addClickListener(e ->{
+            disbursementsList.removeIf(item -> item.getId().equals(disbursements.getId()));
+            disbursementsListDataProvider.refreshAll();
+            UIUtils.showNotification("Registro marcado para borrar, guarde los cambios");
+        });
+        return button;
+
+    }
+
+    private void showDisbursements(Disbursements disbursements){
+        detailsDrawerHeader.setTitle(disbursements.getDescription());
+        detailsDrawer.setContent(createDisbursements(disbursements));
+        binderDisbursements.readBean(disbursements);
+        detailsDrawer.show();
+    }
+
+    private DetailsDrawer createDisbursements(Disbursements disbursements){
+        TextField description = new TextField();
+        description.setWidthFull();
+        description.setRequired(true);
+        description.setRequiredIndicatorVisible(true);
+
+        NumberField amount = new NumberField();
+        amount.setWidthFull();
+        amount.setRequiredIndicatorVisible(true);
+
+        TextArea conditions = new TextArea();
+        conditions.setWidthFull();
+        conditions.setRequired(true);
+        conditions.setRequiredIndicatorVisible(true);
+
+        FormLayout formLayout = new FormLayout();
+        formLayout.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0",1,
+                        FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("600px",2,
+                        FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("810px",3,
+                        FormLayout.ResponsiveStep.LabelsPosition.TOP)
+        );
+        DetailsDrawer detailsDrawerForm = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
+        detailsDrawerForm.setHeight("90%");
+        detailsDrawerForm.setWidthFull();
+        DetailsDrawerFooter footer = new DetailsDrawerFooter();
+
+        binderDisbursements = new BeanValidationBinder<>(Disbursements.class);
+        binderDisbursements.forField(description).asRequired("Descripcion del desembolso es requerido")
+                .bind(Disbursements::getDescription,Disbursements::setDescription);
+        binderDisbursements.forField(amount).asRequired("Monto del desembolso es requerido")
+                .bind(Disbursements::getAmount,Disbursements::setAmount);
+        binderDisbursements.forField(conditions).asRequired("Condiciones para el desembolso son requeridas")
+                .bind(Disbursements::getConditions,Disbursements::setConditions);
+
+        binderDisbursements.addStatusChangeListener(event ->{
+           boolean isValid = !event.hasValidationErrors();
+           boolean hasChanges = binderDisbursements.hasChanges();
+           footer.saveState(isValid && hasChanges);
+        });
+
+        formLayout.addFormItem(description,"Descripcion");
+        formLayout.addFormItem(amount,"Monto desembolso");
+        FormLayout.FormItem conditionItem = formLayout.addFormItem(conditions,"Condiciones desembolso");
+        UIUtils.setColSpan(3, conditionItem);
+
+        footer.addSaveListener(event -> {
+           if(binderDisbursements.writeBeanIfValid(disbursements)){
+               if(disbursements.getId()==null){
+                   disbursements.setId(UUID.randomUUID());
+               }
+               disbursementsList.removeIf(value -> value.getId().equals(disbursements.getId()));
+               disbursementsList.add(disbursements);
+               disbursementsListDataProvider.refreshAll();
+               ObjectMapper mapper = new ObjectMapper();
+               try{
+                   String jsonDisbursements = mapper.writeValueAsString(disbursementsList);
+                   creditResolution.setNumberDisbursements(jsonDisbursements);
+               }catch (JsonProcessingException e){
+                   e.printStackTrace();
+               }
+               detailsDrawer.hide();
+           }
+        });
+
+        footer.addCancelListener(e ->  detailsDrawer.hide());
+        detailsDrawerForm.setContent(formLayout);
+        detailsDrawerForm.setFooter(footer);
+
+        return detailsDrawerForm;
     }
 
     private void showDirectIndirectDebts(DirectIndirectDebts directIndirectDebts){

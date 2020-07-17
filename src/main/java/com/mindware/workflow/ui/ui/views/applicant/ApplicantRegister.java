@@ -109,7 +109,6 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         AppBar appBar = initAppBar();
         appBar.setTitle(Optional.ofNullable(applicant.getFullName()).orElse("NUEVO"));
         UI.getCurrent().getPage().setTitle(applicant.getFullName());
-
     }
 
     @Override
@@ -437,8 +436,13 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         btnSeachApplicant.setIcon(VaadinIcon.SEARCH.create());
         btnSeachApplicant.addClickListener(event -> showSearch());
 
-        FlexBoxLayout searchApplicant = new FlexBoxLayout(numberApplicantSpouse,btnSeachApplicant);
-        searchApplicant.setFlexGrow(1, btnSeachApplicant);
+        Button btnDeleteSpouse = new Button();
+        btnDeleteSpouse.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_CONTRAST);
+        btnDeleteSpouse.setIcon(VaadinIcon.TRASH.create());
+        btnDeleteSpouse.addClickListener(e -> numberApplicantSpouse.setValue(0.0));
+
+        FlexBoxLayout searchApplicant = new FlexBoxLayout(numberApplicantSpouse,btnSeachApplicant,btnDeleteSpouse);
+        searchApplicant.setFlexGrow(1, btnSeachApplicant,btnDeleteSpouse);
         searchApplicant.setSpacing(Right.S);
 
 
@@ -687,7 +691,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_S).setKey("number");
         gridApplicant.addColumn(Applicant::getFullName).setHeader("Nombre")
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XL).setKey("name");
-        gridApplicant.addColumn(Applicant::getIdCardComplement).setHeader("Carnet")
+        gridApplicant.addColumn(Applicant::getFullIdCard).setHeader("Carnet")
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_M).setKey("idcard");
         gridApplicant.addColumn(new ComponentRenderer<>(this::createSelectApplicant)).setWidth(UIUtils.COLUMN_WIDTH_M);
         HeaderRow hr = gridApplicant.appendHeaderRow();
@@ -741,7 +745,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
             dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getFullName(),txtNameFilter.getValue()));
         }
         if(!txtIdCardFilter.getValue().trim().equals("")){
-            dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getIdCardComplement(),txtIdCardFilter.getValue()));
+            dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getFullIdCard(),txtIdCardFilter.getValue()));
         }
     }
 

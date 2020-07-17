@@ -388,10 +388,12 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         gridExceptionsCreditRequestDto.setWidth("100%");
         gridExceptionsCreditRequestDto.addColumn(ExceptionsCreditRequestDto::getInternalCode).setHeader("Cod. Excepcion")
                 .setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true);
+        gridExceptionsCreditRequestDto.addColumn(ExceptionsCreditRequestDto::getTypeException).setHeader("Tipo excepcion")
+                .setFlexGrow(0).setAutoWidth(true).setResizable(true);
         gridExceptionsCreditRequestDto.addColumn(ExceptionsCreditRequestDto::getExceptionDetail).setHeader("Excepcion")
-                .setFlexGrow(1).setResizable(true);
+                .setFlexGrow(1).setResizable(true).setAutoWidth(true);
         gridExceptionsCreditRequestDto.addColumn(new ComponentRenderer<>(this::createButtonDeleteException)).setResizable(true)
-                .setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_S);
+                .setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_S).setAutoWidth(true);
         topLayout.add(gridExceptionsCreditRequestDto);
 //        VerticalLayout contentLayout = new VerticalLayout();
 //        contentLayout.setWidthFull();
@@ -635,7 +637,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         gridVE.setHeight("300px");
         Grid<LinkUp> gridPE = createGridLinkUp("PARTICIPACION_ECONOMICA");
         gridPE.setHeight("300px");
-        Grid<LinkUp> gridVG = createGridLinkUp("VINCULACION_POR_GARANTIA");
+        Grid<LinkUp> gridVG = createGridLinkUp("TIPO_DE_VINCULACION");
         gridVG.setHeight("300px");
 
         gridRP.addSelectionListener(e -> {
@@ -662,7 +664,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         VerticalLayout layoutRP = gridLayout(gridRP,"REFERENCIA_PERSONAL");
         VerticalLayout layoutVE = gridLayout(gridVE,"VINCULACION_ECONOMICA");
         VerticalLayout layoutPE = gridLayout(gridPE,"PARTICIPACION_ECONOMICA");
-        VerticalLayout layoutVG = gridLayout(gridVG,"VINCULACION_POR_GARANTIA");
+        VerticalLayout layoutVG = gridLayout(gridVG,"TIPO_DE_VINCULACION");
 
         dataProviderLinkUp = new ListDataProvider<>(linkUpList);
 
@@ -682,7 +684,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                     filter("PARTICIPACION_ECONOMICA");
 
                 } else if (e.getOpenedIndex().getAsInt() == 3) {
-                    filter("VINCULACION_POR_GARANTIA");
+                    filter("TIPO_DE_VINCULACION");
 
                 }
             }
@@ -722,8 +724,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 linkUp.setTypeLinkUp(TypeLinkUp.VINCULACION_ECONOMICA);
             }else if(relation.equals("PARTICIPACION_ECONOMICA")){
                 linkUp.setTypeLinkUp(TypeLinkUp.PARTICIPACION_ECONOMICA);
-            }else if(relation.equals("VINCULACION_POR_GARANTIA")){
-                linkUp.setTypeLinkUp(TypeLinkUp.VINCULACION_POR_GARANTIA);
+            }else if(relation.equals("TIPO_DE_VINCULACION")){
+                linkUp.setTypeLinkUp(TypeLinkUp.TIPO_DE_VINCULACION);
             }
             showFormRelation(linkUp);
         });
@@ -751,9 +753,9 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         }else if(relation.equals("VINCULACION_ECONOMICA")){
             gridLinkUp.addColumn(LinkUp::getFirstField).setHeader("Nombre del Ejecutivo")
                     .setWidth(UIUtils.COLUMN_WIDTH_L).setResizable(true);
-            gridLinkUp.addColumn(LinkUp::getSeconfField).setHeader("Numero C.I.")
+            gridLinkUp.addColumn(LinkUp::getThirdField).setHeader("Numero C.I.")
                     .setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
-            gridLinkUp.addColumn(LinkUp::getThirdField).setHeader("Actividad")
+            gridLinkUp.addColumn(LinkUp::getSeconfField).setHeader("Actividad")
                     .setWidth(UIUtils.COLUMN_WIDTH_L).setResizable(true);
             gridLinkUp.addColumn(LinkUp::getFouthField).setHeader("Relacion")
                     .setWidth(UIUtils.COLUMN_WIDTH_L);
@@ -765,7 +767,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             gridLinkUp.addColumn(LinkUp::getThirdField).setHeader("Relacion que tiene con UD.")
                     .setWidth(UIUtils.COLUMN_WIDTH_L).setResizable(true);
 
-        }else if(relation.equals("VINCULACION_POR_GARANTIA")){
+        }else if(relation.equals("TIPO_DE_VINCULACION")){
             gridLinkUp.addColumn(LinkUp::getFirstField).setHeader("Nombre del prestatario")
                     .setWidth(UIUtils.COLUMN_WIDTH_L).setResizable(true);
             gridLinkUp.addColumn(LinkUp::getSeconfField).setHeader("Numero de credito")
@@ -952,6 +954,10 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         typeGuarantee.setItems(getValueParameter("TIPO GARANTIA"));
         typeGuarantee.setWidth("100%");
 
+        ComboBox<String> operationType = new ComboBox<>();
+        operationType.setItems("NUEVA","REFINANCIAMIENTO","REPROGRAMACION");
+        operationType.setWidthFull();
+
         TextArea destination = new TextArea();
         destination.setRequired(true);
         destination.setWidth("100%");
@@ -988,6 +994,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 .withValidator(value -> value.intValue()>=0, "Numero credito no valido, 0 valor por defecto")
                 .bind(CreditRequest::getNumberCredit,CreditRequest::setNumberCredit);
         binder.forField(typeGuarantee).bind(CreditRequest::getTypeGuarantee,CreditRequest::setTypeGuarantee);
+        binder.forField(operationType).asRequired("Tipo de operacion es requerida")
+                .bind(CreditRequest::getOperationType,CreditRequest::setOperationType);
 
         binder.addStatusChangeListener(event -> {
            boolean isValid = !event.hasValidationErrors();
@@ -1032,7 +1040,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         formRequest.addFormItem(paymentPlanDate, "Fecha plan pagos");
         formRequest.addFormItem(typeGuarantee,"Garantia princial");
         formRequest.addFormItem(numberCredit,"Numero credito");
-//        formRequest.addFormItem(destination,"Destino del credito");
+        formRequest.addFormItem(operationType,"Tipo de operacion");
         FormLayout.FormItem destinationItem = formRequest.addFormItem(destination,"Destino del credito");
         UIUtils.setColSpan(4, destinationItem);
         footer = new DetailsDrawerFooter();
@@ -1186,7 +1194,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         List<Exceptions> exceptionsList = exceptionsRestTemplate.getAll();
         for(Exceptions exceptions : exceptionsList){
             if(exceptions.getState().equals("ACTIVO")) {
-                list.add(exceptions.getInternalCode() + "-" + exceptions.getDescription());
+                list.add(exceptions.getInternalCode() + "-" + exceptions.getDescription() +"-"+exceptions.getTypeException());
             }
         }
         return list;
@@ -1241,7 +1249,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_S).setKey("number");
         gridApplicant.addColumn(Applicant::getFullName).setHeader("Nombre")
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XL).setKey("name");
-        gridApplicant.addColumn(Applicant::getIdCardComplement).setHeader("Carnet")
+        gridApplicant.addColumn(Applicant::getFullIdCard).setHeader("Carnet")
                 .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_M).setKey("idcard");
         gridApplicant.addColumn(new ComponentRenderer<>(this::createSelectApplicant)).setWidth(UIUtils.COLUMN_WIDTH_M);
         HeaderRow hr = gridApplicant.appendHeaderRow();
@@ -1420,7 +1428,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getFullName(),txtNameFilter.getValue()));
         }
         if(!txtIdCardFilter.getValue().trim().equals("")){
-            dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getIdCardComplement(),txtIdCardFilter.getValue()));
+            dataProvider.addFilter(applicant -> StringUtils.containsIgnoreCase(applicant.getFullIdCard(),txtIdCardFilter.getValue()));
         }
     }
 
@@ -1495,6 +1503,11 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         ComboBox<String> comboBox1 = new ComboBox();
         comboBox1.setWidth("100%");
         comboBox1.setRequired(true);
+        comboBox1.setAllowCustomValue(true);
+
+        TextField relation = new TextField();
+        relation.setWidthFull();
+
         if(linkUp.getTypeLinkUp().equals(TypeLinkUp.REFERENCIA_PERSONAL)) {
             comboBox1.setItems(getValueParameter("REFERENCIA PERSONAL"));
         }else if (linkUp.getTypeLinkUp().equals(TypeLinkUp.VINCULACION_ECONOMICA)){
@@ -1549,14 +1562,14 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             formRelation.addFormItem(field4,"Participacion");
         }else{
             binderRelations.forField(field1).asRequired("Nombre del prestatario es requerido").bind(LinkUp::getFirstField,LinkUp::setFirstField);
-            binderRelations.forField(comboBox1).asRequired("Relacion es requerida").bind(LinkUp::getSeconfField,LinkUp::setSeconfField);
+            binderRelations.forField(relation).asRequired("Relacion es requerida").bind(LinkUp::getSeconfField,LinkUp::setSeconfField);
             binderRelations.forField(field2).asRequired("Numero de credito").bind(LinkUp::getThirdField,LinkUp::setThirdField);
             binderRelations.forField(comboBox2).asRequired("Tipo de vinculacion es querida").bind(LinkUp::getFouthField,LinkUp::setFouthField);
             binderRelations.forField(textArea).asRequired("Explicacion de la vinculacion es requerida").bind(LinkUp::getFifthField,LinkUp::setFifthField);
 
             formRelation.addFormItem(field1,"Nombre del prestatario");
             formRelation.addFormItem(field2,"Numero de credito");
-            formRelation.addFormItem(comboBox1,"Relacion");
+            formRelation.addFormItem(relation,"Relacion");
             formRelation.addFormItem(comboBox2,"Tipo de vinculacion");
             FormLayout.FormItem formItem = formRelation.addFormItem(textArea,"Explicacion sobre vinculacion economica");
             UIUtils.setColSpan(3,formItem);

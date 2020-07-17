@@ -38,6 +38,8 @@ public class CreditResolution {
 
     private String directIndirectDebts; //deudas indirectas , definir campos json, se ingresa a mano
 
+    private String numberDisbursements; //Numero desembolsos;
+
 //    private String directDebts; //inicialmente vienen de los pasivos, se debe permitir ingresar datos
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)

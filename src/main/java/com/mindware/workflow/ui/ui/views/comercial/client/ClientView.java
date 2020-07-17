@@ -314,11 +314,11 @@ public class ClientView extends SplitViewFrame implements RouterLayout {
         typeClient.setRequired(true);
         typeClient.setRequiredIndicatorVisible(true);
 
-        ComboBox<String> size = new ComboBox<>();
-        size.setItems("MICRO EMPRESA","PEQUEÑA EMPRESA","MEDIANA EMPRESA","GRANDE EMPRESA");
-        size.setWidth("100%");
-        size.setRequired(true);
-        size.setRequiredIndicatorVisible(true);
+//        ComboBox<String> size = new ComboBox<>();
+//        size.setItems("MICRO EMPRESA","PEQUEÑA EMPRESA","MEDIANA EMPRESA","GRANDE EMPRESA");
+//        size.setWidth("100%");
+//        size.setRequired(true);
+//        size.setRequiredIndicatorVisible(true);
 
         ComboBox<String> caedec = new ComboBox<>();
         caedec.setItems(UtilValues.getParameterValueDescription("CAEDEC"));
@@ -354,7 +354,7 @@ public class ClientView extends SplitViewFrame implements RouterLayout {
         binder.forField(extension).bind(Client::getExtension,Client::setExtension);
         binder.forField(typePerson).asRequired("Tipo de Persona es requerido").bind(Client::getTypePerson,Client::setTypePerson);
         binder.forField(typeClient).asRequired("Tipo cliente es requerido").bind(Client::getTypeClient,Client::setTypeClient);
-        binder.forField(size).asRequired("Tamaño cliente es requerido").bind(Client::getSize,Client::setSize);
+//        binder.forField(size).asRequired("Tamaño cliente es requerido").bind(Client::getSize,Client::setSize);
         binder.forField(caedec).asRequired("Caedec cliente es requerido").bind(Client::getCaedec,Client::setCaedec);
         binder.forField(cellPhone).bind(Client::getCellPhone,Client::setCellPhone);
         binder.forField(homePhone).bind(Client::getHomePhone,Client::setHomePhone);
@@ -389,7 +389,7 @@ public class ClientView extends SplitViewFrame implements RouterLayout {
         UIUtils.setColSpan(1,idCardItem);
         formLayout.addFormItem(typePerson,"Tipo Persona");
         formLayout.addFormItem(typeClient,"Tipo cliente");
-        formLayout.addFormItem(size,"Tamaño cliente");
+//        formLayout.addFormItem(size,"Tamaño cliente");
         formLayout.addFormItem(caedec,"CAEDEC ocupacion");
         formLayout.addFormItem(cellPhone,"Celular");
         formLayout.addFormItem(homePhone,"Telf. domicilio");

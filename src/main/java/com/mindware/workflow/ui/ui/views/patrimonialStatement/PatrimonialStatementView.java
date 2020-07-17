@@ -222,6 +222,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                     parameter.put("full-name",param.get("full-name"));
                     parameter.put("id-applicant",param.get("id-applicant"));
                     parameter.put("id-credit-request-applicant",param.get("id-credit-request-applicant"));
+                    parameter.put("currency",param.get("currency"));
                     QueryParameters qp = new QueryParameters(parameter);
 
                     UI.getCurrent().navigate("patrimonial-statement-options",qp);
@@ -323,7 +324,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                         grid.addColumn(new ComponentRenderer<>(this::createActiveBoolean1))
                                 .setFlexGrow(0).setHeader(f.getComponentLabel()).setWidth(UIUtils.COLUMN_WIDTH_M);
                     } else if (f.getComponentName().equals("fieldDouble1")) {
-                        grid.addColumn(new ComponentRenderer<>(this::createAmount)).setHeader("Valor")
+                        grid.addColumn(new ComponentRenderer<>(this::createAmount)).setHeader("Valor " +param.get("currency").get(0))
                                 .setSortable(true).setFlexGrow(0).setResizable(true).setWidth(UIUtils.COLUMN_WIDTH_L);
                     }
                 }
@@ -907,14 +908,19 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                         fieldDouble1.setReadOnly(true);
                         binder.forField(fieldDouble1).withNullRepresentation(0.0)
                                 .bind(PatrimonialStatement::getFieldDouble1, PatrimonialStatement::setFieldDouble1);
-                    }else {
+                    }if(element.contains("SUELDO")){
+                        fieldDouble1.setValue(0.0);
+                        fieldDouble1.setReadOnly(true);
+                        binder.forField(fieldDouble1).withNullRepresentation(0.0)
+                                .bind(PatrimonialStatement::getFieldDouble1, PatrimonialStatement::setFieldDouble1);
+                    } else {
                         binder.forField(fieldDouble1).withValidator(value -> value.doubleValue() >= 0.0, "Monto tiene que ser mayor a 0")
                                 .withNullRepresentation(0.0)
                                 .asRequired("Valor es requerido").bind(PatrimonialStatement::getFieldDouble1, PatrimonialStatement::setFieldDouble1);
                     }
 
                 }
-                formData.addFormItem(fieldDouble1,f.getComponentLabel());
+                formData.addFormItem(fieldDouble1,f.getComponentLabel() + " " +param.get("currency").get(0));
             }else
             if (f.getComponentName().equals("fieldDouble2")){
                 if(f.isRequired()){
@@ -927,7 +933,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                     binder.forField(fieldDouble2).withNullRepresentation(0.0)
                             .bind(PatrimonialStatement::getFieldDouble2,PatrimonialStatement::setFieldDouble2);
                 }
-                formData.addFormItem(fieldDouble2,f.getComponentLabel());
+                formData.addFormItem(fieldDouble2,f.getComponentLabel() + " " +param.get("currency").get(0));
             }else
             if (f.getComponentName().equals("fieldDouble3")){
                 if(f.isRequired()){
@@ -940,7 +946,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                     binder.forField(fieldDouble3).withNullRepresentation(0.0)
                             .bind(PatrimonialStatement::getFieldDouble3,PatrimonialStatement::setFieldDouble3);
                 }
-                formData.addFormItem(fieldDouble3,f.getComponentLabel());
+                formData.addFormItem(fieldDouble3,f.getComponentLabel() + " " +param.get("currency").get(0));
             }else
             if (f.getComponentName().equals("fieldDouble4")){
                 if(f.isRequired()){
@@ -953,7 +959,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                     binder.forField(fieldDouble4).withNullRepresentation(0.0)
                             .bind(PatrimonialStatement::getFieldDouble4,PatrimonialStatement::setFieldDouble4);
                 }
-                formData.addFormItem(fieldDouble4,f.getComponentLabel());
+                formData.addFormItem(fieldDouble4,f.getComponentLabel() + " " +param.get("currency").get(0));
             }else
             if (f.getComponentName().equals("fieldDouble5")){
                 if(f.isRequired()){
@@ -966,7 +972,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                     binder.forField(fieldDouble5).withNullRepresentation(0.0)
                             .bind(PatrimonialStatement::getFieldDouble5,PatrimonialStatement::setFieldDouble5);
                 }
-                formData.addFormItem(fieldDouble5,f.getComponentLabel());
+                formData.addFormItem(fieldDouble5,f.getComponentLabel() + " " +param.get("currency").get(0));
             }else    
             if (f.getComponentName().equals("fieldDate1")){
                 if(f.isRequired()){

@@ -216,7 +216,7 @@ public class MainLayout extends FlexBoxLayout
 		if(assignedOption("Clientes")){
 			NaviItem mercadeo = menu.addNaviItem(VaadinIcon.SITEMAP,"Mercadeo",null);
 			if(assignedOption("Clientes")){
-				menu.addNaviItem(mercadeo, "Clientes", ClientView.class);
+				menu.addNaviItem(mercadeo, "Clientes Potenciales", ClientView.class);
 			}
 //			if(assignedOption("Propuestas")){
 //				menu.addNaviItem(mercadeo,"Propuestas",Home.class);

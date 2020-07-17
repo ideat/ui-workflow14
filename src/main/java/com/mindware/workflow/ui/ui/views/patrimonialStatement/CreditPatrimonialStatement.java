@@ -117,6 +117,10 @@ public class CreditPatrimonialStatement extends ViewFrame implements RouterLayou
             idCreditRequestApplicant.add(e.getFirstSelectedItem().get().getId().toString());
             param.put("id-credit-request-applicant",idCreditRequestApplicant);
 
+            List<String> currency = new ArrayList<>();
+            currency.add(e.getFirstSelectedItem().get().getCurrency());
+            param.put("currency",currency);
+
             QueryParameters qp = new QueryParameters(param);
             UI.getCurrent().navigate("patrimonial-statement-options", qp);
 

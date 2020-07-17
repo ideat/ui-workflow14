@@ -152,6 +152,7 @@ public class PatrimonialStatementOptions extends SplitViewFrame implements HasUr
                 paramPso.put("number-applicant", param.get("number-applicant"));
                 paramPso.put("number-request", param.get("number-request"));
                 paramPso.put("id-credit-request-applicant", param.get("id-credit-request-applicant"));
+                paramPso.put("currency",param.get("currency"));
 
                 QueryParameters qp = new QueryParameters(paramPso);
                 UI.getCurrent().navigate("report-preview", qp);
@@ -191,7 +192,7 @@ public class PatrimonialStatementOptions extends SplitViewFrame implements HasUr
         gridAssets.addColumn(TemplateRenderer.<PatrimonialStatementOptionsDto>  of (
                 "<div style='white-space:normal'> <small> [[item.element]] </small> </div>"
         ) .withProperty("element",PatrimonialStatementOptionsDto::getElement)).setHeader("Activo");
-        gridAssets.addColumn(PatrimonialStatementOptionsDto::getAmount).setHeader("Total");
+        gridAssets.addColumn(PatrimonialStatementOptionsDto::getAmount).setHeader("Total "+param.get("currency").get(0));
 
         Grid<PatrimonialStatementOptionsDto> gridLiabilities = new Grid<>();
         gridLiabilities.addThemeVariants(GridVariant.LUMO_COMPACT);
@@ -204,7 +205,7 @@ public class PatrimonialStatementOptions extends SplitViewFrame implements HasUr
         gridLiabilities.addColumn(TemplateRenderer.<PatrimonialStatementOptionsDto>  of (
                 "<div style='white-space:normal'> <small> [[item.element]] </small> </div>"
         ) .withProperty("element",PatrimonialStatementOptionsDto::getElement)).setHeader("Pasivo");
-        gridLiabilities.addColumn(PatrimonialStatementOptionsDto::getAmount).setHeader("Total");
+        gridLiabilities.addColumn(PatrimonialStatementOptionsDto::getAmount).setHeader("Total " + param.get("currency").get(0));
 
 
         accordionA.add("Activos",gridAssets);
@@ -220,7 +221,7 @@ public class PatrimonialStatementOptions extends SplitViewFrame implements HasUr
         gridEarnings.addColumn(TemplateRenderer.<PatrimonialStatementOptionsDto>  of (
                 "<div style='white-space:normal'> <small> [[item.element]] </small> </div>"
         ) .withProperty("element",PatrimonialStatementOptionsDto::getElement)).setHeader("Ingreso");
-        gridEarnings.addColumn(PatrimonialStatementOptionsDto::getAmount).setHeader("Total");
+        gridEarnings.addColumn(PatrimonialStatementOptionsDto::getAmount).setHeader("Total " +param.get("currency").get(0));
 
         Grid<PatrimonialStatementOptionsDto> gridExpenses = new Grid<>();
         gridExpenses.setItems(expenses);
@@ -231,7 +232,7 @@ public class PatrimonialStatementOptions extends SplitViewFrame implements HasUr
         gridExpenses.addColumn(TemplateRenderer.<PatrimonialStatementOptionsDto>  of (
                 "<div style='white-space:normal'> <small> [[item.element]] </small> </div>"
         ) .withProperty("element",PatrimonialStatementOptionsDto::getElement)).setHeader("Egreso");
-        gridExpenses.addColumn(PatrimonialStatementOptionsDto::getAmount).setHeader("Total");
+        gridExpenses.addColumn(PatrimonialStatementOptionsDto::getAmount).setHeader("Total " +param.get("currency").get(0));
 
         accordionE.add("Ingresos",gridEarnings);
         accordionX.add("Egresos",gridExpenses);
@@ -297,6 +298,7 @@ public class PatrimonialStatementOptions extends SplitViewFrame implements HasUr
         paramPatrimonial.put("full-name",param.get("full-name"));
         paramPatrimonial.put("id-applicant",param.get("id-applicant"));
         paramPatrimonial.put("id-credit-request-applicant", param.get("id-credit-request-applicant"));
+        paramPatrimonial.put("currency",param.get("currency"));
 
         QueryParameters qp = new QueryParameters(paramPatrimonial);
 

@@ -7,6 +7,7 @@ import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.patrimonialStatement.PatrimonialStatement;
 import com.mindware.workflow.ui.backend.entity.patrimonialStatement.SalaryAnalisys;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
+import com.mindware.workflow.ui.backend.rest.patrimonialStatement.PatrimonialStatementDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.patrimonialStatement.PatrimonialStatementRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
 import com.mindware.workflow.ui.backend.util.UtilValues;
@@ -43,7 +44,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.router.*;
 import lombok.SneakyThrows;
 
-import javax.rmi.CORBA.Util;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,13 +69,15 @@ public class SalaryAnalisysRegister extends SplitViewFrame implements HasUrlPara
     private Map<String,List<String>> param = new HashMap<>();
     private List<PatrimonialStatement> patrimonialStatementList;
     private PatrimonialStatement patrimonialStatementSalary;
-
+    private PatrimonialStatementDtoRestTemplate patrimonialStatementDtoRestTemplate;
     private FlexBoxLayout flexBoxLayout;
 
     private QueryParameters qp;
     private Integer priority;
 
     private ComboBox<String> typeClient;
+    private String idPatrimonialStatement;
+    private String idApplicant;
 
     @SneakyThrows
     @Override
@@ -85,11 +88,16 @@ public class SalaryAnalisysRegister extends SplitViewFrame implements HasUrlPara
 
 
         parameterRestTemplate = new ParameterRestTemplate();
+        patrimonialStatementDtoRestTemplate = new PatrimonialStatementDtoRestTemplate();
         flexBoxLayout = new FlexBoxLayout();
         flexBoxLayout.setFlexDirection(FlexDirection.ROW);
         Location location = beforeEvent.getLocation();
         qp =  location.getQueryParameters();
         param = qp.getParameters();
+
+        idApplicant = param.get("id-applicant").get(0);
+        idPatrimonialStatement = param.get("id-patrimonial-statement").get(0);
+
         restTemplate = new PatrimonialStatementRestTemplate();
         patrimonialStatementList = restTemplate.getByIdCreditRequestApplicantCategory(UUID.fromString(param.get("id-credit-request-applicant").get(0))
                 , param.get("category").get(0));
@@ -154,10 +162,14 @@ public class SalaryAnalisysRegister extends SplitViewFrame implements HasUrlPara
                     }
 
                     String items = mapper.writeValueAsString(salaryAnalysisMonth1List);
-
-
                     patrimonialStatementSalary.setFieldText2(items);
                     restTemplate.add(patrimonialStatementSalary);
+
+                    Double salary = patrimonialStatementDtoRestTemplate.getSalaryVaeDependent(idApplicant,idPatrimonialStatement,typeClient.getValue());
+                    patrimonialStatementSalary.setFieldDouble1(salary);
+                    restTemplate.add(patrimonialStatementSalary);
+
+
                     UIUtils.showNotification("Registro guardado");
 
                 } catch (JsonProcessingException jsonProcessingException) {
@@ -268,6 +280,8 @@ public class SalaryAnalisysRegister extends SplitViewFrame implements HasUrlPara
                 dataProviderMonth3.setSortOrder(SalaryAnalisys::getPriority, SortDirection.ASCENDING);
                 dataProviderMonth3.refreshAll();
             }
+
+
         });
         Button cancel = new Button("Cancelar", e-> editor.cancel());
         cancel.addClassName("cancel");
