@@ -40,6 +40,7 @@ public class CreditResolution {
 
     private String numberDisbursements; //Numero desembolsos;
 
+    private String creditRequestRelevantInformation;
 //    private String directDebts; //inicialmente vienen de los pasivos, se debe permitir ingresar datos
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)

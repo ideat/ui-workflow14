@@ -186,6 +186,7 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             paramPrev.put("number-request",param.get("number-request"));
             paramPrev.put("id-credit-request-applicant",param.get("id-credit-request-applicant"));
             paramPrev.put("full-name",param.get("full-name"));
+            paramPrev.put("amount",param.get("amount"));
         }else if(param.get("origin").get(0).equals("legal-information-report")){
             LegalInformationReportDtoRestTemplate restTemplate = new LegalInformationReportDtoRestTemplate();
             previousPage = param.get("path").get(0);
@@ -205,7 +206,7 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             paramPrev.put("id-credit-request-applicant",param.get("id-credit-request-applicant"));
         }else if(param.get("origin").get(0).equals("authorizer-exception")){
             AuthorizationExceptionReportDtoRestTemplate restTemplate = new AuthorizationExceptionReportDtoRestTemplate();
-            file = restTemplate.report(param.get("number-request").get(0));
+            file = restTemplate.report(param.get("number-request").get(0), param.get("type-exception").get(0));
             previousPage = param.get("path").get(0);
 
         }else if(param.get("origin").get(0).equals("creditrequest-company-size-indicator")){

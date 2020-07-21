@@ -121,14 +121,17 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
 
         grid.addSelectionListener(e -> {
            if(e.getFirstSelectedItem().isPresent()){
+               if(GrantOptions.grantedOption("Autorizar Excepciones")) {
+                   ExceptionsCreditRequest exceptionsCreditRequest = restTemplate.getByCodeExceptionNumberRequest(e.getFirstSelectedItem().get().getInternalCode(),
+                           e.getFirstSelectedItem().get().getNumberRequest());
 
-               ExceptionsCreditRequest exceptionsCreditRequest = restTemplate.getByCodeExceptionNumberRequest(e.getFirstSelectedItem().get().getInternalCode(),
-                       e.getFirstSelectedItem().get().getNumberRequest());
-
-               try {
-                   showException(exceptionsCreditRequest);
-               } catch (JsonProcessingException ex) {
-                   ex.printStackTrace();
+                   try {
+                       showException(exceptionsCreditRequest);
+                   } catch (JsonProcessingException ex) {
+                       ex.printStackTrace();
+                   }
+               }else{
+                   UIUtils.showNotification("Usuario no autorizado a editar las autorizaciones");
                }
            }
         });
@@ -147,10 +150,14 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
 
         ObjectMapper mapper = new ObjectMapper();
         List<StatusReview> statusReviewList = mapper.readValue(exceptionsCreditRequest.getStatusReview(), new TypeReference<List<StatusReview>>() {});
-
+        boolean validUser;
         if(statusReviewList.size()>0) {
-            statusReview = statusReviewList.stream().filter(f -> f.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()))
+
+            statusReview = statusReviewList.stream().filter(f -> f.getLoginUser().equals(VaadinSession.getCurrent()
+                    .getAttribute("login").toString()))
                     .collect(Collectors.toList()).get(0);
+
+
         }else{
             statusReview = new StatusReview();
             statusReview.setState("PROPUESTA");

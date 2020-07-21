@@ -45,7 +45,7 @@ public class UIUtils {
 	private static final ThreadLocal<DecimalFormat> decimalFormat = ThreadLocal
 			.withInitial(() -> new DecimalFormat("###,###.00", DecimalFormatSymbols.getInstance(Locale.US)));
 	private static final ThreadLocal<DateTimeFormatter> dateFormat = ThreadLocal
-			.withInitial(() -> DateTimeFormatter.ofPattern("MMM dd, YYYY"));
+			.withInitial(() -> DateTimeFormatter.ofPattern("dd MMM, YYYY"));
 
 	/* ==== BUTTONS ==== */
 
@@ -423,10 +423,15 @@ public class UIUtils {
 		return dateFormat.get().format(date);
 	}
 
+	public static Label createFormatDate(LocalDate date){
+		if(date==null) return new Label("");
+		return new Label(dateFormat.get().format(date));
+	}
+
 	/* === NOTIFICATIONS === */
 
 	public static void showNotification(String text) {
-		Notification.show(text, 3000, Notification.Position.MIDDLE);
+		Notification.show(text, 4000, Notification.Position.MIDDLE);
 	}
 
 	public static void dialogError(String caption, String message){

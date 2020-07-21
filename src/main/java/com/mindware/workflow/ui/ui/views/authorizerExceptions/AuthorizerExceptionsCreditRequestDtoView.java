@@ -1,5 +1,6 @@
 package com.mindware.workflow.ui.ui.views.authorizerExceptions;
 
+import com.github.appreciated.papermenubutton.PaperMenuButton;
 import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.exceptions.Authorizer;
@@ -22,14 +23,19 @@ import com.mindware.workflow.ui.ui.views.ViewFrame;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.contextmenu.ContextMenu;
+import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
+import dev.mett.vaadin.tooltip.Tooltips;
 
 import java.util.*;
 
@@ -134,6 +140,8 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame implemen
                 .setFlexGrow(1).setSortable(true).setResizable(true).setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createButtonPrint)).setResizable(true)
                 .setFlexGrow(1).setAutoWidth(true);
+        grid.addColumn(new ComponentRenderer<>(this::createButtonPrintPermanent)).setResizable(true)
+                .setFlexGrow(1).setAutoWidth(true);
 
         return grid;
     }
@@ -142,6 +150,8 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame implemen
         Button btn = new Button();
         btn.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
         btn.setIcon(VaadinIcon.PRINT.create());
+        Tooltips.getCurrent().setTooltip(btn,"Autorizaciones TEMPORALES");
+
         btn.addClickListener(e ->{
             String listException = "";
             ExceptionsCreditRequestRestTemplate exceptionsCreditRequestRestTemplate = new ExceptionsCreditRequestRestTemplate();
@@ -163,19 +173,70 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame implemen
                 List<String> numberRequestList = new ArrayList<>();
                 numberRequestList.add(authorizerExceptionsCreditRequestDto.getNumberRequest().toString());
 
-
+                List<String> typeException = new ArrayList<>();
+                typeException.add("TEMPORAL");
                 List<String> titleReport = new ArrayList<>();
                 titleReport.add("Autorizacion Excepciones ");
                 paramAuthException.put("path",path);
                 paramAuthException.put("title",titleReport);
                 paramAuthException.put("origin",origin);
                 paramAuthException.put("number-request",numberRequestList);
+                paramAuthException.put("type-exception",typeException);
                 QueryParameters qp = new QueryParameters(paramAuthException);
                 UI.getCurrent().navigate("report-preview",qp);
             }else{
                 UIUtils.showNotification("Faltan aprobar excecpciones "+listException);
             }
+
         });
+
+        return btn;
+    }
+
+    private Component createButtonPrintPermanent(AuthorizerExceptionsCreditRequestDto authorizerExceptionsCreditRequestDto){
+        Button btn = new Button();
+        btn.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_PRIMARY);
+        btn.setIcon(VaadinIcon.PRINT.create());
+        Tooltips.getCurrent().setTooltip(btn,"Autorizaciones PERMANENTES");
+
+        btn.addClickListener(e ->{
+            String listException = "";
+            ExceptionsCreditRequestRestTemplate exceptionsCreditRequestRestTemplate = new ExceptionsCreditRequestRestTemplate();
+            List<ExceptionsCreditRequest> exceptionsCreditRequestList =
+                    exceptionsCreditRequestRestTemplate.getByNumberRequest(authorizerExceptionsCreditRequestDto.getNumberRequest());
+            boolean allowPrint = true;
+            for(ExceptionsCreditRequest ec:exceptionsCreditRequestList){
+                if(!ec.getState().equals("APROBADA")){
+                    allowPrint = false;
+                    listException = listException +"-"+ ec.getCodeException()+"-";
+                }
+            }
+            if(allowPrint){
+                Map<String,List<String>> paramAuthException = new HashMap<>();
+                List<String> origin = new ArrayList<>();
+                origin.add("authorizer-exception");
+                List<String> path = new ArrayList<>();
+                path.add("authorizer-exception");
+                List<String> numberRequestList = new ArrayList<>();
+                numberRequestList.add(authorizerExceptionsCreditRequestDto.getNumberRequest().toString());
+
+                List<String> typeException = new ArrayList<>();
+                typeException.add("PERMANENTE");
+                List<String> titleReport = new ArrayList<>();
+                titleReport.add("Autorizacion Excepciones ");
+                paramAuthException.put("path",path);
+                paramAuthException.put("title",titleReport);
+                paramAuthException.put("origin",origin);
+                paramAuthException.put("number-request",numberRequestList);
+                paramAuthException.put("type-exception",typeException);
+                QueryParameters qp = new QueryParameters(paramAuthException);
+                UI.getCurrent().navigate("report-preview",qp);
+            }else{
+                UIUtils.showNotification("Faltan aprobar excecpciones "+listException);
+            }
+
+        });
+
         return btn;
     }
 

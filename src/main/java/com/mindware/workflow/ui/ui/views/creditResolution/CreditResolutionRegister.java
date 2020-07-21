@@ -83,8 +83,9 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
 
     private  TextField sector;
     private  TextField item;
-    private TextField creditObject;
-    private TextArea conclusion;
+    private ComboBox<String> creditObject;
+//    private TextArea conclusion;
+    private TextArea relevantInformation;
     private  DatePicker creationDate;
     private TextField amortizationDescription;
     private ComboBox<String> typeResolution;
@@ -223,6 +224,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
             paramCreditResolution.put("origin",origin);
             paramCreditResolution.put("path",path);
             paramCreditResolution.put("title",title);
+            paramCreditResolution.put("amount",param.get("amount"));
 
             QueryParameters qp = new QueryParameters(paramCreditResolution);
             UI.getCurrent().navigate("report-preview",qp);
@@ -470,7 +472,14 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         return layout;
     }
 
-
+    private List<String> getListObjectCredit(){
+        List<Parameter> parameterList = parameterRestTemplate.getParametersByCategory("OBJETO DEL CREDITO");
+        List<String> objectCreditList = new ArrayList<>();
+        for(Parameter p:parameterList){
+            objectCreditList.add(p.getDescription());
+        }
+        return objectCreditList;
+    }
 
     private FormLayout formCreditDestination(){
         FormLayout formLayout = new FormLayout();
@@ -484,15 +493,22 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         item.setRequired(true);
         item.setRequiredIndicatorVisible(true);
 
-        creditObject = new TextField();
+        creditObject = new ComboBox<>();
         creditObject.setWidth("100%");
+        creditObject.setItems(getListObjectCredit());
         creditObject.setRequired(true);
         creditObject.setRequiredIndicatorVisible(true);
+        creditObject.setAllowCustomValue(false);
 
-        conclusion = new TextArea();
-        conclusion.setWidth("100%");
-        conclusion.setRequired(true);
-        conclusion.setRequiredIndicatorVisible(true);
+//        conclusion = new TextArea();
+//        conclusion.setWidth("100%");
+//        conclusion.setRequired(true);
+//        conclusion.setRequiredIndicatorVisible(true);
+
+        relevantInformation = new TextArea();
+        relevantInformation.setWidthFull();
+        relevantInformation.setRequired(true);
+        relevantInformation.setRequiredIndicatorVisible(true);
 
         creationDate = new DatePicker();
         creationDate.setWidth("100%");
@@ -545,8 +561,10 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
                 .bind(CreditResolution::getItem,CreditResolution::setItem);
         binderCreditResolution.forField(creditObject).asRequired("Objeto del credito es requerido")
                 .bind(CreditResolution::getCreditObject,CreditResolution::setCreditObject);
-        binderCreditResolution.forField(conclusion).asRequired("Conclusion es requerida")
-                .bind(CreditResolution::getConclusion,CreditResolution::setConclusion);
+//        binderCreditResolution.forField(conclusion).asRequired("Conclusion es requerida")
+//                .bind(CreditResolution::getConclusion,CreditResolution::setConclusion);
+        binderCreditResolution.forField(relevantInformation).asRequired("Informacion requerida")
+                .bind(CreditResolution::getCreditRequestRelevantInformation,CreditResolution::setCreditRequestRelevantInformation);
         binderCreditResolution.forField(reciprocity).asRequired("Reciprocidad es requerida")
                 .bind(CreditResolution::getReciprocity,CreditResolution::setReciprocity);
         binderCreditResolution.forField(applicantRating).asRequired("Calificacion es requerida")
@@ -560,8 +578,10 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         formLayout.addFormItem(item,"Rubro");
         formLayout.addFormItem(creditObject,"Objeto de la operacion");
         formLayout.addFormItem(reciprocity,"Monto Reciprocidad");
-        FormLayout.FormItem conclusionItem = formLayout.addFormItem(conclusion,"Conclusion");
-        UIUtils.setColSpan(3,conclusionItem);
+//        FormLayout.FormItem conclusionItem = formLayout.addFormItem(conclusion,"Conclusion");
+        FormLayout.FormItem relavantInformationItem = formLayout.addFormItem(relevantInformation,"Informacion relevante del credito");
+//        UIUtils.setColSpan(2,conclusionItem);
+        UIUtils.setColSpan(3,relavantInformationItem);
 
 
         return formLayout;

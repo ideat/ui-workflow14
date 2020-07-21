@@ -1,5 +1,6 @@
 package com.mindware.workflow.ui.backend.entity.creditRequest;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -85,4 +86,11 @@ public class CreditRequest {
     private String companySizeIndicator;
 
     private String operationType;
+
+    private Integer gracePeriod;
+
+    private String typeGracePeriod;
+
+    private String noOwnGuarantee;//json
+
 }

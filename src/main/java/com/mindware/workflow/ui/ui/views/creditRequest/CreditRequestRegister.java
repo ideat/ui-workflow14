@@ -66,9 +66,11 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
@@ -122,6 +124,10 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private BeanValidationBinder<ExceptionsCreditRequest> binderExceptionCreditRequest;
     private List<ExceptionsCreditRequestDto> exceptionsCreditRequestDtoList;
     private ListDataProvider<ExceptionsCreditRequestDto> dataProviderExceptionsCreditRequestDto;
+    private BeanValidationBinder<NoOwnGuarantee> binderNoOwnGuarantee;
+    private ListDataProvider<NoOwnGuarantee> dataProviderNoOwnGuarantee;
+    private List<NoOwnGuarantee> noOwnGuaranteeList;
+    private NoOwnGuarantee currentNoOwnGuarantee;
 
     private ListDataProvider<Charge> dataCharge;
     private Grid<CreditRequestApplicantDto> gridCodebtorGuarantor;
@@ -130,12 +136,14 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private DetailsDrawer detailsDrawer;
     private DetailsDrawerHeader detailsDrawerHeader;
     private DetailsDrawerFooter footerRelations;
+    private DetailsDrawerFooter footerNoOwnGuarantee;
 
     private FlexBoxLayout contentCreditRequest;
     private FlexBoxLayout contentRelations;
     private FlexBoxLayout contentPaymentPlan;
     private FlexBoxLayout contentCodebtor;
     private FlexBoxLayout contentExceptionsCreditRequest;
+    private FlexBoxLayout contentNoOwnGuarantees;
 
 
     private List<String> listTabs = new ArrayList<>();
@@ -149,7 +157,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private Location currentLocation;
     private Map<String,List<String>> paramCredit;
 
-
+    private Integer auxGracePeriod=0;
+    private String auxTypeGracePeriod="";
 
     @Override
     protected void onAttach(AttachEvent attachEvent){
@@ -186,11 +195,13 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             contentCreditRequest = (FlexBoxLayout) createContent(createCreditRequest(current));
 //            contentPatrimonialStatement = (FlexBoxLayout) createContent(createMenuPatrimonialStatement());
             contentRelations = (FlexBoxLayout) createContent(createRelations());
+            contentNoOwnGuarantees = (FlexBoxLayout) createContent(createNoOwnGuarantee());
 //            contentPaymentPlan = (FlexBoxLayout) createContent(createPaymentPlan());
 
-            setViewContent(contentCreditRequest,contentRelations);//,contentPatrimonialStatement,contentPaymentPlan);
+            setViewContent(contentCreditRequest,contentRelations,contentNoOwnGuarantees);//,contentPatrimonialStatement,contentPaymentPlan);
 //            contentPatrimonialStatement.setVisible(false);
             contentRelations.setVisible(false);
+            contentNoOwnGuarantees.setVisible(false);
 //            contentPaymentPlan.setVisible(false);
             binder.readBean(current);
         }else{
@@ -206,13 +217,15 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             contentCreditRequest = (FlexBoxLayout) createContent(createCreditRequest(current));
 //            contentPatrimonialStatement = (FlexBoxLayout) createContent(createMenuPatrimonialStatement());
             contentRelations = (FlexBoxLayout) createContent(createRelations());
+            contentNoOwnGuarantees = (FlexBoxLayout) createContent(createNoOwnGuarantee());
             contentPaymentPlan = (FlexBoxLayout) createContent(createPaymentPlan());
             contentCodebtor = (FlexBoxLayout) createContent(createCodebtorGuarantor());
             contentExceptionsCreditRequest = (FlexBoxLayout) createContent(createExceptions());
-            setViewContent(contentCreditRequest,/*contentPatrimonialStatement,*/contentRelations
+            setViewContent(contentCreditRequest,/*contentPatrimonialStatement,*/contentRelations,contentNoOwnGuarantees
                     ,contentPaymentPlan,contentCodebtor,contentExceptionsCreditRequest);
 //            contentPatrimonialStatement.setVisible(false);
             contentRelations.setVisible(false);
+            contentNoOwnGuarantees.setVisible(false);
             contentPaymentPlan.setVisible(false);
             contentCodebtor.setVisible(false);
             contentExceptionsCreditRequest.setVisible(false);
@@ -257,6 +270,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         AppBar appBar = MainLayout.get().getAppBar();
         appBar.addTab("Datos solicitud");
         appBar.addTab("Relaciones");
+        appBar.addTab("Garantias No Propias");
 
         nameTabSelected = "";
         if(!paramCredit.get("numberRequest").get(0).equals("NUEVO")) {
@@ -265,6 +279,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             appBar.addTab("Codeudores");
             appBar.addTab("Garantes");
             appBar.addTab("Excepciones");
+//            appBar.addTab("Garantias No Propias");
 
         }
 
@@ -272,12 +287,14 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
         listTabs.add("Datos solicitud");
         listTabs.add("Relaciones");
+        listTabs.add("Garantias No Propias");
         if(!paramCredit.get("numberRequest").get(0).equals("NUEVO")) {
 //            listTabs.add("Declaracion patrimonial");
             listTabs.add("Plan de pagos");
             listTabs.add("Codeudores");
             listTabs.add("Garantes");
             listTabs.add("Excepciones");
+//            listTabs.add("Garantias No Propias");
 
         }
         appBar.addTabSelectionListener(e ->{
@@ -288,6 +305,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                     if (selectedTab.getLabel().equals("Datos solicitud")) {
                         contentCreditRequest.setVisible(true);
                         contentRelations.setVisible(false);
+                        contentNoOwnGuarantees.setVisible(false);
                         if(!paramCredit.get("numberRequest").get(0).equals("NUEVO")) {
 //                            contentPatrimonialStatement.setVisible(false);
                             contentPaymentPlan.setVisible(false);
@@ -297,6 +315,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                     } else if(selectedTab.getLabel().equals("Relaciones")) {
                         contentCreditRequest.setVisible(false);
                         contentRelations.setVisible(true);
+                        contentNoOwnGuarantees.setVisible(false);
                         if(!paramCredit.get("numberRequest").get(0).equals("NUEVO")) {
 //                            contentPatrimonialStatement.setVisible(false);
                             contentPaymentPlan.setVisible(false);
@@ -306,6 +325,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                     } else if(selectedTab.getLabel().equals("Plan de pagos")){
                         contentCreditRequest.setVisible(false);
                         contentRelations.setVisible(false);
+                        contentNoOwnGuarantees.setVisible(false);
                         contentCodebtor.setVisible(false);
                         contentExceptionsCreditRequest.setVisible(false);
                         if(!paramCredit.get("numberRequest").get(0).equals("NUEVO")) {
@@ -316,6 +336,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                     } else if(selectedTab.getLabel().equals("Codeudores") || (selectedTab.getLabel().equals("Garantes"))){
                         contentCreditRequest.setVisible(false);
                         contentRelations.setVisible(false);
+                        contentNoOwnGuarantees.setVisible(false);
                         if(!paramCredit.get("numberRequest").get(0).equals("NUEVO")) {
 //                            contentPatrimonialStatement.setVisible(false);
                             contentPaymentPlan.setVisible(false);
@@ -331,12 +352,25 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                     } else if(selectedTab.getLabel().equals("Excepciones")){
                         contentCreditRequest.setVisible(false);
                         contentRelations.setVisible(false);
+                        contentNoOwnGuarantees.setVisible(false);
                         contentCodebtor.setVisible(false);
                         contentPaymentPlan.setVisible(false);
                         contentExceptionsCreditRequest.setVisible(true);
+                    }else if(selectedTab.getLabel().equals("Garantias No Propias")){
+                        contentNoOwnGuarantees.setVisible(true);
+                        contentCreditRequest.setVisible(false);
+                        contentRelations.setVisible(false);
+                        if(!paramCredit.get("numberRequest").get(0).equals("NUEVO")) {
+//                            contentPatrimonialStatement.setVisible(false);
+                            contentPaymentPlan.setVisible(false);
+                            contentCodebtor.setVisible(false);
+                            contentExceptionsCreditRequest.setVisible(false);
+                        }
+
                     } else {
                         contentCreditRequest.setVisible(false);
                         contentRelations.setVisible(false);
+                        contentNoOwnGuarantees.setVisible(false);
                         if(!paramCredit.get("numberRequest").get(0).equals("NUEVO")) {
 //                            contentPatrimonialStatement.setVisible(true);
                             contentPaymentPlan.setVisible(false);
@@ -903,6 +937,16 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         paymentPeriod.setItems(30,60,90,120,150,180,360);
         paymentPeriod.setWidth("100%");
 
+        ComboBox<String> typeGracePeriod = new ComboBox<>();
+        typeGracePeriod.setWidthFull();
+        typeGracePeriod.setItems("NINGUNO","INTERESES","CAPITAL+INTERESES");
+        typeGracePeriod.addValueChangeListener(e-> auxTypeGracePeriod = e.getValue());
+
+        ComboBox<Integer> gracePeriod = new ComboBox<>();
+        gracePeriod.setWidthFull();
+        gracePeriod.setItems(0,1,2,3,4,5,6,7,8,9,10,11,12);
+        gracePeriod.addValueChangeListener(e -> auxGracePeriod = e.getValue());
+
         NumberField fixedDay = new NumberField();
         fixedDay.setValue(0d);
         fixedDay.setMin(0);
@@ -982,6 +1026,28 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binder.forField(fixedDay).withValidator(value -> value.intValue()>=0 && value.intValue()<=30, "Dia fijo debe estar entre 0 a 30")
                 .withConverter(new UtilValues.DoubleToIntegerConverter()).bind(CreditRequest::getFixedDay,CreditRequest::setFixedDay);
         binder.forField(typeFee).asRequired("Tipo de cuota es requerido").bind(CreditRequest::getTypeFee,CreditRequest::setTypeFee);
+        binder.forField(typeGracePeriod).asRequired("Tipo de Periodo de Gracia es Requerido")
+//                .withValidator(validGracePeriod -> typeGracePeriod.getValue().equals("NINGUNO") && auxGracePeriod>0
+//                        ,"Si el Tipo de Periodo es: NINGUNO, el Periodo de Gracia debe ser: 0" )
+                .bind(CreditRequest::getTypeGracePeriod,CreditRequest::setTypeGracePeriod);
+
+        binder.forField(gracePeriod).asRequired("Perido de Gracia es requerido")
+                .withValidator((s,valueContext) -> {
+                    if(!auxTypeGracePeriod.equals("NINGUNO") && s.intValue()==0){
+                        return ValidationResult.error("El periodo de gracia tiene que ser mayor a 0");
+                    }else if (s.intValue()%(paymentPeriod.getValue()/30)>0) {
+                        return ValidationResult.error("Periodo de Gracia no corresponde al periodo de amortizacion");
+                    }else if(auxTypeGracePeriod.equals("NINGUNO") && s.intValue()>0){
+                        return ValidationResult.error("Si el Tipo de Periodo es: NINGUNO, el Periodo de Gracia debe ser: 0");
+                    }
+                    return ValidationResult.ok();
+                })
+//                .withValidator(validGracePeriod -> !auxTypeGracePeriod.equals("NINGUNO") && validGracePeriod.intValue()==0
+//                        , "El Periodo de Gracia tiene que ser mayor a 0")
+//                .withValidator(validGracePeriod -> (validGracePeriod.intValue() % (paymentPeriod.getValue()/30)) > 0
+//                        ,"Periodo de Gracia no corresponde al Periodo de Amortizacion")
+                .bind(CreditRequest::getGracePeriod,CreditRequest::setGracePeriod);
+
         binder.forField(baseInterestRate).asRequired("Tasa base es requerida, si no corresponde ingrese '0'").bind(CreditRequest::getBaseInterestRate,CreditRequest::setBaseInterestRate);
         binder.forField(initPeriodBaseRate).asRequired("Inicio tasa base es requerido, sino corresponde seleccione '0'").bind(CreditRequest::getInitPeriodBaseRate,CreditRequest::setInitPeriodBaseRate);
         binder.forField(caedec).asRequired("Caedec destino es requerido").bind(CreditRequest::getCaedec,CreditRequest::setCaedec);
@@ -1030,9 +1096,11 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         formRequest.addFormItem(term,"Plazo");
         formRequest.addFormItem(typeTerm,"Tipo plazo");
 //        formRequest.addFormItem(termFlex,"Plazo - Tipo plazo");
-        formRequest.addFormItem(paymentPeriod,"Periodo");
+        formRequest.addFormItem(paymentPeriod,"Periodo de amortizacion");
         formRequest.addFormItem(fixedDay,"Dia fijo");
         formRequest.addFormItem(typeFee,"Tipo cuota");
+        formRequest.addFormItem(typeGracePeriod,"Tipo Periodo de Gracia");
+        formRequest.addFormItem(gracePeriod,"Periodo de Gracias (Meses)");
         formRequest.addFormItem(baseInterestRate,"Tasa base");
         formRequest.addFormItem(initPeriodBaseRate,"Periodo inicio tasa base");
         formRequest.addFormItem(caedec,"CAEDEC");
@@ -1048,7 +1116,11 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             if(binder.writeBeanIfValid(creditRequest)) {
                if(creditRequest.getState()==null || creditRequest.getState().isEmpty()) {
                    creditRequest.setState("ANALISIS_PREVIO");
+
                }
+                if(creditRequest.getNoOwnGuarantee()==null || creditRequest.getNoOwnGuarantee().isEmpty()) {
+                    creditRequest.setNoOwnGuarantee("[]");
+                }
                creditRequest.setLoginUser(VaadinSession.getCurrent().getAttribute("login").toString());
                CreditRequest result = restTemplate.addCreditRequest(creditRequest);
                if(creditRequest.getId()==null){
@@ -1153,7 +1225,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binderExceptionCreditRequest.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderExceptionCreditRequest.hasChanges();
-           footerException.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud") && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
+           footerException.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud")
+                   && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         });
 
         footerException.addSaveListener(e ->{
@@ -1186,6 +1259,234 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
 
         return detailsDrawerException;
+    }
+
+    private VerticalLayout gridLayoutNoOwnGuarantee(Grid<NoOwnGuarantee> grid){
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+        Button btnNew = new Button("NUEVA");
+        btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_SUCCESS);
+        btnNew.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        btnNew.addClickListener(click ->{
+
+            showCreateNoOwnGuarantee(new NoOwnGuarantee());
+        });
+
+        layout.add(btnNew,grid);
+
+        return layout;
+    }
+
+    private void showCreateNoOwnGuarantee(NoOwnGuarantee noOwnGuarantee){
+        currentNoOwnGuarantee = noOwnGuarantee;
+        detailsDrawerHeader.setTitle("Garantias No Propias");
+        detailsDrawer.setContent(createLayoutNoOwnGuarantees(noOwnGuarantee));
+        binderNoOwnGuarantee.readBean(currentNoOwnGuarantee);
+        detailsDrawer.setFooter(footerNoOwnGuarantee);
+        detailsDrawer.show();
+    }
+
+    private DetailsDrawer createNoOwnGuarantee(){
+        noOwnGuaranteeList = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+
+        if(current.getNoOwnGuarantee()!=null && !current.getNoOwnGuarantee().equals("[]")){
+            try {
+                noOwnGuaranteeList = new ArrayList<>(Arrays.asList(mapper.readValue(current.getNoOwnGuarantee(),NoOwnGuarantee[].class)));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        dataProviderNoOwnGuarantee = new ListDataProvider<>(noOwnGuaranteeList);
+        Grid<NoOwnGuarantee> grid = createGridNoOwnGuarantee();
+        grid.setWidthFull();
+
+        VerticalLayout contentLayout = gridLayoutNoOwnGuarantee(grid);
+        contentLayout.setWidthFull();
+
+
+        DetailsDrawer detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
+        detailsDrawer.setHeightFull();
+        detailsDrawer.setWidthFull();
+        detailsDrawer.setContent(contentLayout);
+
+        return detailsDrawer;
+    }
+
+    private FormLayout createLayoutNoOwnGuarantees(NoOwnGuarantee noOwnGuarantee){
+        FormLayout formLayout = new FormLayout();
+
+        TextField description = new TextField();
+        description.setWidthFull();
+        description.setRequired(true);
+        description.setRequiredIndicatorVisible(true);
+
+        ComboBox<String> mortgageDegree = new ComboBox<>();
+        mortgageDegree.setWidthFull();
+        mortgageDegree.setItems("1er Grado","2do Grado","3er Grado", "4to Grado");
+        mortgageDegree.setRequired(true);
+
+        NumberField mortgageValue = new NumberField();
+        mortgageValue.setWidthFull();
+        mortgageValue.setRequiredIndicatorVisible(true);
+
+        NumberField commercialValue = new NumberField();
+        commercialValue.setWidthFull();
+        commercialValue.setRequiredIndicatorVisible(true);
+
+        DatePicker apprasialDate = new DatePicker();
+        apprasialDate.setWidthFull();
+        apprasialDate.setRequired(true);
+        apprasialDate.setRequiredIndicatorVisible(true);
+
+        NumberField guaranteeAmount = new NumberField();
+        guaranteeAmount.setWidthFull();
+        guaranteeAmount.setRequiredIndicatorVisible(true);
+
+        formLayout.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1,
+                        FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("600px", 2,
+                        FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("800px", 3,
+                        FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("1024px", 4,
+                    FormLayout.ResponsiveStep.LabelsPosition.TOP)
+        );
+
+        DetailsDrawer detailsDrawerException = new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
+        detailsDrawerException.setContent(formLayout);
+        footerNoOwnGuarantee = new DetailsDrawerFooter();
+
+        formLayout.addFormItem(description,"Descripcion garantia");
+        formLayout.addFormItem(mortgageDegree,"Grado garantia");
+        formLayout.addFormItem(mortgageValue,"Valor hipotecario");
+        formLayout.addFormItem(commercialValue, "Valor comercial");
+        formLayout.addFormItem(apprasialDate,"Fecha avaluo");
+        formLayout.addFormItem(guaranteeAmount,"Monto garantia");
+
+        binderNoOwnGuarantee = new BeanValidationBinder<>(NoOwnGuarantee.class);
+        binderNoOwnGuarantee.forField(description).asRequired("Descripcion garantia es requerida")
+                .bind(NoOwnGuarantee::getDescription,NoOwnGuarantee::setDescription);
+        binderNoOwnGuarantee.forField(mortgageDegree).asRequired("Grado de la Hipoteca es requerido")
+                .bind(NoOwnGuarantee::getMortgageDegree,NoOwnGuarantee::setMortgageDegree);
+        binderNoOwnGuarantee.forField(mortgageValue).asRequired("Valor hipoteca es requerido")
+                .bind(NoOwnGuarantee::getMortgageValue,NoOwnGuarantee::setMortgageValue);
+        binderNoOwnGuarantee.forField(commercialValue).asRequired("Valor comercial es requerido")
+                .bind(NoOwnGuarantee::getCommercialValue,NoOwnGuarantee::setCommercialValue);
+        binderNoOwnGuarantee.forField(apprasialDate).asRequired("Fecha avaluo es requerida")
+                .bind(NoOwnGuarantee::getAppraisalDate,NoOwnGuarantee::setAppraisalDate);
+        binderNoOwnGuarantee.forField(guaranteeAmount).asRequired("Monto de la garantia es requerido")
+                .bind(NoOwnGuarantee::getGuaranteeAmount,NoOwnGuarantee::setGuaranteeAmount);
+        binderNoOwnGuarantee.addStatusChangeListener(event -> {
+            boolean isValid = !event.hasValidationErrors();
+            boolean hasChanges = binderNoOwnGuarantee.hasChanges();
+            footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud")
+                    && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
+        });
+
+        footerNoOwnGuarantee.addSaveListener(e ->{
+           if(binderNoOwnGuarantee.writeBeanIfValid(noOwnGuarantee)){
+               ObjectMapper mapper = new ObjectMapper();
+               if(currentNoOwnGuarantee.getId()==null){
+                   currentNoOwnGuarantee.setId(UUID.randomUUID());
+                   noOwnGuaranteeList.add(currentNoOwnGuarantee);
+               }else{
+                   List<NoOwnGuarantee> newList = noOwnGuaranteeList.stream()
+                           .filter(g -> !g.getId().equals(currentNoOwnGuarantee.getId()))
+                           .collect(Collectors.toList());
+                   newList.add(currentNoOwnGuarantee);
+                   noOwnGuaranteeList = newList;
+               }
+               String jsonNoOwnGuarantee = null;
+               try {
+                   jsonNoOwnGuarantee = mapper.writeValueAsString(noOwnGuaranteeList);
+                   jsonNoOwnGuarantee = jsonNoOwnGuarantee==null?"[]":jsonNoOwnGuarantee;
+                   current.setNoOwnGuarantee(jsonNoOwnGuarantee);
+                   UIUtils.showNotification("Datos Garantias no propias creados, para terminar de guardar GUARDE en la solicitud");
+                   detailsDrawer.hide();
+                   footer.saveState(true && GrantOptions.grantedOption("Solicitud"));
+                   dataProviderNoOwnGuarantee.refreshAll();
+
+               } catch (JsonProcessingException jsonProcessingException) {
+                   jsonProcessingException.printStackTrace();
+               }
+
+           }
+        });
+        footerNoOwnGuarantee.addCancelListener(e -> detailsDrawer.hide());
+        return formLayout;
+    }
+
+    private Grid createGridNoOwnGuarantee(){
+        Grid<NoOwnGuarantee> grid = new Grid<>();
+        grid.setWidthFull();
+        grid.addThemeVariants(GridVariant.LUMO_COMPACT,GridVariant.MATERIAL_COLUMN_DIVIDERS);
+        grid.setDataProvider(dataProviderNoOwnGuarantee);
+
+        grid.addSelectionListener(event -> {
+            event.getFirstSelectedItem().ifPresent(this::showCreateNoOwnGuarantee);
+            binderNoOwnGuarantee.readBean(currentNoOwnGuarantee);
+        });
+
+        grid.addColumn(NoOwnGuarantee::getDescription)
+                .setFlexGrow(0)
+                .setAutoWidth(true)
+                .setHeader("Descripcion Garantia")
+                .setResizable(true);
+        grid.addColumn(NoOwnGuarantee::getMortgageDegree)
+                .setFlexGrow(0)
+                .setAutoWidth(true)
+                .setHeader("Grado garantia")
+                .setResizable(true);
+        grid.addColumn(new ComponentRenderer<>(this::createMortageValue))
+                .setFlexGrow(0)
+                .setAutoWidth(true)
+                .setHeader("Valor hipotecario")
+                .setResizable(true);
+
+        grid.addColumn(new ComponentRenderer<>(this::createCommercialValue))
+                .setFlexGrow(0)
+                .setAutoWidth(true)
+                .setHeader("Valor comercial")
+                .setResizable(true);
+
+        grid.addColumn(new ComponentRenderer<>(this::createApprasialDate))
+                .setFlexGrow(0)
+                .setAutoWidth(true)
+                .setHeader("Fecha avaluo")
+                .setResizable(true);
+
+        grid.addColumn(new ComponentRenderer<>(this::createGuaranteeAmount))
+                .setFlexGrow(0)
+                .setAutoWidth(true)
+                .setHeader("Monto garantia")
+                .setResizable(true);
+
+
+        return grid;
+    }
+
+
+    private Component createMortageValue(NoOwnGuarantee noOwnGuarantee){
+        Double mortageValue = noOwnGuarantee.getMortgageValue();
+        return UIUtils.createAmountLabel(mortageValue);
+    }
+
+    private Component createCommercialValue(NoOwnGuarantee noOwnGuarantee){
+        Double commercialValue = noOwnGuarantee.getCommercialValue();
+        return UIUtils.createAmountLabel(commercialValue);
+    }
+
+    private Component createApprasialDate(NoOwnGuarantee noOwnGuarantee){
+        LocalDate apprasialDate = noOwnGuarantee.getAppraisalDate();
+        return UIUtils.createFormatDate(apprasialDate);
+    }
+
+    private Component createGuaranteeAmount(NoOwnGuarantee noOwnGuarantee){
+        Double guaranteeAmount = noOwnGuarantee.getGuaranteeAmount();
+        return UIUtils.createAmountLabel(guaranteeAmount);
     }
 
     private List<String> getListExceptions(){
