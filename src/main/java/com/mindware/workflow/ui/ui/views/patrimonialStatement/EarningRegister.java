@@ -164,8 +164,9 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         String operativeExpenses = patrimonialStatementCommerce.getFieldText5();
         String costProduct = patrimonialStatementCommerce.getFieldText6();
         String productionInventory = patrimonialStatementCommerce.getFieldText7();
-        frecuency.setValue(patrimonialStatementCommerce.getFieldInteger1().doubleValue());
-
+        if(patrimonialStatementCommerce.getFieldInteger1()!=null) {
+            frecuency.setValue(patrimonialStatementCommerce.getFieldInteger1().doubleValue());
+        }
         ObjectMapper mapper = new ObjectMapper();
         if(historySales==null ||  historySales.equals("") || historySales.equals("[]")){
             salesHistoryList = new ArrayList<>();

@@ -22,8 +22,9 @@ public class ApplicantDataProvider extends ListDataProvider<Applicant> {
         this.filterText = filterText.trim();
         setFilter(applicant ->
                 passesFilter(applicant.getFullName(), filterText)
-                    || passesFilter(applicant.getIdCardComplement(),filterText)
+                    || passesFilter(applicant.getFullIdCard(),filterText)
                     || passesFilter(applicant.getProfession(),filterText)
+                    || passesFilter(applicant.getRegisterDate(),filterText)
                     || passesFilter(applicant.getNumberApplicant(),filterText));
     }
 

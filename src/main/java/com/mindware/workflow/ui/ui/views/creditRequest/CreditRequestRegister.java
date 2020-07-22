@@ -1872,7 +1872,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             formRelation.addFormItem(field2,"Numero de credito");
             formRelation.addFormItem(relation,"Relacion");
             formRelation.addFormItem(comboBox2,"Tipo de vinculacion");
-            FormLayout.FormItem formItem = formRelation.addFormItem(textArea,"Explicacion sobre vinculacion economica");
+            FormLayout.FormItem formItem = formRelation.addFormItem(textArea,"Explicacion sobre vinculacion");
             UIUtils.setColSpan(3,formItem);
         }
         footerRelations = new DetailsDrawerFooter();

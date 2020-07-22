@@ -384,20 +384,20 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         grid.addThemeVariants(GridVariant.LUMO_COMPACT);
 
         grid.addColumn(DirectIndirectDebts::getEntity).setFlexGrow(0).setHeader("Entidad")
-                .setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true);
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(new ComponentRenderer<>(this::createAmount))
-                .setFlexGrow(0).setHeader("Monto")
-                .setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
+                .setFlexGrow(0).setHeader("Monto " + param.get("currency").get(0))
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(DirectIndirectDebts::getState).setFlexGrow(0).setHeader("Estado")
-                .setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(DirectIndirectDebts::getRating).setFlexGrow(0).setHeader("Calif")
-                .setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(DirectIndirectDebts::getGuarantee).setFlexGrow(0).setHeader("Garantia")
-                .setWidth(UIUtils.COLUMN_WIDTH_M).setResizable(true);
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(DirectIndirectDebts::getRate).setFlexGrow(0).setHeader("Tasa")
-                .setWidth(UIUtils.COLUMN_WIDTH_XS).setResizable(true);
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(DirectIndirectDebts::getFinalExpiration).setFlexGrow(0).setHeader("Vcto. final")
-                .setWidth(UIUtils.COLUMN_WIDTH_S).setResizable(true);
+                .setAutoWidth(true).setResizable(true);
         grid.addColumn(new ComponentRenderer<>(this::createButtonDelete)).setFlexGrow(1);
 
         return grid;
@@ -808,7 +808,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         });
 
         formLayout.addFormItem(entity,"Entidad");
-        formLayout.addFormItem(amount,"Monto $us");
+        formLayout.addFormItem(amount,"Monto " + param.get("currency").get(0));
         formLayout.addFormItem(state,"Estado");
         formLayout.addFormItem(rating,"Calificacion");
         formLayout.addFormItem(guarantee,"Garantia");

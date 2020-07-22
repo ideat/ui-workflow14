@@ -84,7 +84,11 @@ public class UtilValues {
 
         @Override
         public Result<Instant> convertToModel(String presentation, ValueContext valueContext) {
-            DateTimeFormatter f = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss",Locale.UK);
+//            DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm",Locale.UK);
+            DateTimeFormatter f = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                    .withLocale( Locale.UK )
+                    .withZone( ZoneId.systemDefault() );
+
             LocalDateTime ldt = LocalDateTime.parse(presentation,f);
             ZoneId z = ZoneId.systemDefault();
             ZonedDateTime zdt = ldt.atZone( z ) ;
@@ -95,9 +99,10 @@ public class UtilValues {
         @Override
         public String convertToPresentation(Instant model, ValueContext valueContext) {
             DateTimeFormatter formatter =
-                    DateTimeFormatter.ofLocalizedDateTime( FormatStyle.MEDIUM )
+                    DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
                             .withLocale( Locale.UK )
                             .withZone( ZoneId.systemDefault() );
+
             String output="";
             if(model!=null)
              output= formatter.format( model );

@@ -78,7 +78,7 @@ public class ApplicantView extends ViewFrame implements RouterLayout {
 
     private HorizontalLayout createTopBar(){
         filterText = new TextField();
-        filterText.setPlaceholder("Filtro Nombre, Nro Solicitante, Carnet, Ocupacion, Fecha registro");
+        filterText.setPlaceholder("Filtro Nombre, Nro Solicitante, Carnet, Ocupacion, Fecha registro(mm-dd-yyyy)");
         filterText.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
         filterText.addValueChangeListener(event -> dataProvider.setFilter(event.getValue()));
 

@@ -429,6 +429,9 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
 
     private Component createActiveBoolean1(PatrimonialStatement patrimonialStatement){
         Icon icon;
+        if(patrimonialStatement.getFieldBoolean1()==null){
+            icon = UIUtils.createDisabledIcon(VaadinIcon.CLOSE);
+        }else
         if(patrimonialStatement.getFieldBoolean1().equals("SI")){
             icon = UIUtils.createPrimaryIcon(VaadinIcon.CHECK);
         }else{
@@ -908,7 +911,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
                         fieldDouble1.setReadOnly(true);
                         binder.forField(fieldDouble1).withNullRepresentation(0.0)
                                 .bind(PatrimonialStatement::getFieldDouble1, PatrimonialStatement::setFieldDouble1);
-                    }if(element.contains("SUELDO")){
+                    }else if(element.contains("SUELDO")){
                         fieldDouble1.setValue(0.0);
                         fieldDouble1.setReadOnly(true);
                         binder.forField(fieldDouble1).withNullRepresentation(0.0)
