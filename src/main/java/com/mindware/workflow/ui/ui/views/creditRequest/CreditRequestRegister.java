@@ -939,7 +939,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
         ComboBox<String> typeGracePeriod = new ComboBox<>();
         typeGracePeriod.setWidthFull();
-        typeGracePeriod.setItems("NINGUNO","INTERESES","CAPITAL+INTERESES");
+        typeGracePeriod.setItems("NINGUNO","CAPITAL","CAPITAL+INTERESES");
         typeGracePeriod.addValueChangeListener(e-> auxTypeGracePeriod = e.getValue());
 
         ComboBox<Integer> gracePeriod = new ComboBox<>();
@@ -1027,8 +1027,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 .withConverter(new UtilValues.DoubleToIntegerConverter()).bind(CreditRequest::getFixedDay,CreditRequest::setFixedDay);
         binder.forField(typeFee).asRequired("Tipo de cuota es requerido").bind(CreditRequest::getTypeFee,CreditRequest::setTypeFee);
         binder.forField(typeGracePeriod).asRequired("Tipo de Periodo de Gracia es Requerido")
-//                .withValidator(validGracePeriod -> typeGracePeriod.getValue().equals("NINGUNO") && auxGracePeriod>0
-//                        ,"Si el Tipo de Periodo es: NINGUNO, el Periodo de Gracia debe ser: 0" )
                 .bind(CreditRequest::getTypeGracePeriod,CreditRequest::setTypeGracePeriod);
 
         binder.forField(gracePeriod).asRequired("Perido de Gracia es requerido")
@@ -1042,10 +1040,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                     }
                     return ValidationResult.ok();
                 })
-//                .withValidator(validGracePeriod -> !auxTypeGracePeriod.equals("NINGUNO") && validGracePeriod.intValue()==0
-//                        , "El Periodo de Gracia tiene que ser mayor a 0")
-//                .withValidator(validGracePeriod -> (validGracePeriod.intValue() % (paymentPeriod.getValue()/30)) > 0
-//                        ,"Periodo de Gracia no corresponde al Periodo de Amortizacion")
                 .bind(CreditRequest::getGracePeriod,CreditRequest::setGracePeriod);
 
         binder.forField(baseInterestRate).asRequired("Tasa base es requerida, si no corresponde ingrese '0'").bind(CreditRequest::getBaseInterestRate,CreditRequest::setBaseInterestRate);
@@ -1056,7 +1050,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binder.forField(destination).asRequired("Destino del credito es requerido").bind(CreditRequest::getDestination,CreditRequest::setDestination);
         binder.forField(numberCredit)
                 .withConverter(Integer::valueOf,String::valueOf,"Ingrese un numero, 0 valor por defeccto")
-//                .withConverter(new StringToIntegerConverter("Se admiten solo numeros"))
                 .withValidator(value -> value.intValue()>=0, "Numero credito no valido, 0 valor por defecto")
                 .bind(CreditRequest::getNumberCredit,CreditRequest::setNumberCredit);
         binder.forField(typeGuarantee).bind(CreditRequest::getTypeGuarantee,CreditRequest::setTypeGuarantee);

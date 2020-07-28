@@ -225,6 +225,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
             paramCreditResolution.put("path",path);
             paramCreditResolution.put("title",title);
             paramCreditResolution.put("amount",param.get("amount"));
+            paramCreditResolution.put("currency",param.get("currency"));
 
             QueryParameters qp = new QueryParameters(paramCreditResolution);
             UI.getCurrent().navigate("report-preview",qp);

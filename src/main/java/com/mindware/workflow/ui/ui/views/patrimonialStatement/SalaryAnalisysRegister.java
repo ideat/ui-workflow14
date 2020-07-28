@@ -347,7 +347,7 @@ public class SalaryAnalisysRegister extends SplitViewFrame implements HasUrlPara
                 descount = amount * Double.parseDouble(p.getValue());
                 flag = true;
             }
-            if(amount>salary && !flag && splitSalary[0].trim().equals(">")){
+            if(amount>=salary && !flag && splitSalary[0].trim().equals(">")){
                 descount = amount * Double.parseDouble(p.getValue());
                 flag = true;
             }

@@ -269,6 +269,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
             paramPso.put("id-credit-request-applicant", param.get("id-credit-request-applicant"));
             paramPso.put("element",param.get("element"));
             paramPso.put("category",param.get("category"));
+            paramPso.put("currency",param.get("currency"));
 
             QueryParameters qp = new QueryParameters(paramPso);
             UI.getCurrent().navigate("report-preview",qp);
