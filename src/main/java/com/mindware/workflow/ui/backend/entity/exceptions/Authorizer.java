@@ -23,4 +23,6 @@ public class Authorizer {
     private String scope;
 
     private String state;
+
+    private String riskType;
 }

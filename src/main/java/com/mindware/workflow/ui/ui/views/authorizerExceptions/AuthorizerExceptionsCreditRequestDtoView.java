@@ -72,15 +72,18 @@ public class AuthorizerExceptionsCreditRequestDtoView extends ViewFrame implemen
             authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByUser(login));
         }else{
             if(authorizer.getScope().equals("LOCAL")){
-                authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByCityCurrencyAmounts(office.getCity(),
-                        "BS", authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs()));
-                authorizerExceptionsCreditRequestDtoList.addAll(restTemplate.getByCityCurrencyAmounts(office.getCity(),
-                        "$US", authorizer.getMinimumAmountSus(),authorizer.getMaximumAmountSus()));
+//                authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByCityCurrencyAmounts(office.getCity(),
+//                        "BS", authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs()));
+//                authorizerExceptionsCreditRequestDtoList.addAll(restTemplate.getByCityCurrencyAmounts(office.getCity(),
+//                        "$US", authorizer.getMinimumAmountSus(),authorizer.getMaximumAmountSus()));
+                authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByRiskTypeCity(authorizer.getRiskType(),office.getCity()));
             }else if (authorizer.getScope().equals("NACIONAL")){
-                authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByCurrencyAmounts("BS",
-                        authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs()));
-                authorizerExceptionsCreditRequestDtoList.addAll(restTemplate.getByCurrencyAmounts("$US",
-                        authorizer.getMinimumAmountSus(),authorizer.getMaximumAmountSus()));
+//                authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByCurrencyAmounts("BS",
+//                        authorizer.getMinimumAmountBs(),authorizer.getMaximumAmountBs()));
+//                authorizerExceptionsCreditRequestDtoList.addAll(restTemplate.getByCurrencyAmounts("$US",
+//                        authorizer.getMinimumAmountSus(),authorizer.getMaximumAmountSus()));
+                authorizerExceptionsCreditRequestDtoList = new ArrayList<>(restTemplate.getByRiskType(authorizer.getRiskType()));
+
             }
         }
         dataProvider = new AuthorizerExceptionsCreditRequestDtoDataProvider(authorizerExceptionsCreditRequestDtoList);

@@ -78,7 +78,7 @@ public class ApplicantView extends ViewFrame implements RouterLayout {
 
     private HorizontalLayout createTopBar(){
         filterText = new TextField();
-        filterText.setPlaceholder("Filtro Nombre, Nro Solicitante, Carnet, Ocupacion, Fecha registro(mm-dd-yyyy)");
+        filterText.setPlaceholder("Filtro Nombre, Nro Solicitante, Carnet, Ocupacion, Fecha registro(dd/mm/yyyy)");
         filterText.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
         filterText.addValueChangeListener(event -> dataProvider.setFilter(event.getValue()));
 
@@ -137,7 +137,7 @@ public class ApplicantView extends ViewFrame implements RouterLayout {
                 .setAutoWidth(true).setFlexGrow(1);
         grid.addColumn(Applicant::getProfession).setFlexGrow(1).setSortable(true)
                 .setAutoWidth(true).setHeader("Ocupacion").setSortable(true);
-        grid.addColumn(new LocalDateRenderer<>(Applicant::getRegisterDate, DateTimeFormatter.ofPattern("MMM dd, YYYY")))
+        grid.addColumn(new LocalDateRenderer<>(Applicant::getRegisterDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 .setComparator(Applicant::getRegisterDate).setFlexGrow(0).setHeader("Registro")
                 .setAutoWidth(true).setResizable(true).setSortable(true);
 

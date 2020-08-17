@@ -22,4 +22,6 @@ public class ExceptionsCreditRequest {
     private String justification;
 
     private String statusReview;
+
+    private String riskType;
 }

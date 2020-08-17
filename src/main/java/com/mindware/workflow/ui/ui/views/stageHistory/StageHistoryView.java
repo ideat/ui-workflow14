@@ -110,7 +110,6 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
         topLayout.expand(filterText);
 
         return topLayout;
-
     }
 
     private Grid createGrid(){
@@ -136,7 +135,6 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
 
                     QueryParameters qp = new QueryParameters(param);
                     UI.getCurrent().navigate("stage-history-register",qp);
-
                 }
             }
         });

@@ -2,8 +2,10 @@ package com.mindware.workflow.ui.ui.views.config.exceptions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.exceptions.Exceptions;
 import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsRestTemplate;
+import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
 import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
@@ -51,7 +53,6 @@ public class ExceptionsRegister extends SplitViewFrame implements HasUrlParamete
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
         restTemplate = new ExceptionsRestTemplate();
-
         if(s.equals("NUEVO")){
             exceptions = new Exceptions();
             setViewContent(createContent());
@@ -125,6 +126,10 @@ public class ExceptionsRegister extends SplitViewFrame implements HasUrlParamete
         rbState.setItems("ACTIVO","BAJA");
         rbState.setValue(Optional.ofNullable(exceptions.getState()).orElse("").equals("ACTIVO") ? "ACTIVO":"BAJA");
 
+        ComboBox<String> riskType = new ComboBox<>();
+        riskType.setItems(getRiskType());
+        riskType.setWidthFull();
+
 
 
         binder = new BeanValidationBinder<>(Exceptions.class);
@@ -139,6 +144,8 @@ public class ExceptionsRegister extends SplitViewFrame implements HasUrlParamete
                 .bind(Exceptions::getDescription,Exceptions::setDescription);
         binder.forField(rbState).asRequired("Estado de excepcion no puede omitirse")
                 .bind(Exceptions::getState,Exceptions::setState);
+        binder.forField(riskType).asRequired("Tipo de riesgo es requerido")
+                .bind(Exceptions::getRiskType,Exceptions::setRiskType);
         binder.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binder.hasChanges();
@@ -160,6 +167,7 @@ public class ExceptionsRegister extends SplitViewFrame implements HasUrlParamete
         layout.addFormItem(typeException,"Tipo Excepcin");
         layout.addFormItem(limitTime,"Tiempo maximo(dias)");
         layout.addFormItem(rbState,"Estado");
+        layout.addFormItem(riskType,"Tipo de riesgo");
         FormLayout.FormItem descriptionItem = layout.addFormItem(description,"Excepcion (descripcion)");
         UIUtils.setColSpan(3,descriptionItem);
         footer = new DetailsDrawerFooter();
@@ -187,6 +195,16 @@ public class ExceptionsRegister extends SplitViewFrame implements HasUrlParamete
         detailsDrawer.setFooter(footer);
 
         return detailsDrawer;
+    }
+
+    private List<String> getRiskType(){
+        ParameterRestTemplate parameterRestTemplate = new ParameterRestTemplate();
+        List<Parameter> parameterList = parameterRestTemplate.getParametersByCategories("TIPO RIESGO");
+        List<String> riskTypeList = new ArrayList<>();
+        for(Parameter p: parameterList){
+            riskTypeList.add(p.getValue());
+        }
+        return riskTypeList;
     }
 
 }

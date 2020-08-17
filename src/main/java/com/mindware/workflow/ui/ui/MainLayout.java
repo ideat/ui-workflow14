@@ -22,6 +22,7 @@ import com.mindware.workflow.ui.ui.views.config.office.OfficeView;
 import com.mindware.workflow.ui.ui.views.config.office.SignatorieView;
 import com.mindware.workflow.ui.ui.views.config.parameter.ParameterView;
 import com.mindware.workflow.ui.ui.views.config.templateForms.TemplateFormsView;
+import com.mindware.workflow.ui.ui.views.config.typeCredit.TypeCreditView;
 import com.mindware.workflow.ui.ui.views.config.workflowProduct.WorflowProductView;
 import com.mindware.workflow.ui.ui.views.contract.ContractCreditRequestDtoView;
 import com.mindware.workflow.ui.ui.views.contract.ContractVariableView;
@@ -294,6 +295,9 @@ public class MainLayout extends FlexBoxLayout
 			}
 			if (assignedOption("Parametros")) {
 				menu.addNaviItem(configuration, "Parametros", ParameterView.class);
+			}
+			if (assignedOption("Tipo de Credito")) {
+				menu.addNaviItem(configuration, "Tipo de Credito", TypeCreditView.class);
 			}
 			if (assignedOption("Plantillas")) {
 				menu.addNaviItem(configuration, "Plantillas", TemplateFormsView.class);

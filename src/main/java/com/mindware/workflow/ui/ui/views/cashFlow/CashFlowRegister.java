@@ -6,6 +6,7 @@ import com.mindware.workflow.ui.backend.entity.cashFlow.CashFlow;
 import com.mindware.workflow.ui.backend.entity.cashFlow.FlowItem;
 import com.mindware.workflow.ui.backend.entity.creditRequest.PaymentPlan;
 import com.mindware.workflow.ui.backend.entity.patrimonialStatement.PatrimonialStatement;
+import com.mindware.workflow.ui.backend.entity.rol.Option;
 import com.mindware.workflow.ui.backend.rest.cashFlow.CashFlowRestTemplate;
 import com.mindware.workflow.ui.backend.rest.patrimonialStatement.PatrimonialStatementRestTemplate;
 import com.mindware.workflow.ui.backend.rest.paymentPlan.PaymentPlanRestTemplate;
@@ -144,23 +145,29 @@ public class CashFlowRegister extends SplitViewFrame implements HasUrlParameter<
         Button btnPrint = new Button("Imprimir");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
         btnPrint.addClickListener(e -> {
-            Map<String, List<String>> paramCashFlow = new HashMap<>();
-            List<String> origin = new ArrayList<>();
-            origin.add("cashFlow");
-            List<String> path = new ArrayList<>();
-            path.add("register-cashflow");
+            Optional<CashFlow> cashFlow = Optional.ofNullable(cashFlowRestTemplate.getByNumberRequest(Integer.parseInt(param.get("number-request").get(0))));
+            if(!cashFlow.isPresent()){
+                UIUtils.showNotification("Guarde el flujo antes de poder imprimirlo");
+            }else {
 
-            List<String> titleReport = new ArrayList<>();
-            titleReport.add("Flujo de Caja Mensual ");
-            paramCashFlow.put("path",path);
-            paramCashFlow.put("title",titleReport);
-            paramCashFlow.put("origin",origin);
-            paramCashFlow.put("number-request",param.get("number-request"));
-            paramCashFlow.put("full-name",param.get("full-name"));
-            paramCashFlow.put("id-credit-request-applicant",param.get("id-credit-request-applicant"));
+                Map<String, List<String>> paramCashFlow = new HashMap<>();
+                List<String> origin = new ArrayList<>();
+                origin.add("cashFlow");
+                List<String> path = new ArrayList<>();
+                path.add("register-cashflow");
 
-            QueryParameters qp = new QueryParameters(paramCashFlow);
-            UI.getCurrent().navigate("report-preview", qp);
+                List<String> titleReport = new ArrayList<>();
+                titleReport.add("Flujo de Caja Mensual ");
+                paramCashFlow.put("path", path);
+                paramCashFlow.put("title", titleReport);
+                paramCashFlow.put("origin", origin);
+                paramCashFlow.put("number-request", param.get("number-request"));
+                paramCashFlow.put("full-name", param.get("full-name"));
+                paramCashFlow.put("id-credit-request-applicant", param.get("id-credit-request-applicant"));
+
+                QueryParameters qp = new QueryParameters(paramCashFlow);
+                UI.getCurrent().navigate("report-preview", qp);
+            }
 
         });
 

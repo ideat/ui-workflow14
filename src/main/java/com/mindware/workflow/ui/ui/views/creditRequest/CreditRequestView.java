@@ -26,10 +26,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -107,7 +109,7 @@ public class CreditRequestView extends SplitViewFrame implements RouterLayout {
 
     private HorizontalLayout createTopBar(){
         filterText = new TextField();
-        filterText.setPlaceholder("Filtro por Nro solicitud, Solicitante, Moneda, Fecha solicitud (mm-dd-yyyy)");
+        filterText.setPlaceholder("Filtro por Nro solicitud, Solicitante, Moneda, Fecha solicitud (dd/mm/yyyy)");
         filterText.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
         filterText.addValueChangeListener(event -> dataProvider.setFilter(event.getValue()));
 
@@ -203,9 +205,7 @@ public class CreditRequestView extends SplitViewFrame implements RouterLayout {
         grid.addColumn(new ComponentRenderer<>(this::createAmount)).setHeader("Monto")
                 .setSortable(true).setFlexGrow(1).setResizable(true)
                 .setAutoWidth(true);
-        grid.addColumn(TemplateRenderer.<CreditRequestApplicantDto> of("[[item.requestDate]]")
-                .withProperty("requestDate",
-                        creditRequestApplicantDto -> UIUtils.formatDate(creditRequestApplicantDto.getRequestDate())))
+        grid.addColumn(new LocalDateRenderer<>(CreditRequestApplicantDto::getRequestDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 .setHeader("Fecha solicitud").setComparator(CreditRequestApplicantDto::getRequestDate)
                 .setAutoWidth(true).setFlexGrow(1).setSortable(true);
 

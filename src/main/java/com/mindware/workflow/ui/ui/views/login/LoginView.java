@@ -71,7 +71,7 @@ public class LoginView extends VerticalLayout {
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setDescription("Workflow - Creditos");
         i18n.getForm().setUsername("Usuario");
-        i18n.getForm().setTitle("PROMOCRED");
+        i18n.getForm().setTitle("SEC");
         i18n.getForm().setSubmit("Entrar");
         i18n.getForm().setPassword("Clave");
         i18n.getForm().setForgotPassword("");

@@ -17,7 +17,7 @@
     "webpack-dev-server": "3.9.0",
     "webpack-merge": "4.2.2"
   },
-  "vaadinAppPackageHash": "eeae2a34909845e044ebe1752bf940d758a0b49233b9eb62662879f23e8a9cee",
+  "vaadinAppPackageHash": "64cb0858bf3cdcf729c449ed880a46083d75a9e597cc1c4bdf520b3db3208196",
   "vaadin": {
     "dependencies": {
       "@polymer/polymer": "3.2.0",

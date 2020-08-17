@@ -137,9 +137,10 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
                 e.printStackTrace();
             }
             setViewContent(createApplicant(applicant));
-            setViewDetails(createDetailDrawer());
-            setViewDetailsPosition(Position.BOTTOM);
+
         }
+        setViewDetails(createDetailDrawer());
+        setViewDetailsPosition(Position.BOTTOM);
         binder.readBean(applicant);
     }
 
@@ -530,7 +531,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         formPersonal.addFormItem(dependentNumber,"Numero dependientes");
         formPersonal.addFormItem(birthdate,"Fecha Nacimiento");
         formPersonal.addFormItem(gender,"Genero");
-        formPersonal.addFormItem(profession,"Ocupación");
+        formPersonal.addFormItem(profession,"Ocupación/Profesión");
         formPersonal.addFormItem(nationality,"Nacionalidad");
         formPersonal.addFormItem(caedec,"CAEDEC");
         formPersonal.addFormItem(cellphone,"Celular");

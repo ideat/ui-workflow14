@@ -259,7 +259,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
 
         topBar.setSpacing(true);
         topBar.setPadding(true);
-        topBar.add(btnPrint,btnSave);
+        topBar.add(btnSave,btnPrint);
 
         Accordion accordion = new Accordion();
         accordion.setWidthFull();
@@ -523,7 +523,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
 
         typeResolution = new ComboBox<>();
         typeResolution.setItems(getValueParameter("RESOLUCION"));
-        typeResolution.setItems("REGIONAL","NIVEL1","NIVEL2","NIVEL3");
+        typeResolution.setItems("REGIONAL","NIVEL3","NIVEL2","NIVEL1");
         typeResolution.setRequired(true);
         typeResolution.setRequiredIndicatorVisible(true);
         typeResolution.setWidth("100%");

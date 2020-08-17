@@ -71,4 +71,25 @@ public class AuthorizerExceptionsCreditRequestDtoRestTemplate {
         return Arrays.asList(response.getBody());
     }
 
+    public List<AuthorizerExceptionsCreditRequestDto> getByRiskType(String riskType){
+        final String uri = "http://localhost:8080/rest/v1/authorizerExceptionCreditRequest/getByRiskType";
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("risk-type",riskType);
+        HttpEntity<AuthorizerExceptionsCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<AuthorizerExceptionsCreditRequestDto[]> response = restTemplate.exchange(uri,HttpMethod.GET
+                ,entity,AuthorizerExceptionsCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<AuthorizerExceptionsCreditRequestDto> getByRiskTypeCity(String riskType, String city){
+        final String uri = "http://localhost:8080/rest/v1/authorizerExceptionCreditRequest/getByRiskTypeCity";
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.set("risk-type",riskType);
+        headers.set("city",city);
+        HttpEntity<AuthorizerExceptionsCreditRequestDto[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<AuthorizerExceptionsCreditRequestDto[]> response = restTemplate.exchange(uri,HttpMethod.GET
+                ,entity,AuthorizerExceptionsCreditRequestDto[].class);
+        return Arrays.asList(response.getBody());
+    }
+
 }

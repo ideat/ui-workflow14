@@ -201,5 +201,12 @@
     "name": "Indicador Tamaño Empresa",
     "read": "false",
     "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Tipo de Credito",
+    "read": "false",
+    "write": "false"
   }]
 

@@ -41,6 +41,8 @@ public class UtilValues {
         return list;
     }
 
+
+
     public static List<String> getListOfficeCodeName(){
         OfficeRestTemplate rest = new OfficeRestTemplate();
         List<Office> listOffice = rest.getAllOffice();
@@ -108,6 +110,51 @@ public class UtilValues {
              output= formatter.format( model );
 
             return output;
+        }
+    }
+
+    public static  class SetToStringConverter implements Converter<Set<String>, String>{
+
+        @Override
+        public Result<String> convertToModel(Set<String> presentation, ValueContext valueContext) {
+            String joined = String.join(",",presentation);
+
+            return Result.ok(joined);
+        }
+
+        @Override
+        public Set<String> convertToPresentation(String model, ValueContext valueContext) {
+            Set<String> output = new HashSet<>();
+            if(model!=null) {
+                String[] list = model.split(",");
+                for(String s:list){
+                    output.add(s);
+                }
+            }
+            return output;
+        }
+    }
+
+    public static class StringToSet implements Converter<String,Set<String>>{
+
+        @Override
+        public Result<Set<String>> convertToModel(String model, ValueContext valueContext) {
+            Set<String> output = new HashSet<>();
+            if(model!=null) {
+                String[] list = model.split(",");
+                for(String s:list){
+                    output.add(s);
+                }
+            }
+            return Result.ok(output);
+        }
+
+        @Override
+        public String convertToPresentation(Set<String> presentation, ValueContext valueContext) {
+
+            String joined = String.join(",",presentation);
+
+            return joined;
         }
     }
 

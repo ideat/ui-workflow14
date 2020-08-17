@@ -17,4 +17,5 @@ public class ExceptionsCreditRequestDto {
     private Integer limitTime;
     private LocalDate register;
     private String typeException;
+    private String riskType;
 }

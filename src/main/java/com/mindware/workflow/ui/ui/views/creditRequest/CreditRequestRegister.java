@@ -1,12 +1,15 @@
 package com.mindware.workflow.ui.ui.views.creditRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.Applicant;
 import com.mindware.workflow.ui.backend.entity.CreditRequestApplicant;
 import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
+import com.mindware.workflow.ui.backend.entity.config.RequestStage;
+import com.mindware.workflow.ui.backend.entity.config.WorkflowProduct;
 import com.mindware.workflow.ui.backend.entity.creditRequest.*;
 import com.mindware.workflow.ui.backend.entity.dto.CreditRequestApplicantDto;
 import com.mindware.workflow.ui.backend.entity.exceptions.*;
@@ -26,6 +29,7 @@ import com.mindware.workflow.ui.backend.rest.patrimonialStatement.PatrimonialSta
 import com.mindware.workflow.ui.backend.rest.paymentPlan.PaymentPlanRestTemplate;
 import com.mindware.workflow.ui.backend.rest.stageHistory.StageHistoryRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
+import com.mindware.workflow.ui.backend.rest.workflowProducdt.WorkflowProductRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
 import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
@@ -96,7 +100,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private PaymentPlanRestTemplate paymentPlanRestTemplate;
     private ExceptionsCreditRequestRestTemplate exceptionsCreditRequestRestTemplate;
     private ExceptionsCreditRequestDtoRestTemplate exceptionsCreditRequestDtoRestTemplate;
-
+    private WorkflowProductRestTemplate workflowProductRestTemplate;
 
     private DetailsDrawerFooter footer;
     private ListDataProvider<LinkUp> dataProviderLinkUp;
@@ -159,6 +163,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     private Integer auxGracePeriod=0;
     private String auxTypeGracePeriod="";
+    private String riskType;
 
     @Override
     protected void onAttach(AttachEvent attachEvent){
@@ -181,6 +186,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         creditRequestAplicantRestTemplate = new CreditRequestAplicantRestTemplate();
         exceptionsCreditRequestRestTemplate = new ExceptionsCreditRequestRestTemplate();
         exceptionsCreditRequestDtoRestTemplate = new ExceptionsCreditRequestDtoRestTemplate();
+        workflowProductRestTemplate = new WorkflowProductRestTemplate();
         Location location = beforeEvent.getLocation();
         QueryParameters queryParameters = location.getQueryParameters();
         paramCredit = queryParameters.getParameters();
@@ -411,12 +417,14 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         gridExceptionsCreditRequestDto.addSelectionListener(event -> {
            if(event.getFirstSelectedItem().isPresent()){
                String codeException = event.getFirstSelectedItem().get().getInternalCode();
-               ExceptionsCreditRequest exceptionsCreditRequest = exceptionsCreditRequestRestTemplate.getByCodeExceptionNumberRequest(codeException,paramNumberRequest);
+               ExceptionsCreditRequest exceptionsCreditRequest = exceptionsCreditRequestRestTemplate
+                       .getByCodeExceptionNumberRequest(codeException,paramNumberRequest);
                showCreateException(exceptionsCreditRequest);
            }
         });
 
-        exceptionsCreditRequestDtoList = new ArrayList<>(exceptionsCreditRequestDtoRestTemplate.getByNumberRequest(paramNumberRequest));
+        exceptionsCreditRequestDtoList = new ArrayList<>(exceptionsCreditRequestDtoRestTemplate
+                .getByNumberRequest(paramNumberRequest));
         dataProviderExceptionsCreditRequestDto = new ListDataProvider<>(exceptionsCreditRequestDtoList);
         gridExceptionsCreditRequestDto.setDataProvider(dataProviderExceptionsCreditRequestDto);
         gridExceptionsCreditRequestDto.setWidth("100%");
@@ -822,7 +830,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         Button button = new Button();
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_ERROR);
         button.setIcon(VaadinIcon.TRASH.create());
-        button.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        button.setEnabled(GrantOptions.grantedOption("Solicitud") &&
+                current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         button.addClickListener(e ->{
             linkUpList.removeIf(l -> l.getId().equals(linkUp.getId()));
             ObjectMapper mapper = new ObjectMapper();
@@ -955,10 +964,23 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         fixedDay.setRequiredIndicatorVisible(true);
         fixedDay.setWidth("100%");
 
+        DatePicker paymentPlanEndDate = new DatePicker();
+        paymentPlanEndDate.setWidth("50%");
+        paymentPlanEndDate.setPlaceholder("Venc. plan pagos");
+
         ComboBox<String> typeFee = new ComboBox<>();
         typeFee.setRequired(true);
         typeFee.setItems("FIJA","VARIABLE","PLAZO FIJO");
-        typeFee.setWidth("100%");
+        typeFee.setWidth("50%");
+        typeFee.addValueChangeListener(e ->{
+
+            paymentPlanEndDate.setVisible(e.getValue().equals("PLAZO FIJO"));
+
+        });
+
+        FlexBoxLayout layoutTypeFee = new FlexBoxLayout(typeFee,paymentPlanEndDate);
+        layoutTypeFee.setFlexGrow(1,paymentPlanEndDate);
+        layoutTypeFee.setSpacing(Right.S);
 
         NumberField baseInterestRate = new NumberField();
         baseInterestRate.setPattern("^[0-9]+([.][0-9]{1,2})?$");
@@ -966,7 +988,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
         ComboBox<Integer> initPeriodBaseRate= new ComboBox<>();
         initPeriodBaseRate.setWidth("100%");
-        initPeriodBaseRate.setItems(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24);
+        initPeriodBaseRate.setItems(0,1,2,3,4,5,6,7,8,9,10,11,12,13
+                ,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36);
         initPeriodBaseRate.setValue(0);
 
         ComboBox<String> caedec = new ComboBox<>();
@@ -1022,10 +1045,12 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 .asRequired("Plazo es requerido").withConverter(new UtilValues.DoubleToIntegerConverter()).bind(CreditRequest::getTerm, CreditRequest::setTerm);
         binder.forField(typeTerm).asRequired("Tipo de plazo es requerido").bind(CreditRequest::getTypeTerm, CreditRequest::setTypeTerm);
         binder.forField(paymentPeriod).asRequired("Periodo de pago es requerido")
+                .withValidator(value -> value.intValue()>0,"Periodo de pago tiene que ser mayor a 0")
                 .bind(CreditRequest::getPaymentPeriod,CreditRequest::setPaymentPeriod);
         binder.forField(fixedDay).withValidator(value -> value.intValue()>=0 && value.intValue()<=30, "Dia fijo debe estar entre 0 a 30")
                 .withConverter(new UtilValues.DoubleToIntegerConverter()).bind(CreditRequest::getFixedDay,CreditRequest::setFixedDay);
         binder.forField(typeFee).asRequired("Tipo de cuota es requerido").bind(CreditRequest::getTypeFee,CreditRequest::setTypeFee);
+        binder.forField(paymentPlanEndDate).bind(CreditRequest::getPaymentPlanEndDate,CreditRequest::setPaymentPlanEndDate);
         binder.forField(typeGracePeriod).asRequired("Tipo de Periodo de Gracia es Requerido")
                 .bind(CreditRequest::getTypeGracePeriod,CreditRequest::setTypeGracePeriod);
 
@@ -1091,9 +1116,12 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 //        formRequest.addFormItem(termFlex,"Plazo - Tipo plazo");
         formRequest.addFormItem(paymentPeriod,"Periodo de amortizacion");
         formRequest.addFormItem(fixedDay,"Dia fijo");
-        formRequest.addFormItem(typeFee,"Tipo cuota");
+//        formRequest.addFormItem(typeFee,"Tipo cuota");
+        FormLayout.FormItem typeFeeItem = formRequest.addFormItem(layoutTypeFee,"Tipo cuota");
+        UIUtils.setColSpan(1,typeFeeItem);
+
         formRequest.addFormItem(typeGracePeriod,"Tipo Periodo de Gracia");
-        formRequest.addFormItem(gracePeriod,"Periodo de Gracias (Meses)");
+        formRequest.addFormItem(gracePeriod,"Periodo de Gracia (Meses)");
         formRequest.addFormItem(baseInterestRate,"Tasa base");
         formRequest.addFormItem(initPeriodBaseRate,"Periodo inicio tasa base");
         formRequest.addFormItem(caedec,"CAEDEC");
@@ -1106,6 +1134,10 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         UIUtils.setColSpan(4, destinationItem);
         footer = new DetailsDrawerFooter();
         footer.addSaveListener(e ->{
+            if(typeFee.getValue().equals("PLAZO FIJO") && paymentPlanEndDate.isEmpty()){
+                UIUtils.showNotification("Ingrese una fecha para el vencimiento del plan de pagos");
+                paymentPlanEndDate.focus();
+            }else
             if(binder.writeBeanIfValid(creditRequest)) {
                if(creditRequest.getState()==null || creditRequest.getState().isEmpty()) {
                    creditRequest.setState("ANALISIS_PREVIO");
@@ -1117,16 +1149,27 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                creditRequest.setLoginUser(VaadinSession.getCurrent().getAttribute("login").toString());
                CreditRequest result = restTemplate.addCreditRequest(creditRequest);
                if(creditRequest.getId()==null){
-                   StageHistoryRestTemplate stageHistoryRestTemplate = new StageHistoryRestTemplate();
-                   StageHistory stageHistory = new StageHistory();
-                   stageHistory.setNumberRequest(result.getNumberRequest());
-                   stageHistory.setStage("EVALUACION_CREDITO");
-                   stageHistory.setStartDateTime(Instant.now());
-                   stageHistory.setState("PENDIENTE");
-                   stageHistory.setInitDateTime(Instant.now());
-                   stageHistory.setUserTask(result.getLoginUser());
-                   stageHistory.setComesFrom("EVALUACION_CREDITO");
-                   stageHistoryRestTemplate.add(stageHistory);
+                   ObjectMapper mapper = new ObjectMapper();
+                   WorkflowProduct workflowProduct = workflowProductRestTemplate.getByCode(creditRequest.getProductCredit());
+                   List<RequestStage> requestStageList = new ArrayList<>();
+                   try {
+                       requestStageList = mapper.readValue(workflowProduct.getRequestStage(), new TypeReference<List<RequestStage>>() {});
+                       requestStageList = requestStageList.stream().filter(p -> p.getPosition()==1).collect(Collectors.toList());
+
+                   } catch (JsonProcessingException jsonProcessingException) {
+                       jsonProcessingException.printStackTrace();
+                   }
+                   for(RequestStage r: requestStageList){
+                       addStageHistory(result.getLoginUser(),result.getNumberRequest(),r.getStage());
+                   }
+
+
+//                   if(result.getTypeGuarantee().startsWith("H")) {
+//                       addStageHistory(result.getLoginUser(), result.getNumberRequest(), "EVALUACION_CREDITO");
+//                       addStageHistory(result.getLoginUser(), result.getNumberRequest(), "LEGAL");
+//                   }else{
+//                       addStageHistory(result.getLoginUser(), result.getNumberRequest(), "EVALUACION_CREDITO");
+//                   }
                }
                current = result;
 
@@ -1161,9 +1204,22 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     }
 
+    private void addStageHistory(String loginUser, Integer numberRequest, String stage){
+        StageHistoryRestTemplate stageHistoryRestTemplate = new StageHistoryRestTemplate();
+        StageHistory stageHistory = new StageHistory();
+        stageHistory.setNumberRequest(numberRequest);
+        stageHistory.setStage(stage);
+        stageHistory.setStartDateTime(Instant.now());
+        stageHistory.setState("PENDIENTE");
+        stageHistory.setInitDateTime(Instant.now());
+        stageHistory.setUserTask(loginUser);
+        stageHistory.setComesFrom(stage);
+        stageHistoryRestTemplate.add(stageHistory);
+    }
+
     private DetailsDrawer createExceptionCreditRequest(ExceptionsCreditRequest exceptionsCreditRequest){
         FormLayout formLayout = new FormLayout();
-
+        riskType = exceptionsCreditRequest.getRiskType();
         ComboBox<String> exceptions = new ComboBox<>();
         exceptions.setItems(getListExceptions());
         exceptions.setWidth("100%");
@@ -1173,6 +1229,9 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             if(e.getValue()!=null) {
                 String[] values = e.getValue().split("-");
                 exceptions.setValue(values[0]);
+                if(values.length>1) {
+                    riskType = values[3];
+                }
             }
         });
 
@@ -1228,6 +1287,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                if(exceptionsCreditRequest.getId()==null){
                    exceptionsCreditRequest.setRegister(LocalDate.now());
                    exceptionsCreditRequest.setNumberRequest(paramNumberRequest);
+                   exceptionsCreditRequest.setRiskType(riskType);
                    try {
                        exceptionsCreditRequest.setStatusReview(mapper.writeValueAsString(setAuthorizers()));
                    } catch (JsonProcessingException ex) {
@@ -1235,6 +1295,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                    }
                }
                try {
+                   exceptionsCreditRequest.setRiskType(riskType);
                    exceptionsCreditRequestRestTemplate.add(exceptionsCreditRequest);
                    UIUtils.showNotification("Excepcion registrada");
                    exceptionsCreditRequestDtoList = new ArrayList<>(exceptionsCreditRequestDtoRestTemplate.getByNumberRequest(paramNumberRequest));
@@ -1456,11 +1517,29 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 .setAutoWidth(true)
                 .setHeader("Monto garantia")
                 .setResizable(true);
-
+        grid.addColumn(new ComponentRenderer<>(this::createButtonDeleteNoOwnGuarantee)).setFlexGrow(1);
 
         return grid;
     }
 
+    private Component createButtonDeleteNoOwnGuarantee(NoOwnGuarantee noOwnGuarantee){
+        Button btn = UIUtils.createErrorPrimaryButton(VaadinIcon.TRASH);
+        btn.setEnabled(GrantOptions.grantedOption("Solicitud") &&
+                current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
+        btn.addClickListener(e -> {
+            noOwnGuaranteeList.removeIf(n -> n.getId().equals(noOwnGuarantee.getId()));
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                current.setNoOwnGuarantee(mapper.writeValueAsString(noOwnGuaranteeList));
+                footer.saveState(true);
+                UIUtils.showNotification("Registro marcado para borrar, Guarde los cambios en Datos Solicitud");
+            } catch (JsonProcessingException jsonProcessingException) {
+                jsonProcessingException.printStackTrace();
+            }
+            dataProviderNoOwnGuarantee.refreshAll();
+        });
+        return btn;
+    }
 
     private Component createMortageValue(NoOwnGuarantee noOwnGuarantee){
         Double mortageValue = noOwnGuarantee.getMortgageValue();
@@ -1488,7 +1567,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         List<Exceptions> exceptionsList = exceptionsRestTemplate.getAll();
         for(Exceptions exceptions : exceptionsList){
             if(exceptions.getState().equals("ACTIVO")) {
-                list.add(exceptions.getInternalCode() + "-" + exceptions.getDescription() +"-"+exceptions.getTypeException());
+                list.add(exceptions.getInternalCode() + "-" + exceptions.getDescription() +"-"+exceptions.getTypeException()+"-"+exceptions.getRiskType());
             }
         }
         return list;

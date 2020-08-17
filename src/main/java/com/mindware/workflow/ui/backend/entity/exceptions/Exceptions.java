@@ -19,4 +19,6 @@ public class Exceptions {
     private Integer limitTime;
 
     private String state;
+
+    private String riskType;
 }

@@ -3,10 +3,10 @@ package com.mindware.workflow.ui.ui.views.config.authorizer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mindware.workflow.ui.backend.entity.Users;
 import com.mindware.workflow.ui.backend.entity.exceptions.Authorizer;
-import com.mindware.workflow.ui.backend.entity.exceptions.UserAuthorizer;
 import com.mindware.workflow.ui.backend.rest.exceptions.AuthorizerRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawer;
@@ -18,11 +18,11 @@ import com.mindware.workflow.ui.ui.layout.size.Right;
 import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.FlexDirection;
 import com.mindware.workflow.ui.ui.views.SplitViewFrame;
-import com.mindware.workflow.ui.ui.views.config.exceptions.ExceptionsView;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -36,7 +36,10 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -138,21 +141,21 @@ public class AuthorizerRegister extends SplitViewFrame implements HasUrlParamete
         layoutSearch.setFlexGrow(1,btnSearch);
         layoutSearch.setSpacing(Right.S);
 
-        NumberField minimumAmountBs = new NumberField();
-        minimumAmountBs.setWidth("100%");
-        minimumAmountBs.setRequiredIndicatorVisible(true);
-
-        NumberField maximumAmountBs = new NumberField();
-        maximumAmountBs.setWidth("100%");
-        maximumAmountBs.setRequiredIndicatorVisible(true);
-
-        NumberField minimumAmountSus = new NumberField();
-        minimumAmountSus.setWidth("100%");
-        minimumAmountSus.setRequiredIndicatorVisible(true);
-
-        NumberField maximumAmountSus = new NumberField();
-        maximumAmountSus.setWidth("100%");
-        maximumAmountSus.setRequiredIndicatorVisible(true);
+//        NumberField minimumAmountBs = new NumberField();
+//        minimumAmountBs.setWidth("100%");
+//        minimumAmountBs.setRequiredIndicatorVisible(true);
+//
+//        NumberField maximumAmountBs = new NumberField();
+//        maximumAmountBs.setWidth("100%");
+//        maximumAmountBs.setRequiredIndicatorVisible(true);
+//
+//        NumberField minimumAmountSus = new NumberField();
+//        minimumAmountSus.setWidth("100%");
+//        minimumAmountSus.setRequiredIndicatorVisible(true);
+//
+//        NumberField maximumAmountSus = new NumberField();
+//        maximumAmountSus.setWidth("100%");
+//        maximumAmountSus.setRequiredIndicatorVisible(true);
 
         ComboBox<String> scope = new ComboBox<>();
         scope.setRequired(true);
@@ -163,22 +166,32 @@ public class AuthorizerRegister extends SplitViewFrame implements HasUrlParamete
         state.setItems("ACTIVO","BAJA");
         state.setValue(Optional.ofNullable(authorizer.getState()).orElse("").equals("ACTIVO") ? "ACTIVO":"BAJA");
 
+        CheckboxGroup riskType = new CheckboxGroup();
+        riskType.setItems(UtilValues.getParamterValue("TIPO RIESGO"));
+//        riskType.setItems("RIESGO ALTO","RIESGO MEDIO", "RIESGO BAJO");
+        riskType.setWidthFull();
+
+
         binder = new BeanValidationBinder<>(Authorizer.class);
 
 
         binder.forField(loginUser).asRequired("Login usuario es requerido")
                 .bind(Authorizer::getLoginUser,Authorizer::setLoginUser);
-        binder.forField(minimumAmountBs).asRequired("Monto minimo en Bs es requerido")
-                .bind(Authorizer::getMinimumAmountBs,Authorizer::setMinimumAmountBs);
-        binder.forField(maximumAmountBs).asRequired("Monto maximo en Bs es requerido")
-                .bind(Authorizer::getMaximumAmountBs,Authorizer::setMaximumAmountBs);
-        binder.forField(minimumAmountSus).asRequired("Monto minimo en $us es requerido")
-                .bind(Authorizer::getMinimumAmountSus,Authorizer::setMinimumAmountSus);
-        binder.forField(maximumAmountSus).asRequired("Monto maximo en $us es requerido")
-                .bind(Authorizer::getMaximumAmountSus,Authorizer::setMaximumAmountSus);
+//        binder.forField(minimumAmountBs).asRequired("Monto minimo en Bs es requerido")
+//                .bind(Authorizer::getMinimumAmountBs,Authorizer::setMinimumAmountBs);
+//        binder.forField(maximumAmountBs).asRequired("Monto maximo en Bs es requerido")
+//                .bind(Authorizer::getMaximumAmountBs,Authorizer::setMaximumAmountBs);
+//        binder.forField(minimumAmountSus).asRequired("Monto minimo en $us es requerido")
+//                .bind(Authorizer::getMinimumAmountSus,Authorizer::setMinimumAmountSus);
+//        binder.forField(maximumAmountSus).asRequired("Monto maximo en $us es requerido")
+//                .bind(Authorizer::getMaximumAmountSus,Authorizer::setMaximumAmountSus);
         binder.forField(scope).asRequired("Alcance es requerido")
                 .bind(Authorizer::getScope,Authorizer::setScope);
         binder.forField(state).asRequired("Estado es requerido").bind(Authorizer::getState,Authorizer::setState);
+        binder.forField(riskType)
+                .asRequired("Tipo de riesgo es requerido")
+                .withConverter(new UtilValues.SetToStringConverter())
+                .bind("riskType");
 
         binder.addStatusChangeListener(event -> {
            boolean isValid = !event.hasValidationErrors();
@@ -197,12 +210,13 @@ public class AuthorizerRegister extends SplitViewFrame implements HasUrlParamete
         );
 
         formAuthorizer.addFormItem(layoutSearch,"Usuario");
-        formAuthorizer.addFormItem(minimumAmountBs,"Monto Min. Bs");
-        formAuthorizer.addFormItem(maximumAmountBs,"Monto Max. Bs");
-        formAuthorizer.addFormItem(minimumAmountSus,"Monto Min. $us");
-        formAuthorizer.addFormItem(maximumAmountSus, "Monto Max. $us");
+//        formAuthorizer.addFormItem(minimumAmountBs,"Monto Min. Bs");
+//        formAuthorizer.addFormItem(maximumAmountBs,"Monto Max. Bs");
+//        formAuthorizer.addFormItem(minimumAmountSus,"Monto Min. $us");
+//        formAuthorizer.addFormItem(maximumAmountSus, "Monto Max. $us");
         formAuthorizer.addFormItem(scope,"Alcance autorizacion");
         formAuthorizer.addFormItem(state,"Estado autorizador");
+        formAuthorizer.addFormItem(riskType,"Tipo de Riesgo");
 
         footer = new DetailsDrawerFooter();
         footer.addSaveListener(e ->{
@@ -310,4 +324,6 @@ public class AuthorizerRegister extends SplitViewFrame implements HasUrlParamete
         }
     }
 
-    }
+
+
+}

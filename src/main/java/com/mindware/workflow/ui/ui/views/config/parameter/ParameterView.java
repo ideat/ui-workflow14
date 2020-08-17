@@ -80,7 +80,7 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
             "CARGOS FINANCIEROS","ETAPAS SOLICITUD","ESTADO-WORKFLOW",
             "PUESTOS","MONEDA","REFERENCIA PERSONAL","VINCULACION ECONOMICA",
             "TIPO DOCUMENTO IDENTIDAD","PLANIFICACION-EJECUCION","DESCUENTO SUELDOS","VARIABLES VAE-DEPENDIENTE",
-            "OBJETO DEL CREDITO"};
+            "OBJETO DEL CREDITO","TIPO RIESGO"};
 
     public ParameterView(){
         getListParameter();

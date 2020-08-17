@@ -93,4 +93,6 @@ public class CreditRequest {
 
     private String noOwnGuarantee;//json
 
+    private LocalDate paymentPlanEndDate;
+
 }
