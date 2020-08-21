@@ -24,8 +24,6 @@ public class CreditResolution {
 
     private String item; //rubro
 
-    private String creditObject; //objeto de la operacion
-
     private String conclusion;
 
     private String exceptions;// definir campos, json

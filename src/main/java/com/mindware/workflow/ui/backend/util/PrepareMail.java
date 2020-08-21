@@ -53,6 +53,22 @@ public class PrepareMail {
         }
     }
 
+    public static void sendMailNewCreditRequestForward(String rol, String scope, Integer numberRequest, String stage){
+        List<Users> usersList = userRestTemplate.getByRol(rol);
+
+        for(Users users:usersList){
+            Mail mail = new Mail();
+            mail.setLoginUser(users.getLogin());
+            mail.setSendDate(LocalDateTime.now());
+            mail.setNumberRequest(numberRequest);
+            mail.setMailFrom(users.getEmail());
+            mail.setMailTo(users.getEmail());
+            mail.setMailSubject("Workflow");
+            mail.setMailContent("Operacion se encuentra en su area, solicitud nro: " + numberRequest.toString());
+            mailRestTemplate.add(mail);
+        }
+    }
+
     public static void sendMailWorkflowGoBackward(List<StageHistory> stageHistoryList, String login, Integer numberRequest, String comesFrom){
 
         Users user = userRestTemplate.getByIdUser(login);

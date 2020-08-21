@@ -56,6 +56,10 @@ public class StageHistoryCreditRequestDto {
 
     private State state;
 
+    private String codeTypeCredit;
+
+    private Integer codeObjectCredit;
+
     public String getFullName(){
         return Optional.ofNullable(this.lastName).orElse("")+" "
                 +Optional.ofNullable(this.firstName).orElse("");

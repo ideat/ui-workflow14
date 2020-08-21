@@ -68,6 +68,8 @@ public class WorkflowProductRegister extends SplitViewFrame implements HasUrlPar
     private List<String> rolNames = new ArrayList<>();
     private Map<String,List<String>> param;
 
+
+
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
@@ -86,7 +88,9 @@ public class WorkflowProductRegister extends SplitViewFrame implements HasUrlPar
         QueryParameters queryParameters = location.getQueryParameters();
         param = queryParameters.getParameters();
 
-        workflowProduct = restTemplate.getByCode(param.get("code").get(0));
+//        workflowProduct = restTemplate.getByCode(param.get("code").get(0));
+        workflowProduct = restTemplate.getByTypeCreditAndObject(param.get("code-type-credit").get(0),
+                param.get("code-object-credit").get(0));
         requestStageList = new ArrayList<>();
         rolList = rolRestTemplate.getAllRols();
 
@@ -112,7 +116,11 @@ public class WorkflowProductRegister extends SplitViewFrame implements HasUrlPar
                 requestStageList.add(requestStage);
             }
             workflowProduct = new WorkflowProduct();
-            workflowProduct.setCodeProductCredit(param.get("code").get(0));
+            workflowProduct.setCodeTypeCredit(param.get("code-type-credit").get(0));
+            workflowProduct.setCodeObjectCredit(Integer.parseInt(param.get("code-object-credit").get(0)));
+
+//            workflowProduct.setCodeProductCredit(param.get("code").get(0));
+
             String jsonRequestStage = mapper.writeValueAsString(requestStageList);
             workflowProduct.setRequestStage(jsonRequestStage);
 

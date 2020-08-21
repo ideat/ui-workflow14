@@ -188,6 +188,7 @@ public class ReportPreview extends SplitViewFrame implements HasUrlParameter<Str
             paramPrev.put("full-name",param.get("full-name"));
             paramPrev.put("amount",param.get("amount"));
             paramPrev.put("currency",param.get("currency"));
+            paramPrev.put("type-credit",param.get("type-credit"));
         }else if(param.get("origin").get(0).equals("legal-information-report")){
             LegalInformationReportDtoRestTemplate restTemplate = new LegalInformationReportDtoRestTemplate();
             previousPage = param.get("path").get(0);

@@ -31,6 +31,8 @@ import com.mindware.workflow.ui.backend.rest.stageHistory.StageHistoryRestTempla
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.backend.rest.workflowProducdt.WorkflowProductRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.PrepareMail;
+import com.mindware.workflow.ui.backend.util.TypeCreditDto;
 import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
@@ -164,6 +166,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private Integer auxGracePeriod=0;
     private String auxTypeGracePeriod="";
     private String riskType;
+    private String codeTypeCredit;
 
     @Override
     protected void onAttach(AttachEvent attachEvent){
@@ -244,6 +247,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             numberRequest.setReadOnly(true);
 
         }
+        codeTypeCredit = current.getTypeCredit()!=null?current.getTypeCredit():"";
         setViewDetails(createDetailDrawer());
         setViewDetailsPosition(Position.BOTTOM);
     }
@@ -886,24 +890,43 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
         btnCharge.addClickListener(e -> showCharge());
 
+        ComboBox<String> objectCredit = new ComboBox();
+        objectCredit.setRequired(true);
+        objectCredit.setWidthFull();
+        objectCredit.addValueChangeListener(e ->{
+            if(e.getValue()!=null) {
+                String[] s = e.getValue().split("-");
+                objectCredit.setValue(s[0]);
+            }
+        });
+
+        ComboBox<String> productCredit = new ComboBox<>();
+//        productCredit.setItems(UtilValues.getParameterValueDescription("PRODUCTOS"));
+        productCredit.setRequired(true);
+        productCredit.setWidth("100%");
+        productCredit.setClearButtonVisible(true);
+        productCredit.addValueChangeListener(e ->{
+            if(e.getValue()!=null) {
+                String[] s = e.getValue().split("-");
+                productCredit.setValue(s[0]);
+            }
+        });
 
         ComboBox<String> typeCredit = new ComboBox<>();
-        typeCredit.setItems(UtilValues.getParameterValueDescription("TIPO CREDITO"));
+        typeCredit.setItems(TypeCreditDto.getTypeCredit());
         typeCredit.setRequired(true);
         typeCredit.setWidth("100%");
         typeCredit.addValueChangeListener(e->{
            String[] s = e.getValue().split("-");
-           typeCredit.setValue(s[0]);
+           codeTypeCredit = s[0];
+           typeCredit.setValue(codeTypeCredit);
+//           productCredit.setValue(null);
+           productCredit.setItems(TypeCreditDto.getProductList(codeTypeCredit));
+//           objectCredit.setValue(null);
+           objectCredit.setItems(TypeCreditDto.getObjectList(codeTypeCredit));
         });
 
-        ComboBox<String> productCredit = new ComboBox<>();
-        productCredit.setItems(UtilValues.getParameterValueDescription("PRODUCTOS"));
-        productCredit.setRequired(true);
-        productCredit.setWidth("100%");
-        productCredit.addValueChangeListener(e ->{
-            String[] s = e.getValue().split("-");
-            productCredit.setValue(s[0]);
-        });
+
 
         ComboBox<String> idOffice = new ComboBox<>();
         idOffice.setItems(UtilValues.getListOfficeCodeName());
@@ -1036,6 +1059,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                 .bind(CreditRequest::getAmount,CreditRequest::setAmount);
         binder.forField(typeCredit).asRequired("Tipo credito es requerido").bind(CreditRequest::getTypeCredit,CreditRequest::setTypeCredit);
         binder.forField(productCredit).asRequired("Producto credito es requerido").bind(CreditRequest::getProductCredit,CreditRequest::setProductCredit);
+        binder.forField(objectCredit).asRequired("Objeto del credito es requerido").bind(CreditRequest::getObjectCredit,CreditRequest::setObjectCredit);
         binder.forField(idOffice).asRequired("Oficina es requerida").withConverter(new StringToIntegerConverter(idOffice.getValue()))
                 .withValidator(value -> value.intValue()>0,"Seleccione una oficina") .bind(CreditRequest::getIdOffice, CreditRequest::setIdOffice);
         binder.forField(rateInterest).asRequired("Tasa interes es requerida").withValidator(rate -> rate.doubleValue()>0, "Tasa interes debe ser mayor a 0")
@@ -1106,6 +1130,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         formRequest.addFormItem(layoutSearch,"Solicitante");
         formRequest.addFormItem(typeCredit, "Tipo de credito");
         formRequest.addFormItem(productCredit, "Producto de credito");
+        formRequest.addFormItem(objectCredit,"Objeto del credito");
         formRequest.addFormItem(idOffice,"Oficina");
         formRequest.addFormItem(amount,"Monto");
         formRequest.addFormItem(currency,"Moneda");
@@ -1150,7 +1175,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                CreditRequest result = restTemplate.addCreditRequest(creditRequest);
                if(creditRequest.getId()==null){
                    ObjectMapper mapper = new ObjectMapper();
-                   WorkflowProduct workflowProduct = workflowProductRestTemplate.getByCode(creditRequest.getProductCredit());
+//                   WorkflowProduct workflowProduct = workflowProductRestTemplate.getByCode(creditRequest.getProductCredit());
+                   WorkflowProduct workflowProduct = workflowProductRestTemplate.getByTypeCreditAndObject(creditRequest.getTypeCredit(),creditRequest.getObjectCredit());
                    List<RequestStage> requestStageList = new ArrayList<>();
                    try {
                        requestStageList = mapper.readValue(workflowProduct.getRequestStage(), new TypeReference<List<RequestStage>>() {});
@@ -1160,16 +1186,15 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                        jsonProcessingException.printStackTrace();
                    }
                    for(RequestStage r: requestStageList){
-                       addStageHistory(result.getLoginUser(),result.getNumberRequest(),r.getStage());
+                       if(r.getStage().equals("EVALUACION_CREDITO")) {
+                           addStageHistory(result.getLoginUser(), result.getNumberRequest(), r.getStage());
+                       }else{
+                           addStageHistory(null, result.getNumberRequest(), r.getStage());
+
+//                           PrepareMail.sendMailWorkflowGoForward("",current.getNumberRequest(),r.getRols(),"");
+                       }
                    }
 
-
-//                   if(result.getTypeGuarantee().startsWith("H")) {
-//                       addStageHistory(result.getLoginUser(), result.getNumberRequest(), "EVALUACION_CREDITO");
-//                       addStageHistory(result.getLoginUser(), result.getNumberRequest(), "LEGAL");
-//                   }else{
-//                       addStageHistory(result.getLoginUser(), result.getNumberRequest(), "EVALUACION_CREDITO");
-//                   }
                }
                current = result;
 
@@ -1581,7 +1606,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         Office office = officeRestTemplate.getByCode(users.getCodeOffice());
         AuthorizerOfficeUserDtoRestTemplate  authorizerOfficeUserDtoRestTemplate = new AuthorizerOfficeUserDtoRestTemplate();
         List<AuthorizersOfficeUserDto> authorizersOfficeUserDtos = new LinkedList<>();
-        if( current.getCurrency().toUpperCase().equals("BS")) {
+        if( current.getCurrency().equals("Bs.")) {
             authorizersOfficeUserDtos = authorizerOfficeUserDtoRestTemplate.getByAmountBs(current.getAmount(), current.getAmount());
         }else{
             authorizersOfficeUserDtos = authorizerOfficeUserDtoRestTemplate.getByAmountSus(current.getAmount(), current.getAmount());

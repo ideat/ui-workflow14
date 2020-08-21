@@ -33,6 +33,16 @@ public class WorkflowProductRestTemplate {
         return response.getBody();
     }
 
+    public WorkflowProduct getByTypeCreditAndObject(String codeTypeCredit, String codeObjectCredit){
+        final String uri ="http://localhost:8080/rest/v1/workflowproduct/getByTypeCreditAndObject/{codetypecredit}/{codeobjectcredit}";
+        Map<String,String> params = new HashMap<>();
+        params.put("codetypecredit",codeTypeCredit);
+        params.put("codeobjectcredit",codeObjectCredit);
+        HttpEntity<WorkflowProduct> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<WorkflowProduct> response = restTemplate.exchange(uri, HttpMethod.GET,entity,WorkflowProduct.class,params);
+        return response.getBody();
+    }
+
     public List<WorkflowProduct> getAll(){
         final String uri ="http://localhost:8080/rest/v1/workflowproduct/getAll";
         HttpEntity<WorkflowProduct[]> entity = new HttpEntity<>(HeaderJwt.getHeader());

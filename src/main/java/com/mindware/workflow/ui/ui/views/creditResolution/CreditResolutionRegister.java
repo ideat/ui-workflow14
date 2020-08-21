@@ -15,6 +15,8 @@ import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsRestTemplate;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.workflow.ui.backend.rest.patrimonialStatement.PatrimonialStatementRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.TypeCreditDto;
+import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawer;
@@ -83,7 +85,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
 
     private  TextField sector;
     private  TextField item;
-    private ComboBox<String> creditObject;
+//    private ComboBox<String> creditObject;
 //    private TextArea conclusion;
     private TextArea relevantInformation;
     private  DatePicker creationDate;
@@ -226,7 +228,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
             paramCreditResolution.put("title",title);
             paramCreditResolution.put("amount",param.get("amount"));
             paramCreditResolution.put("currency",param.get("currency"));
-
+            paramCreditResolution.put("type-credit",param.get("type-credit"));
             QueryParameters qp = new QueryParameters(paramCreditResolution);
             UI.getCurrent().navigate("report-preview",qp);
 
@@ -473,14 +475,12 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         return layout;
     }
 
-    private List<String> getListObjectCredit(){
-        List<Parameter> parameterList = parameterRestTemplate.getParametersByCategory("OBJETO DEL CREDITO");
-        List<String> objectCreditList = new ArrayList<>();
-        for(Parameter p:parameterList){
-            objectCreditList.add(p.getDescription());
-        }
-        return objectCreditList;
-    }
+//    private List<String> getListObjectCredit(){
+//
+//        List<String> objectCreditList = TypeCreditDto.getObjectList(param.get("type-credit").get(0));
+//
+//        return objectCreditList;
+//    }
 
     private FormLayout formCreditDestination(){
         FormLayout formLayout = new FormLayout();
@@ -493,13 +493,13 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         item.setWidth("100%");
         item.setRequired(true);
         item.setRequiredIndicatorVisible(true);
-
-        creditObject = new ComboBox<>();
-        creditObject.setWidth("100%");
-        creditObject.setItems(getListObjectCredit());
-        creditObject.setRequired(true);
-        creditObject.setRequiredIndicatorVisible(true);
-        creditObject.setAllowCustomValue(false);
+//
+//        creditObject = new ComboBox<>();
+//        creditObject.setWidth("100%");
+//        creditObject.setItems(getListObjectCredit());
+//        creditObject.setRequired(true);
+//        creditObject.setRequiredIndicatorVisible(true);
+//        creditObject.setAllowCustomValue(false);
 
 //        conclusion = new TextArea();
 //        conclusion.setWidth("100%");
@@ -560,8 +560,8 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
                 .bind(CreditResolution::getSector,CreditResolution::setSector);
         binderCreditResolution.forField(item).asRequired("Rubro es requerido")
                 .bind(CreditResolution::getItem,CreditResolution::setItem);
-        binderCreditResolution.forField(creditObject).asRequired("Objeto del credito es requerido")
-                .bind(CreditResolution::getCreditObject,CreditResolution::setCreditObject);
+//        binderCreditResolution.forField(creditObject).asRequired("Objeto del credito es requerido")
+//                .bind(CreditResolution::getCreditObject,CreditResolution::setCreditObject);
 //        binderCreditResolution.forField(conclusion).asRequired("Conclusion es requerida")
 //                .bind(CreditResolution::getConclusion,CreditResolution::setConclusion);
         binderCreditResolution.forField(relevantInformation).asRequired("Informacion requerida")
@@ -577,7 +577,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         formLayout.addFormItem(applicantRating,"Calificacion");
         formLayout.addFormItem(sector,"Sector");
         formLayout.addFormItem(item,"Rubro");
-        formLayout.addFormItem(creditObject,"Objeto de la operacion");
+//        formLayout.addFormItem(creditObject,"Objeto de la operacion");
         formLayout.addFormItem(reciprocity,"Monto Reciprocidad");
 //        FormLayout.FormItem conclusionItem = formLayout.addFormItem(conclusion,"Conclusion");
         FormLayout.FormItem relavantInformationItem = formLayout.addFormItem(relevantInformation,"Informacion relevante del credito");

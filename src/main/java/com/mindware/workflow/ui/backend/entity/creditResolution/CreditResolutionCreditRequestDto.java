@@ -10,6 +10,7 @@ import java.util.*;
 public class CreditResolutionCreditRequestDto {
     private UUID idCreditRequestApplicant;
     private Integer numberRequest;
+    private String typeCredit;
     private String firstName;
     private String secondName;
     private String lastName;
@@ -24,10 +25,11 @@ public class CreditResolutionCreditRequestDto {
     private Integer numberApplicantSpouse;
 
     public String getFullName(){
-        return Optional.ofNullable(this.lastName).orElse("")+" "
-                +Optional.ofNullable(this.motherLastName).orElse("") + " "
+        return  Optional.ofNullable(this.firstName).orElse("") + " "
                 +Optional.ofNullable(this.secondName).orElse("")+ " "
-                +Optional.ofNullable(this.firstName).orElse("");
+                +Optional.ofNullable(this.lastName).orElse("")+" "
+                +Optional.ofNullable(this.motherLastName).orElse("");
+
     }
 
     public String getInitials(){

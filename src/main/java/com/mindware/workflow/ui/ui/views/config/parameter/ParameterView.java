@@ -75,12 +75,12 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
 
     private TextField txtDescriptionFilter;
 
-    private String[] param = {"TIPO CREDITO","TIPO GARANTIA","PRODUCTOS","PROFESIONES","CAEDEC","EXTENSION CARNET",
+    private String[] param = {"TIPO GARANTIA","PROFESIONES","CAEDEC","EXTENSION CARNET",
             "ESTADO CIVIL", "GENERO", "NACIONALIDAD", "ACTIVO", "PASIVO","INGRESOS","EGRESOS",
             "CARGOS FINANCIEROS","ETAPAS SOLICITUD","ESTADO-WORKFLOW",
             "PUESTOS","MONEDA","REFERENCIA PERSONAL","VINCULACION ECONOMICA",
             "TIPO DOCUMENTO IDENTIDAD","PLANIFICACION-EJECUCION","DESCUENTO SUELDOS","VARIABLES VAE-DEPENDIENTE",
-            "OBJETO DEL CREDITO","TIPO RIESGO"};
+            "TIPO RIESGO"};
 
     public ParameterView(){
         getListParameter();

@@ -12,7 +12,13 @@ public class WorkflowProduct {
 
     private String codeProductCredit;
 
+    private Integer codeObjectCredit;
+
+    private String codeTypeCredit;
+
     private String requestStage; //json
 
     private Integer totalHours;
+
+
 }

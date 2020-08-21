@@ -341,17 +341,31 @@ public class SalaryAnalisysRegister extends SplitViewFrame implements HasUrlPara
         Double descount = 0.0;
         boolean flag = false;
         for(Parameter p:parameterList){
-            String[] splitSalary = p.getDescription().split("=");
+            String[] splitSalary = p.getDescription().split(";");
             Double salary = Double.parseDouble(splitSalary[1]);
-            if(amount<=salary && !flag && splitSalary[0].trim().equals("<")){
-                descount = amount * Double.parseDouble(p.getValue());
-                flag = true;
-            }
-            if(amount>=salary && !flag && splitSalary[0].trim().equals(">")){
-                descount = amount * Double.parseDouble(p.getValue());
-                flag = true;
+            if(splitSalary[0].trim().equals("<=") && !flag){
+                if(amount<=salary ){
+                    descount = amount * Double.parseDouble(p.getValue());
+                    flag = true;
+                }
+            }else if(splitSalary[0].trim().equals("<") && !flag){
+                if(amount<salary ){
+                    descount = amount * Double.parseDouble(p.getValue());
+                    flag = true;
+                }
             }
 
+            if(splitSalary[0].trim().equals(">=") && !flag){
+                if(amount>=salary ){
+                    descount = amount * Double.parseDouble(p.getValue());
+                    flag = true;
+                }
+            }else  if(splitSalary[0].trim().equals(">")&& !flag){
+                if(amount>salary ){
+                    descount = amount * Double.parseDouble(p.getValue());
+                    flag = true;
+                }
+            }
         }
 
         return  Math.round(descount*100.0)/100.0;

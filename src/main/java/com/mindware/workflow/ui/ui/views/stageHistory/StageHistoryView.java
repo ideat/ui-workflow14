@@ -132,6 +132,12 @@ public class StageHistoryView extends SplitViewFrame implements RouterLayout {
                     List<String> codeProduct = new ArrayList<>();
                     codeProduct.add(event.getFirstSelectedItem().get().getProductCode().toString());
                     param.put("code-product",codeProduct);
+                    List<String> codeTypeCredit = new ArrayList<>();
+                    param.put("code-type-credit",codeTypeCredit);
+                    codeTypeCredit.add(event.getFirstSelectedItem().get().getCodeTypeCredit());
+                    List<String> codeObjectCredit = new ArrayList<>();
+                    codeObjectCredit.add(event.getFirstSelectedItem().get().getCodeObjectCredit().toString());
+                    param.put("code-object-credit",codeObjectCredit);
 
                     QueryParameters qp = new QueryParameters(param);
                     UI.getCurrent().navigate("stage-history-register",qp);

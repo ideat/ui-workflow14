@@ -1,7 +1,12 @@
 package com.mindware.workflow.ui.ui.views.config.workflowProduct;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
+import com.mindware.workflow.ui.backend.entity.config.TypeCredit;
+import com.mindware.workflow.ui.backend.entity.config.dto.TypeCreditObjectCreditDto;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
+import com.mindware.workflow.ui.backend.rest.typeCredit.TypeCreditRestTemplate;
+import com.mindware.workflow.ui.backend.util.TypeCreditDto;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.layout.size.Horizontal;
@@ -29,15 +34,18 @@ public class WorflowProductView extends ViewFrame implements RouterLayout {
     private List<Parameter> productCredits;
 
     private ParameterRestTemplate parameterRestTemplate;
+    List<TypeCreditObjectCreditDto> typeCreditObjectCreditDtoList;
 
-    private WorflowProductView(){
+    private WorflowProductView() throws JsonProcessingException {
         getProductList();
         setViewContent(createContent());
     }
 
-    private void getProductList(){
-        parameterRestTemplate = new ParameterRestTemplate();
-        productCredits = parameterRestTemplate.getParametersByCategory("PRODUCTOS");
+    private void getProductList() throws JsonProcessingException {
+//        parameterRestTemplate = new ParameterRestTemplate();
+//        productCredits = parameterRestTemplate.getParametersByCategory("PRODUCTOS");
+
+        typeCreditObjectCreditDtoList = TypeCreditDto.getAllTypeCreditObjectCreditDto();
     }
 
     private Component createContent(){
@@ -53,27 +61,32 @@ public class WorflowProductView extends ViewFrame implements RouterLayout {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
-        Grid<Parameter> grid = new Grid<>();
-        grid.setItems(productCredits);
+        Grid<TypeCreditObjectCreditDto> grid = new Grid<>();
+        grid.setItems(typeCreditObjectCreditDtoList);
         grid.setSizeFull();
 
         grid.addSelectionListener(e ->{
             Map<String,List<String>> p = new HashMap<>();
-            List<String> code = new ArrayList<>();
-            code.add(e.getFirstSelectedItem().get().getValue());
-            List<String> product = new ArrayList<>();
-            product.add(e.getFirstSelectedItem().get().getDescription());
+            List<String> codeTypeCredit = new ArrayList<>();
+            codeTypeCredit.add(e.getFirstSelectedItem().get().getCodeTypeCredit());
+            List<String> codeObjectCredit = new ArrayList<>();
+            codeObjectCredit.add(e.getFirstSelectedItem().get().getExternalCodeObjectCredit().toString());
+            List<String> objectDescription = new ArrayList<>();
+            objectDescription.add(e.getFirstSelectedItem().get().getObjectCreditDescription());
 
-            p.put("code",code);
-            p.put("product",product);
+            p.put("code-type-credit",codeTypeCredit);
+            p.put("code-object-credit",codeObjectCredit);
+            p.put("product",objectDescription);
 
             QueryParameters qp = new QueryParameters(p);
             UI.getCurrent().navigate("workflow-product-register",qp);
         });
 
-        grid.addColumn(Parameter::getValue).setFlexGrow(0).setHeader("Cod. Producto")
+        grid.addColumn(TypeCreditObjectCreditDto::getCodeTypeCredit).setFlexGrow(0).setHeader("Cod. Tipo credito")
                 .setResizable(true).setWidth(UIUtils.COLUMN_WIDTH_M);
-        grid.addColumn(Parameter::getDescription).setFlexGrow(1).setHeader("Producto")
+        grid.addColumn(TypeCreditObjectCreditDto::getExternalCodeObjectCredit).setFlexGrow(1).setHeader("Cod. Objeto credito")
+                .setResizable(true);
+        grid.addColumn(TypeCreditObjectCreditDto::getObjectCreditDescription).setFlexGrow(1).setHeader("Objeto de credito")
                 .setResizable(true);
         layout.add(grid);
         return layout;

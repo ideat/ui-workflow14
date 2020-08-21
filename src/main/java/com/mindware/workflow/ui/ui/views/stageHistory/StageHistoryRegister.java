@@ -70,8 +70,9 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
        comesFromStage = stageHistory.getComesFrom();
 //        rol = rolRestTemplate.getRolByName(VaadinSession.getCurrent().getAttribute("rol").toString());
         workflowProductRestTemplate = new WorkflowProductRestTemplate();
-        workflowProduct = workflowProductRestTemplate.getByCode(paramStage.get("code-product").get(0));
-
+//        workflowProduct = workflowProductRestTemplate.getByCode(paramStage.get("code-product").get(0));
+        workflowProduct = workflowProductRestTemplate.getByTypeCreditAndObject(paramStage.get("code-type-credit").get(0)
+                                                        , paramStage.get("code-object-credit").get(0));
         ObjectMapper mapper = new ObjectMapper();
         try {
             List<RequestStage> requestStageList = mapper.readValue(workflowProduct.getRequestStage(), new TypeReference<List<RequestStage>>() {});

@@ -95,4 +95,6 @@ public class CreditRequest {
 
     private LocalDate paymentPlanEndDate;
 
+    private String objectCredit;
+
 }
