@@ -6,9 +6,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.Charset;
 import java.util.*;
 
 @Service
@@ -39,6 +41,7 @@ public class StageHistoryRestTemplate {
         headers.add("stage",stage);
         headers.add("state",state);
         HttpEntity<StageHistory> entity = new HttpEntity<>(headers);
+        restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
         ResponseEntity<StageHistory[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,StageHistory[].class);
 
         return Arrays.asList(response.getBody());

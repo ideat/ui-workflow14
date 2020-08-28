@@ -2,7 +2,7 @@ package com.mindware.workflow.ui.ui.views.comercial.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flowingcode.vaadin.addons.errorwindow.ErrorWindow;
-import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.users.Users;
 import com.mindware.workflow.ui.backend.entity.comercial.client.Client;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.rest.comercial.client.ClientRestTemplate;

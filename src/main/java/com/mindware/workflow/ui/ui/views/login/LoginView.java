@@ -1,8 +1,6 @@
 package com.mindware.workflow.ui.ui.views.login;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.users.Users;
 import com.mindware.workflow.ui.backend.rest.login.JwtRequest;
 import com.mindware.workflow.ui.backend.rest.login.LoginRestTemplate;
 import com.mindware.workflow.ui.backend.rest.login.Token;

@@ -3,12 +3,16 @@ package com.mindware.workflow.ui.ui.views.stageHistory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.config.RequestStage;
 import com.mindware.workflow.ui.backend.entity.config.States;
 import com.mindware.workflow.ui.backend.entity.config.WorkflowProduct;
+import com.mindware.workflow.ui.backend.entity.creditRequest.CreditRequest;
 import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.entity.stageHistory.StageHistory;
+import com.mindware.workflow.ui.backend.rest.creditRequest.CreditRequestRestTemplate;
 import com.mindware.workflow.ui.backend.rest.email.MailRestTemplate;
+import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.stageHistory.StageHistoryRestTemplate;
 import com.mindware.workflow.ui.backend.rest.workflowProducdt.WorkflowProductRestTemplate;
@@ -142,7 +146,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         nextState.setItems(getListNextStates());
         nextState.addValueChangeListener(e -> {
             if(isGoBack(e.getValue())){
-                stageObservation.setVisible(true);
+                stageObservation.setVisible(false); //TODO: change to true
             }else{
                 stageObservation.setVisible(false);
             }
@@ -239,11 +243,12 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
 
                     stageHistory.setObservation(observation.getValue());
                     stageHistory.setAnswer(answer.getValue());
-                    if(stageObservation.getSelectedItems().size()>0 && !observation.isEmpty()) {
-                        createGoBackwardStage(stageHistory, stageObservation.getSelectedItems());
-                    }else{
-                        UIUtils.showNotification("Si realiza una observacion, indique que ETAPA observa e ingrese observaciones");
-                    }
+                    createGoBackFirstStage(stageHistory,"EVALUACION_CREDITO");
+//                    if(stageObservation.getSelectedItems().size()>0 && !observation.isEmpty()) {
+//                        createGoBackwardStage(stageHistory, stageObservation.getSelectedItems());
+//                    }else{
+//                        UIUtils.showNotification("Si realiza una observacion, indique que ETAPA observa e ingrese observaciones");
+//                    }
                }else if(states.isFinished()){
                    stageHistory.setFinishedDateTime((Instant.now()));
                    restTemplate.update(stageHistory);
@@ -287,9 +292,13 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
     private void createGoForwardStage(StageHistory stageHistory, ComboBox<String> nextState) {
 
         ObjectMapper mapper = new ObjectMapper();
+        CreditRequestRestTemplate creditRequestRestTemplate = new CreditRequestRestTemplate();
+        CreditRequest creditRequest = creditRequestRestTemplate.getByNumberRequest(stageHistory.getNumberRequest());
+
         try {
              List<RequestStage> requestStages = Arrays.asList(mapper.readValue(workflowProduct.getRequestStage(),RequestStage[].class));
              requestStages = requestStages.stream()
+                     .filter(r -> r.isActive()==true)
                      .sorted(Comparator.comparing(RequestStage::getPosition))
                      .collect(Collectors.toList());
              stageHistory.setFinishedDateTime(Instant.now());
@@ -297,15 +306,37 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
              List<StageHistory> stageHistoryList = restTemplate.getByNumberRequest(stageHistory.getNumberRequest());
 
              if (verifyAllStageFinished(stageHistoryList,stageHistory.getStage(),requestStages)) {
-                 List<RequestStage> nextRequestStages = getNextStage(stageHistory, requestStages);
+                 List<RequestStage> nextRequestStages = getNextStage(stageHistory, requestStages,0);
                  String comesFrom = getAllStagesForNextStage(stageHistoryList,stageHistory.getStage(),requestStages);
                  for (RequestStage r : nextRequestStages) {
-                     StageHistory s = createNewStageHistory(r.getStage(),nextState.getValue());
-                     s.setNumberRequest(stageHistory.getNumberRequest());
-                     s.setComesFrom(comesFrom);
-                     restTemplate.add(s);
-                     PrepareMail.sendMailWorkflowGoForward(stageHistory.getUserTask(), stageHistory.getNumberRequest(),
-                             r.getRols(),"");
+                     if(r.getStage().equals("APROBACION2")){
+                        if(validStage(r.getStage(),creditRequest)){
+                            StageHistory s = createNewStageHistory(r.getStage(), nextState.getValue());
+                            s.setNumberRequest(stageHistory.getNumberRequest());
+                            s.setComesFrom(comesFrom);
+                            restTemplate.add(s);
+                            PrepareMail.sendMailWorkflowGoForward(stageHistory.getUserTask(), stageHistory.getNumberRequest(),
+                                    r.getRols(), "");
+                        }else{ //next stage after APROBACION2
+                            List<RequestStage> nextRequestStages1 = getNextStage(stageHistory, requestStages,1);
+                            for(RequestStage r1:nextRequestStages1) {
+                                StageHistory s = createNewStageHistory(r1.getStage(), nextState.getValue());
+                                s.setNumberRequest(stageHistory.getNumberRequest());
+                                s.setComesFrom(comesFrom);
+                                restTemplate.add(s);
+                                PrepareMail.sendMailWorkflowGoForward(stageHistory.getUserTask(), stageHistory.getNumberRequest(),
+                                        r1.getRols(), "");
+                            }
+                        }
+
+                     }else {
+                         StageHistory s = createNewStageHistory(r.getStage(), nextState.getValue());
+                         s.setNumberRequest(stageHistory.getNumberRequest());
+                         s.setComesFrom(comesFrom);
+                         restTemplate.add(s);
+                         PrepareMail.sendMailWorkflowGoForward(stageHistory.getUserTask(), stageHistory.getNumberRequest(),
+                                 r.getRols(), "");
+                     }
                  }
                  UIUtils.showNotification(stageHistory.getStage() +" concluida, paso a la siguiente Etapa");
              }else{
@@ -319,12 +350,43 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         }
     }
 
+    private boolean validStage(String stage, CreditRequest creditRequest){
+        boolean result =false;
+        if(stage.equals("APROBACION2")){
+            Double amount = creditRequest.getAmount();
+            if(creditRequest.getCurrency().equals("$us.")) {
+                amount = amount * UtilValues.getExchange();
+            }
+
+            ParameterRestTemplate parameterRestTemplate = new ParameterRestTemplate();
+            List<Parameter> parameterList = new ArrayList<>();
+            parameterList = parameterRestTemplate.getParametersByCategory("RANGO APROBACION");
+            String[] conditions = new String[2];
+            for(Parameter p:parameterList){
+                if(p.getValue().contains(stage)){
+                    String[] listTypeCredit = p.getExternalCode().split(",");
+                    if(Arrays.stream(listTypeCredit).anyMatch(s -> s.trim().equals(creditRequest.getTypeCredit()))){
+                        conditions = p.getDescription().split(";");
+                    }
+                }
+            }
+            if(conditions[0].equals(">")){
+                if(amount > Double.parseDouble(conditions[1])) result = true;
+            } else if(conditions[0].equals(">=")){
+                if(amount >= Double.parseDouble(conditions[1])) result = true;
+            }
+        }
+        return result;
+    }
+
+
+
     private String getAllStagesForNextStage(List<StageHistory> stageHistories, String currentStageHistory,
                                             List<RequestStage> requestStageList){
         RequestStage requestStage = requestStageList.stream().filter(r -> r.getStage().equals(currentStageHistory))
                 .findFirst().get();
         List<RequestStage> requestStagesSamePosition = requestStageList.stream()
-                .filter(r -> r.getPosition().equals(requestStage.getPosition()))
+                .filter(r -> r.getPosition().equals(requestStage.getPosition()) && r.isActive()==true)
                 .collect(Collectors.toList());
 
         List<String> comesFrom = new ArrayList<>();
@@ -334,11 +396,11 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         return comesFrom.stream().collect(Collectors.joining(","));
     }
 
-    private List<RequestStage> getNextStage(StageHistory currentStageHistory, List<RequestStage> requestStages){
+    private List<RequestStage> getNextStage(StageHistory currentStageHistory, List<RequestStage> requestStages, int skip){
         List<RequestStage> currentRequestStage = requestStages.stream().filter(p -> p.getStage().equals(currentStageHistory.getStage()))
                                                 .collect(Collectors.toList());
         List<RequestStage> nextStages = requestStages.stream()
-                .filter(p -> p.getPosition().equals(currentRequestStage.get(0).getPosition() + 1))
+                .filter(p -> p.getPosition().equals(currentRequestStage.get(0).getPosition() + 1+skip) && p.isActive()==true)
                 .collect(Collectors.toList());
         return nextStages;
 
@@ -435,6 +497,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
 
         restTemplate.update(stageHistory);
         List<StageHistory> stageHistoryList = restTemplate.getByNumberRequest(stageHistory.getNumberRequest());
+
         for(String stage : stageToBack) {
             StageHistory aux = stageHistoryList.stream()
                     .filter(f -> f.getStage().equals(stage))
@@ -453,6 +516,31 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
 
         PrepareMail.sendMailWorkflowGoBackward(stageHistoryList,stageHistory.getUserTask(),stageHistory.getNumberRequest(),
                 stageHistory.getComesFrom());
+
+        UIUtils.showNotification("Correos enviados");
+        UIUtils.showNotification("Estado observado");
+        UI.getCurrent().navigate(StageHistoryView.class);
+    }
+
+    private void createGoBackFirstStage(StageHistory stageHistory, String stageGoBack){
+        stageHistory.setFinishedDateTime(Instant.now());
+        restTemplate.update(stageHistory);
+        StageHistory aux = restTemplate.getByNumberRequestStageState(stageHistory.getNumberRequest().toString(),
+                "CONCLUIDO",stageGoBack).get(0);
+
+        List<StageHistory> stageHistoryList = new ArrayList<>();
+        StageHistory s = createNewStageHistory(stageHistory.getComesFrom(),stageHistory.getNextState());
+        s.setNumberRequest(stageHistory.getNumberRequest());
+        s.setComesFrom(stageHistory.getStage());
+        s.setStage(stageGoBack);
+        s.setUserTask(aux.getUserTask());
+        s.setInitDateTime(Instant.now());
+        s.setObservation(stageHistory.getObservation());
+        restTemplate.add(s);
+
+        stageHistoryList.add(aux);
+        PrepareMail.sendMailWorkflowGoBackward(stageHistoryList,stageHistory.getUserTask(),stageHistory.getNumberRequest(),
+                stageGoBack);
 
         UIUtils.showNotification("Correos enviados");
         UIUtils.showNotification("Estado observado");

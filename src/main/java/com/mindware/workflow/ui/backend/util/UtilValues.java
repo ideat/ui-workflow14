@@ -1,7 +1,9 @@
 package com.mindware.workflow.ui.backend.util;
 
 import com.mindware.workflow.ui.backend.entity.Office;
+import com.mindware.workflow.ui.backend.entity.config.ExchangeRate;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
+import com.mindware.workflow.ui.backend.rest.exchangeRate.ExchangeRateRestTemplate;
 import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.vaadin.flow.data.binder.Result;
@@ -176,5 +178,11 @@ public class UtilValues {
                 .toString();
 
         return generatedString;
+    }
+
+    public static Double getExchange(){
+        ExchangeRateRestTemplate restTemplate = new ExchangeRateRestTemplate();
+        ExchangeRate exchangeRate= restTemplate.getActiveExchangeRateByCurrency("$us.");
+        return exchangeRate.getExchange();
     }
 }

@@ -45,11 +45,17 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,6 +80,9 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
     private  VerticalLayout layoutOptions;
     private VerticalLayout layoutStates;
 
+    @Autowired
+    ResourceLoader resourceLoader;
+
     @Override
     protected void onAttach(AttachEvent attachEvent){
         super.onAttach(attachEvent);
@@ -82,6 +91,7 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
 
     }
 
+    @SneakyThrows
     @Override
     public void setParameter(BeforeEvent beforeEvent, String s) {
         restTemplate = new RolRestTemplate();
@@ -90,18 +100,7 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
         if(s.equals("NUEVO")){
             rol = new Rol();
             try {
-                File file = ResourceUtils.getFile("classpath:static/menu-json.json");
-                optionList = mapper.readValue(file,new TypeReference<List<Option>>() {});
-                statesList = new ArrayList<>();
-                List<Parameter> parameterList = parameterRestTemplate.getParametersByCategory("ESTADO-WORKFLOW");
-                parameterList = parameterList.stream().sorted(Comparator.comparing(Parameter::getValue))
-                        .collect(Collectors.toList());
-                for(Parameter p : parameterList){
-                    States states = new States();
-                    states.setState(p.getDescription());
-                    states.setActive(false);
-                    statesList.add(states);
-                }
+                initOptions();
 
 
             } catch (FileNotFoundException e) {
@@ -118,11 +117,16 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
 
         }else{
             rol = restTemplate.getById(UUID.fromString(s));
-            if(rol.getOptions()==null || rol.getOptions().equals("")) rol.setOptions("[]");
-            try {
-                optionList = mapper.readValue(rol.getOptions(), new TypeReference<List<Option>>() {});
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
+            if(rol.getOptions()==null || rol.getOptions().equals("") || rol.getOptions().equals("[]")) {
+                rol.setOptions("[]");
+                initOptions();
+            }else {
+                try {
+                    optionList = mapper.readValue(rol.getOptions(), new TypeReference<List<Option>>() {
+                    });
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
             }
 
             if(rol.getStates()==null || rol.getStates().equals("")) rol.setStates("[]");
@@ -137,6 +141,25 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
             setViewDetailsPosition(Position.BOTTOM);
         }
         binder.readBean(rol);
+    }
+
+    private void initOptions() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:static/menu-json.json");
+        File file = File.createTempFile("menu","json");
+        InputStream inputStream = resource.getInputStream();
+        FileUtils.copyInputStreamToFile(inputStream,file);
+//        File file = ResourceUtils.getFile("classpath:static/menu-json.json");
+        optionList = mapper.readValue(file,new TypeReference<List<Option>>() {});
+        statesList = new ArrayList<>();
+        List<Parameter> parameterList = parameterRestTemplate.getParametersByCategory("ESTADO-WORKFLOW");
+        parameterList = parameterList.stream().sorted(Comparator.comparing(Parameter::getValue))
+                .collect(Collectors.toList());
+        for(Parameter p : parameterList){
+            States states = new States();
+            states.setState(p.getDescription());
+            states.setActive(false);
+            statesList.add(states);
+        }
     }
 
     private AppBar initAppBar(){

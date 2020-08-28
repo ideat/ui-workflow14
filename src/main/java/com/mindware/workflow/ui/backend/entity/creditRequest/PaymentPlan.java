@@ -29,4 +29,6 @@ public class PaymentPlan {
 
     private Double residue;
 
+    private Double itf;
+
 }

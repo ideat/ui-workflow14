@@ -3,6 +3,8 @@ package com.mindware.workflow.ui.backend.entity.creditRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;

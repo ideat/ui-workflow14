@@ -80,7 +80,8 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
             "CARGOS FINANCIEROS","ETAPAS SOLICITUD","ESTADO-WORKFLOW",
             "PUESTOS","MONEDA","REFERENCIA PERSONAL","VINCULACION ECONOMICA",
             "TIPO DOCUMENTO IDENTIDAD","PLANIFICACION-EJECUCION","DESCUENTO SUELDOS","VARIABLES VAE-DEPENDIENTE",
-            "TIPO RIESGO"};
+            "TIPO RIESGO","TIPO GARANTIA INFORME LEGAL","TIPO CREDITO APROBACION1","TIPO CREDITO APROBACION2",
+            "RANGO APROBACION"};
 
     public ParameterView(){
         getListParameter();
@@ -296,7 +297,7 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
 //            dataProvider.addFilter(parameter -> Objects.equals(txtDescriptionFilter.getValue(),parameter.getDescription()));
             dataProvider.addFilter(parameter -> StringUtils.containsIgnoreCase(parameter.getDescription(),txtDescriptionFilter.getValue()));
         }
-        if(externalCodeFilter.getValue().trim().equals("")){
+        if(!externalCodeFilter.getValue().trim().equals("")){
             dataProvider.addFilter(parameter -> StringUtils.containsIgnoreCase(parameter.getExternalCode(),externalCodeFilter.getValue()));
         }
 

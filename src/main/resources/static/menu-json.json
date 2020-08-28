@@ -1,137 +1,137 @@
 [
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Solicitantes",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Solicitud",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Declaracion Patrimonial",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Resolucion de Credito",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Formulario Observaciones",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Informe Legal",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Contratos",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Oficinas",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Responsables",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Parametros",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Plantillas",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Plantilla Observaciones",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Usuarios",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Roles",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Flujo de Caja",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Bandeja Pendientes",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Flujo por Producto",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Plantilla Contratos",
-  "read": "false",
-  "write": "false"
-},
-{
-  "assigned": "false",
-  "description": "",
-  "name": "Bandeja Seguimiento",
-  "read": "false",
-  "write": "false"
-},
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Solicitantes",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Solicitud",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Declaracion Patrimonial",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Resolucion de Credito",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Formulario Observaciones",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Informe Legal",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Contratos",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Oficinas",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Responsables",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Parametros",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Plantillas",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Plantilla Observaciones",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Usuarios",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Roles",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Flujo de Caja",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Bandeja Pendientes",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Flujo por Producto",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Plantilla Contratos",
+    "read": "false",
+    "write": "false"
+  },
+  {
+    "assigned": "false",
+    "description": "",
+    "name": "Bandeja Seguimiento",
+    "read": "false",
+    "write": "false"
+  },
   {
     "assigned": "false",
     "description": "",
@@ -157,20 +157,6 @@
     "assigned": "false",
     "description": "",
     "name": "Clientes",
-    "read": "false",
-    "write": "false"
-  },
-  {
-    "assigned": "false",
-    "description": "",
-    "name": "Propuestas",
-    "read": "false",
-    "write": "false"
-  },
-  {
-    "assigned": "false",
-    "description": "",
-    "name": "Monitoreo",
     "read": "false",
     "write": "false"
   },
@@ -209,4 +195,3 @@
     "read": "false",
     "write": "false"
   }]
-

@@ -3,7 +3,7 @@ package com.mindware.workflow.ui.ui.views.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flowingcode.vaadin.addons.errorwindow.ErrorWindow;
 import com.mindware.workflow.ui.backend.entity.Office;
-import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.users.Users;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;

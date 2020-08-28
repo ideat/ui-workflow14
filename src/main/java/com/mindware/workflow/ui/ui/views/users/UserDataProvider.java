@@ -1,6 +1,6 @@
 package com.mindware.workflow.ui.ui.views.users;
 
-import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.users.Users;
 import com.vaadin.flow.data.provider.ListDataProvider;
 
 import java.util.Collection;

@@ -2,25 +2,27 @@ package com.mindware.workflow.ui.ui.views.config.workflowProduct;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
-import com.mindware.workflow.ui.backend.entity.config.TypeCredit;
+import com.mindware.workflow.ui.backend.entity.config.WorkflowProduct;
 import com.mindware.workflow.ui.backend.entity.config.dto.TypeCreditObjectCreditDto;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
-import com.mindware.workflow.ui.backend.rest.typeCredit.TypeCreditRestTemplate;
 import com.mindware.workflow.ui.backend.util.TypeCreditDto;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.layout.size.Horizontal;
 import com.mindware.workflow.ui.ui.layout.size.Top;
-import com.mindware.workflow.ui.ui.layout.size.Vertical;
 import com.mindware.workflow.ui.ui.util.UIUtils;
 import com.mindware.workflow.ui.ui.util.css.BoxSizing;
 import com.mindware.workflow.ui.ui.views.ViewFrame;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +35,13 @@ import java.util.Map;
 public class WorflowProductView extends ViewFrame implements RouterLayout {
     private List<Parameter> productCredits;
 
-    private ParameterRestTemplate parameterRestTemplate;
     List<TypeCreditObjectCreditDto> typeCreditObjectCreditDtoList;
+    ListDataProvider<TypeCreditObjectCreditDto> dataProvider;
+
+    private TextField codeTypeCreditFilter;
+    private TextField typeCreditDescriptionFilter;
+    private TextField externalCodeObjectCreditFilter;
+    private TextField objectCreditDescriptionFilter;
 
     private WorflowProductView() throws JsonProcessingException {
         getProductList();
@@ -42,10 +49,9 @@ public class WorflowProductView extends ViewFrame implements RouterLayout {
     }
 
     private void getProductList() throws JsonProcessingException {
-//        parameterRestTemplate = new ParameterRestTemplate();
-//        productCredits = parameterRestTemplate.getParametersByCategory("PRODUCTOS");
 
         typeCreditObjectCreditDtoList = TypeCreditDto.getAllTypeCreditObjectCreditDto();
+        dataProvider = new ListDataProvider<>(typeCreditObjectCreditDtoList);
     }
 
     private Component createContent(){
@@ -62,7 +68,7 @@ public class WorflowProductView extends ViewFrame implements RouterLayout {
         layout.setSizeFull();
 
         Grid<TypeCreditObjectCreditDto> grid = new Grid<>();
-        grid.setItems(typeCreditObjectCreditDtoList);
+        grid.setDataProvider(dataProvider);
         grid.setSizeFull();
 
         grid.addSelectionListener(e ->{
@@ -82,16 +88,85 @@ public class WorflowProductView extends ViewFrame implements RouterLayout {
             UI.getCurrent().navigate("workflow-product-register",qp);
         });
 
-        grid.addColumn(TypeCreditObjectCreditDto::getCodeTypeCredit).setFlexGrow(0).setHeader("Cod. Tipo credito")
-                .setResizable(true).setWidth(UIUtils.COLUMN_WIDTH_M);
-        grid.addColumn(TypeCreditObjectCreditDto::getExternalCodeObjectCredit).setFlexGrow(1).setHeader("Cod. Objeto credito")
-                .setResizable(true);
-        grid.addColumn(TypeCreditObjectCreditDto::getObjectCreditDescription).setFlexGrow(1).setHeader("Objeto de credito")
-                .setResizable(true);
+        grid.addColumn(TypeCreditObjectCreditDto::getCodeTypeCredit)
+                .setFlexGrow(0)
+                .setHeader("Cod. Tipo credito")
+                .setResizable(true)
+                .setKey("codeTypeCredit")
+                .setWidth(UIUtils.COLUMN_WIDTH_M)
+                .setSortable(true);
+        grid.addColumn(TypeCreditObjectCreditDto::getTypeCreditDescription)
+                .setFlexGrow(0)
+                .setHeader("Descripcion Tipo credito")
+                .setResizable(true)
+                .setKey("typeDescription")
+                .setSortable(true)
+                .setAutoWidth(true);
+
+        grid.addColumn(TypeCreditObjectCreditDto::getExternalCodeObjectCredit)
+                .setFlexGrow(1)
+                .setHeader("Cod. Objeto credito")
+                .setSortable(true)
+                .setKey("externalCodeObjectCredit")
+                .setResizable(true).setSortable(true);
+        grid.addColumn(TypeCreditObjectCreditDto::getObjectCreditDescription)
+                .setFlexGrow(1)
+                .setHeader("Objeto de credito")
+                .setResizable(true)
+                .setKey("objectCreditDescription")
+                .setSortable(true);
+
+        HeaderRow hr = grid.appendHeaderRow();
+
+        codeTypeCreditFilter = new TextField();
+        codeTypeCreditFilter.setValueChangeMode(ValueChangeMode.EAGER);
+        codeTypeCreditFilter.setWidthFull();
+        codeTypeCreditFilter.addValueChangeListener(e -> applyFilter(dataProvider));
+        hr.getCell(grid.getColumnByKey("codeTypeCredit")).setComponent(codeTypeCreditFilter);
+
+        typeCreditDescriptionFilter = new TextField();
+        typeCreditDescriptionFilter.setValueChangeMode(ValueChangeMode.EAGER);
+        typeCreditDescriptionFilter.setWidthFull();
+        typeCreditDescriptionFilter.addValueChangeListener(e -> applyFilter(dataProvider));
+        hr.getCell(grid.getColumnByKey("typeDescription")).setComponent(typeCreditDescriptionFilter);
+
+        externalCodeObjectCreditFilter = new TextField();
+        externalCodeObjectCreditFilter.setValueChangeMode(ValueChangeMode.EAGER);
+        externalCodeObjectCreditFilter.setWidthFull();
+        externalCodeObjectCreditFilter.addValueChangeListener(e -> applyFilter(dataProvider));
+        hr.getCell(grid.getColumnByKey("externalCodeObjectCredit")).setComponent(externalCodeObjectCreditFilter);
+
+        objectCreditDescriptionFilter = new TextField();
+        objectCreditDescriptionFilter.setValueChangeMode(ValueChangeMode.EAGER);
+        objectCreditDescriptionFilter.setWidthFull();
+        objectCreditDescriptionFilter.addValueChangeListener(e -> applyFilter(dataProvider));
+        hr.getCell(grid.getColumnByKey("objectCreditDescription")).setComponent(objectCreditDescriptionFilter);
+
         layout.add(grid);
         return layout;
     }
 
+    private void applyFilter(ListDataProvider<TypeCreditObjectCreditDto> dataProvider){
+        dataProvider.clearFilters();
+        if(!codeTypeCreditFilter.getValue().trim().equals("")){
+            dataProvider.addFilter(workflowProduct ->
+                    StringUtils.containsIgnoreCase(workflowProduct.getCodeTypeCredit(),codeTypeCreditFilter.getValue()));
+        }
+        if(!typeCreditDescriptionFilter.getValue().trim().equals("")){
+            dataProvider.addFilter(workflowProduct ->
+                    StringUtils.containsIgnoreCase(workflowProduct.getTypeCreditDescription(),typeCreditDescriptionFilter.getValue()));
+        }
+        if(!externalCodeObjectCreditFilter.getValue().trim().equals("")){
+            dataProvider.addFilter(workflowProduct ->
+                    StringUtils.containsIgnoreCase(workflowProduct.getExternalCodeObjectCredit().toString(),externalCodeObjectCreditFilter.getValue()));
 
+        }
+        if(!objectCreditDescriptionFilter.getValue().trim().equals("")){
+            dataProvider.addFilter(workflowProduct ->
+                    StringUtils.containsIgnoreCase(workflowProduct.getObjectCreditDescription(),objectCreditDescriptionFilter.getValue()));
+
+        }
+
+    }
 
 }

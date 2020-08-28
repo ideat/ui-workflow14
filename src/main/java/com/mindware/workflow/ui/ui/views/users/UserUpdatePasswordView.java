@@ -1,6 +1,6 @@
 package com.mindware.workflow.ui.ui.views.users;
 
-import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.users.Users;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawer;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawerFooter;

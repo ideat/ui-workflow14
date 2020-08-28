@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.Applicant;
 import com.mindware.workflow.ui.backend.entity.CreditRequestApplicant;
 import com.mindware.workflow.ui.backend.entity.Office;
-import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.users.Users;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.config.RequestStage;
 import com.mindware.workflow.ui.backend.entity.config.WorkflowProduct;
@@ -76,7 +76,6 @@ import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
@@ -167,6 +166,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private String auxTypeGracePeriod="";
     private String riskType;
     private String codeTypeCredit;
+    private String typePerson;
+    private String codeTypeGuarantee;
 
     @Override
     protected void onAttach(AttachEvent attachEvent){
@@ -248,6 +249,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
         }
         codeTypeCredit = current.getTypeCredit()!=null?current.getTypeCredit():"";
+        codeTypeGuarantee = current.getTypeGuarantee()!=null?current.getTypeGuarantee():"";
         setViewDetails(createDetailDrawer());
         setViewDetailsPosition(Position.BOTTOM);
     }
@@ -920,9 +922,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
            String[] s = e.getValue().split("-");
            codeTypeCredit = s[0];
            typeCredit.setValue(codeTypeCredit);
-//           productCredit.setValue(null);
            productCredit.setItems(TypeCreditDto.getProductList(codeTypeCredit));
-//           objectCredit.setValue(null);
            objectCredit.setItems(TypeCreditDto.getObjectList(codeTypeCredit));
         });
 
@@ -1037,12 +1037,19 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         paymentPlanDate.setRequired(true);
         paymentPlanDate.setWidth("100%");
 
-        TextField numberCredit = new TextField();
+        NumberField numberCredit = new NumberField();
         numberCredit.setWidth("100%");
 
         ComboBox<String> typeGuarantee = new ComboBox<>();
         typeGuarantee.setItems(getValueParameter("TIPO GARANTIA"));
         typeGuarantee.setWidth("100%");
+        typeGuarantee.addValueChangeListener(event->{
+            if (event.getValue()!=null) {
+                String[] s = event.getValue().split("-");
+                codeTypeGuarantee =s[0];
+                typeGuarantee.setValue(s[0]);
+            }
+        });
 
         ComboBox<String> operationType = new ComboBox<>();
         operationType.setItems("NUEVA","REFINANCIAMIENTO","REPROGRAMACION");
@@ -1098,7 +1105,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binder.forField(paymentPlanDate).asRequired("Fecha de inicio plan de pagos es requerida").bind(CreditRequest::getPaymentPlanDate,CreditRequest::setPaymentPlanDate);
         binder.forField(destination).asRequired("Destino del credito es requerido").bind(CreditRequest::getDestination,CreditRequest::setDestination);
         binder.forField(numberCredit)
-                .withConverter(Integer::valueOf,String::valueOf,"Ingrese un numero, 0 valor por defeccto")
+                .withConverter(new UtilValues.DoubleToIntegerConverter())
                 .withValidator(value -> value.intValue()>=0, "Numero credito no valido, 0 valor por defecto")
                 .bind(CreditRequest::getNumberCredit,CreditRequest::setNumberCredit);
         binder.forField(typeGuarantee).bind(CreditRequest::getTypeGuarantee,CreditRequest::setTypeGuarantee);
@@ -1180,7 +1187,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                    List<RequestStage> requestStageList = new ArrayList<>();
                    try {
                        requestStageList = mapper.readValue(workflowProduct.getRequestStage(), new TypeReference<List<RequestStage>>() {});
-                       requestStageList = requestStageList.stream().filter(p -> p.getPosition()==1).collect(Collectors.toList());
+                       requestStageList = requestStageList.stream().filter(p -> p.getPosition()==1 && p.isActive()).collect(Collectors.toList());
 
                    } catch (JsonProcessingException jsonProcessingException) {
                        jsonProcessingException.printStackTrace();
@@ -1189,9 +1196,15 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                        if(r.getStage().equals("EVALUACION_CREDITO")) {
                            addStageHistory(result.getLoginUser(), result.getNumberRequest(), r.getStage());
                        }else{
-                           addStageHistory(null, result.getNumberRequest(), r.getStage());
+                           List<String> guaranteeForLegalReport = UtilValues.getParamterValue("TIPO GARANTIA INFORME LEGAL");
+                           if(guaranteeForLegalReport.stream().anyMatch(s->s.trim().equals(creditRequest.getTypeGuarantee()))
+                                || typePerson.equals("juridica")) {
+                               addStageHistory(null, result.getNumberRequest(), r.getStage());
+                               PrepareMail.sendMailNewCreditRequestForward(r.getRols(),result.getNumberRequest(),r.getStage()
+                                       ,Integer.valueOf(idOffice.getValue()));
+                           }
 
-//                           PrepareMail.sendMailWorkflowGoForward("",current.getNumberRequest(),r.getRols(),"");
+
                        }
                    }
 
@@ -1766,6 +1779,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             if(!(nameTabSelected.equals("Codeudores") || nameTabSelected.equals("Garantes"))) {
                 numberApplicant.setValue(applicant.getNumberApplicant().toString());
                 paramNumberApplicant = applicant.getNumberApplicant();
+                typePerson = applicant.getTypePerson();
             }else{
                 CreditRequestAplicantRestTemplate rest = new CreditRequestAplicantRestTemplate();
                 CreditRequestApplicant creditRequestApplicant = new CreditRequestApplicant();
@@ -2049,8 +2063,14 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         ParameterRestTemplate rest = new ParameterRestTemplate();
         List<Parameter> parameters = rest.getParametersByCategory(category);
         List<String> listValues = new ArrayList<>();
-        for(Parameter p:parameters){
-            listValues.add(p.getValue());
+        if(category.equals("TIPO GARANTIA")){
+            for (Parameter p : parameters) {
+                listValues.add(p.getValue()+"-"+p.getDescription());
+            }
+        }else {
+            for (Parameter p : parameters) {
+                listValues.add(p.getValue());
+            }
         }
         return listValues;
     }

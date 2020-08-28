@@ -114,6 +114,8 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
         grid.setDataProvider(dataProvider);
         grid.addColumn(ExceptionsCreditRequestDto::getInternalCode).setHeader("Cod. Excep").setFlexGrow(1)
                 .setAutoWidth(true);
+        grid.addColumn(ExceptionsCreditRequestDto::getTypeException).setHeader("Tipo excepcion").setFlexGrow(1)
+                .setAutoWidth(true);
         grid.addColumn(ExceptionsCreditRequestDto::getStateException).setHeader("Estado").setFlexGrow(1)
                 .setAutoWidth(true);
         grid.addColumn(ExceptionsCreditRequestDto::getExceptionDetail).setHeader("Excepcion").setFlexGrow(1)

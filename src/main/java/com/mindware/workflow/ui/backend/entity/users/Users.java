@@ -1,4 +1,4 @@
-package com.mindware.workflow.ui.backend.entity;
+package com.mindware.workflow.ui.backend.entity.users;
 
 import lombok.Getter;
 import lombok.Setter;

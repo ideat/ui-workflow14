@@ -1,7 +1,7 @@
 package com.mindware.workflow.ui.ui.views.config.authorizer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.users.Users;
 import com.mindware.workflow.ui.backend.entity.exceptions.Authorizer;
 import com.mindware.workflow.ui.backend.rest.exceptions.AuthorizerRestTemplate;
 import com.mindware.workflow.ui.backend.rest.users.UserRestTemplate;
@@ -30,7 +30,6 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -40,10 +39,10 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Route(value = "authorizer-register", layout = MainLayout.class)
@@ -314,14 +313,16 @@ public class AuthorizerRegister extends SplitViewFrame implements HasUrlParamete
     private void applyFilter(ListDataProvider<Users> dataUsers){
         dataUsers.clearFilters();
         if(!loginFilter.getValue().trim().equals("")){
-            dataUsers.addFilter(users -> Objects.equals(loginFilter.getValue().trim(),users.getLogin()));
+            dataUsers.addFilter(users -> StringUtils.containsIgnoreCase(users.getLogin(),loginFilter.getValue().trim()));
         }
         if(!namefilter.getValue().trim().equals("")){
-            dataUsers.addFilter(users -> Objects.equals(namefilter.getValue().trim(),users.getFullName()));
+            dataUsers.addFilter(users ->StringUtils.containsIgnoreCase(users.getFullName(),namefilter.getValue().trim()));
         }
         if(!rolFilter.getValue().trim().equals("")){
-            dataUsers.addFilter(users -> Objects.equals(rolFilter.getValue().trim(),users.getRol()));
+            dataUsers.addFilter(users -> StringUtils.containsIgnoreCase(users.getRol(),rolFilter.getValue().trim()));
         }
+
+        //StringUtils.containsIgnoreCase(workflowProduct.getTypeCreditDescription(),typeCreditDescriptionFilter.getValue()));
     }
 
 

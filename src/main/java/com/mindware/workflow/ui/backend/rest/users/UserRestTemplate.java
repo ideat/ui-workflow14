@@ -1,6 +1,7 @@
 package com.mindware.workflow.ui.backend.rest.users;
 
-import com.mindware.workflow.ui.backend.entity.Users;
+import com.mindware.workflow.ui.backend.entity.users.Users;
+import com.mindware.workflow.ui.backend.entity.users.UsersOfficeDto;
 import com.mindware.workflow.ui.backend.util.HeaderJwt;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -78,5 +79,27 @@ public class UserRestTemplate {
         final String uri = "http://localhost:8080/rest/user/v1/updateUser";
         HttpEntity<Users> entity = new HttpEntity<>(users,HeaderJwt.getHeader());
         restTemplate.exchange(uri,HttpMethod.PUT,entity,Users.class);
+    }
+
+
+    public List<UsersOfficeDto> getByUserOfficeByCityAndRol(String city, String rol){
+        final String uri = "http://localhost:8080/rest/userOffice/v1/getByCityAndRol/{city}/{rol}";
+        Map<String,String> params = new HashMap<>();
+        params.put("city",city);
+        params.put("rol",rol);
+        HttpEntity<UsersOfficeDto[]> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<UsersOfficeDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,UsersOfficeDto[].class,params);
+
+        return Arrays.asList(response.getBody());
+    }
+
+    public List<UsersOfficeDto> getByUserOfficeByRol(String rol){
+        final String uri = "http://localhost:8080/rest/userOffice/v1/getByRol/{rol}";
+        Map<String,String> params = new HashMap<>();
+        params.put("rol",rol);
+        HttpEntity<UsersOfficeDto[]> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<UsersOfficeDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,UsersOfficeDto[].class,params);
+
+        return Arrays.asList(response.getBody());
     }
 }
