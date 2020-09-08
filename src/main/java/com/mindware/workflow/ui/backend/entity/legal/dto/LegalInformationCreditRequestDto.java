@@ -39,8 +39,8 @@ public class LegalInformationCreditRequestDto {
     private boolean hasGuarantor;
 
     public String getFullName(){
-        return Optional.ofNullable(this.lastName).orElse("")+" "
-                +Optional.ofNullable(this.firstName).orElse("");
+        return Optional.ofNullable(this.firstName).orElse("")+" "
+                +Optional.ofNullable(this.lastName).orElse("");
     }
 
     public enum State {

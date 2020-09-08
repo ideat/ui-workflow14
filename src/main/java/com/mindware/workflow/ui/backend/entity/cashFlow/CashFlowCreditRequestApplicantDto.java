@@ -24,10 +24,11 @@ public class CashFlowCreditRequestApplicantDto {
     private boolean hasPaymentPlan;
     private boolean hasPatrimonialStatement;
     private UUID idCreditRequestApplicant;
+    private String typeFee;
 
     public String getFullName(){
-        return Optional.ofNullable(this.lastName).orElse("")+" "
-                +Optional.ofNullable(this.firstName).orElse("");
+        return Optional.ofNullable(this.firstName).orElse("")+" "
+                +Optional.ofNullable(this.lastName).orElse("");
     }
 
     public enum State {

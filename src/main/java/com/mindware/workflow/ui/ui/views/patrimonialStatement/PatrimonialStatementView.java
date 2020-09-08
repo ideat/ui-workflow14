@@ -151,6 +151,8 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
     @PropertyId("fieldSelection3")
     private ComboBox<String> fieldSelection3;
 
+    private boolean isActiveCreditRequest;
+
     @Override
     protected void onAttach(AttachEvent attachment){
         super.onAttach(attachment);
@@ -195,6 +197,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
             }
 
         }
+        isActiveCreditRequest = UtilValues.isActiveCreditRequest(creditRequestApplicant.getNumberRequest());
         setViewDetails(createDetailsDrawer());
         setViewDetailsPosition(Position.BOTTOM);
         setViewContent(createContent());
@@ -242,7 +245,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
            showDetails(new PatrimonialStatement());
 
         });
-        btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
 
         Button btnPrint = new Button("Imprimir VAE");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
@@ -360,7 +363,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
             UIUtils.showNotification("Registro borrado");
 
         });
-        btn.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
+        btn.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         return btn;
     }
 
@@ -376,6 +379,8 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
             activity.add(patrimonialStatement.getFieldText1());
             List<String> idPatrimonialStatement = new ArrayList<>();
             idPatrimonialStatement.add(patrimonialStatement.getId().toString());
+            List<String> activeCreditRequest = new ArrayList<>();
+            activeCreditRequest.add(String.valueOf(isActiveCreditRequest));
 
             p.put(("id-patrimonial-statement"),idPatrimonialStatement);
             p.put("id-credit-request-applicant",idCreditRequestApplicantList);
@@ -383,6 +388,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
             p.put("id-applicant",param.get("id-applicant"));
             p.put("category",param.get("category"));
             p.put("activity", activity);
+            p.put("is-active-credit-request",activeCreditRequest);
 
             QueryParameters qp = new QueryParameters(p);
 
@@ -449,7 +455,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
         detailsDrawer.setHeader(detailsDrawerHeader);
 
         footer = new DetailsDrawerFooter();
-        footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial"));
+        footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         footer.addSaveListener(e -> {
             if(current!=null && binder.writeBeanIfValid(current)){
                 current.setCategory(category);
@@ -1028,7 +1034,7 @@ public class PatrimonialStatementView extends SplitViewFrame implements HasUrlPa
         binder.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binder.hasChanges();
-           footer.saveState(hasChanges && isValid && GrantOptions.grantedOption("Declaracion Patrimonial"));
+           footer.saveState(hasChanges && isValid && GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         });
         return formData;
     }

@@ -98,13 +98,14 @@ public class WorkflowProductRegister extends SplitViewFrame implements HasUrlPar
             String name = rol.getName();
             rolNames.add(name);
         }
-
+        parameterList = parameterRestTemplate.getParametersByCategory("ETAPAS SOLICITUD");
         if(workflowProduct.getId()!=null) {
             String jsonRequestStage = workflowProduct.getRequestStage();
             requestStageList = mapper.readValue(jsonRequestStage, new TypeReference<List<RequestStage>>() {});
+            getMissingStages();
 //            setViewContent(createContent());
         }else{
-            parameterList = parameterRestTemplate.getParametersByCategory("ETAPAS SOLICITUD");
+
             for(Parameter p:parameterList){
                 RequestStage requestStage = new RequestStage();
                 requestStage.setId(UUID.randomUUID());
@@ -483,5 +484,26 @@ public class WorkflowProductRegister extends SplitViewFrame implements HasUrlPar
             icon = UIUtils.createDisabledIcon(VaadinIcon.CLOSE);
         }
         return icon;
+    }
+
+    private void getMissingStages(){
+
+        for(Parameter p:parameterList){
+            Optional<RequestStage> r = requestStageList.stream()
+                    .filter(f->f.getStage().equals(p.getValue()))
+                    .findFirst();
+            if(!r.isPresent()){
+                RequestStage requestStage = new RequestStage();
+                requestStage.setId(UUID.randomUUID());
+                requestStage.setPosition(0);
+                requestStage.setHours(0);
+                requestStage.setStage(p.getValue());
+                requestStage.setActive(false);
+                requestStage.setRols("");
+                requestStageList.add(requestStage);
+
+            }
+        }
+
     }
 }

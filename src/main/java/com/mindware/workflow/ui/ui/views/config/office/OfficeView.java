@@ -230,9 +230,9 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
         footer = new DetailsDrawerFooter();
         footer.addSaveListener(e -> {
             if (current!=null && binder.writeBeanIfValid(current)) {
-                if (cmbTypeOffice.getValue().equals("AGENCIA") || cmbTypeOffice.getValue().equals("AGENCIA MOVIL")) {
+                if (cmbTypeOffice.getValue().equals("AGENCIA") || cmbTypeOffice.getValue().equals("AGENCIA MOVIL") || cmbTypeOffice.getValue().equals("SUCURSAL")) {
                     try {
-                        current.setIdRoot(cmbRoot.getValue().getIdRoot());
+                        current.setIdRoot(cmbRoot.getValue().getId());
                     }catch (Exception ex){
                         UIUtils.showNotification("Error: seleccione oficina principal");
                         cmbRoot.focus();
@@ -281,16 +281,28 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
     }
 
     private List<Office> filterNameSucursal(){
+
         return dataProvider.getItems().stream()
-                .filter(office -> office.getTypeOffice().toUpperCase().equals("SUCURSAL") || office.getTypeOffice().toUpperCase().equals("CENTRAL"))
+                .filter(office -> office.getTypeOffice().toUpperCase().equals("SUCURSAL") ||
+                        office.getTypeOffice().toUpperCase().equals("CENTRAL"))
                 .collect(Collectors.toList());
 
     }
 
     private Optional<Office> findOfficeById(){
-        return dataProvider.getItems().stream()
-                .filter(office -> office.getIdRoot().equals(current.getIdRoot()))
-                .findFirst();
+        Optional<Office> office = Optional.empty();
+        if(current.getTypeOffice().equals("SUCURSAL") || current.getTypeOffice().equals("CENTRAL")) {
+
+            office = dataProvider.getItems().stream()
+                    .filter(o -> o.getIdRoot().equals(current.getIdRoot()) && o.getId().equals(current.getIdRoot()))
+                    .findFirst();
+            return office;
+        }else{
+            office = dataProvider.getItems().stream()
+                    .filter(o -> o.getId().equals(current.getIdRoot()) && o.getCity().equals(current.getCity()))
+                    .findFirst();
+            return office;
+        }
     }
 
     private FormLayout createDetails(Office office){
@@ -345,7 +357,7 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
                 footer.saveState(true && GrantOptions.grantedOption("Oficinas"));
             }
             if(event.getValue()!=null) {
-                current.setIdRoot(event.getValue().getIdRoot());
+                current.setIdRoot(event.getValue().getId());
             }else{
                 UIUtils.showNotification("Error: seleccione la oficina principal");
                 cmbRoot.focus();
@@ -360,7 +372,7 @@ public class OfficeView extends SplitViewFrame implements RouterLayout {
         cmbTypeOffice.setRequired(true);
         cmbTypeOffice.addValueChangeListener(e ->{
 
-           if (e.getValue().equals("AGENCIA") || e.getValue().equals("AGENCIA MOVIL") ){
+           if (e.getValue().equals("AGENCIA") || e.getValue().equals("AGENCIA MOVIL") || e.getValue().equals("SUCURSAL") ){
                cmbRoot.setEnabled(true);
            }else{
                cmbRoot.clear();

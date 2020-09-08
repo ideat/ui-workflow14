@@ -137,8 +137,8 @@ public class PrepareMail {
         mail.setNumberRequest(0);
         mail.setMailFrom(comeFrom);
         mail.setMailTo(users.getEmail());
-        mail.setMailSubject("Cuenta usuario PROMOCRED");
-        mail.setMailContent("Se creo su cuenta de usuario en el sisema PROMOCRED, su clave temporal es: " + plainPassword);
+        mail.setMailSubject("Cuenta usuario SEC");
+        mail.setMailContent("Se creo su cuenta de usuario en el sistema SEC, su clave temporal es: " + plainPassword);
         mailRestTemplate.add(mail);
     }
 

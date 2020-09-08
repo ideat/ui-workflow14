@@ -3,9 +3,11 @@ package com.mindware.workflow.ui.backend.util;
 import com.mindware.workflow.ui.backend.entity.Office;
 import com.mindware.workflow.ui.backend.entity.config.ExchangeRate;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
+import com.mindware.workflow.ui.backend.entity.stageHistory.StageHistory;
 import com.mindware.workflow.ui.backend.rest.exchangeRate.ExchangeRateRestTemplate;
 import com.mindware.workflow.ui.backend.rest.office.OfficeRestTemplate;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
+import com.mindware.workflow.ui.backend.rest.stageHistory.StageHistoryRestTemplate;
 import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
@@ -20,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class UtilValues {
 
@@ -184,5 +187,18 @@ public class UtilValues {
         ExchangeRateRestTemplate restTemplate = new ExchangeRateRestTemplate();
         ExchangeRate exchangeRate= restTemplate.getActiveExchangeRateByCurrency("$us.");
         return exchangeRate.getExchange();
+    }
+
+    public static boolean isActiveCreditRequest(Integer numberRequest){
+        StageHistoryRestTemplate stageHistoryRestTemplate = new StageHistoryRestTemplate();
+        List<StageHistory> stageHistoryList = stageHistoryRestTemplate.getByNumberRequest(numberRequest);
+        stageHistoryList = stageHistoryList.stream()
+                .filter(s->s.getStage().equals("DESEMBOLSO") && s.getState().equals("CONCLUIDO"))
+                .collect(Collectors.toList());
+        if(stageHistoryList.size()>0){
+            return false;
+        }else{
+            return true;
+        }
     }
 }

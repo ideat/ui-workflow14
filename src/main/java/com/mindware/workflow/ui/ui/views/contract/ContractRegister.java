@@ -8,6 +8,7 @@ import com.mindware.workflow.ui.backend.rest.contract.ContractRestTemplate;
 import com.mindware.workflow.ui.backend.rest.contract.ContractVariableRestTemplate;
 import com.mindware.workflow.ui.backend.rest.contract.TemplateContractRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawer;
@@ -72,6 +73,8 @@ public class ContractRegister extends SplitViewFrame implements HasUrlParameter<
     private TextField descriptionFilter;
     private TextField fileTemplateContract;
     private Integer numberRequest;
+    private boolean isActiveCreditRequest;
+
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
         templateContractRestTemplate = new TemplateContractRestTemplate();
@@ -83,6 +86,7 @@ public class ContractRegister extends SplitViewFrame implements HasUrlParameter<
         QueryParameters qp =  location.getQueryParameters();
         param = qp.getParameters();
         numberRequest = Integer.parseInt(param.get("number-request").get(0));
+        isActiveCreditRequest = UtilValues.isActiveCreditRequest(numberRequest);
 
         contract = restTemplate.getByNumberRequest(numberRequest);
 //        if(contract.getId()==null){
@@ -194,7 +198,7 @@ public class ContractRegister extends SplitViewFrame implements HasUrlParameter<
         binder.addStatusChangeListener(event ->{
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges();
-            footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Contratos"));
+            footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Contratos") && isActiveCreditRequest);
         });
 
         FormLayout formLayout = new FormLayout();

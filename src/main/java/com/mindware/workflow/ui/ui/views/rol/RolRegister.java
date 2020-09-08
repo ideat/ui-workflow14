@@ -12,6 +12,7 @@ import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawer;
@@ -51,6 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ResourceUtils;
+import org.vaadin.gatanaso.MultiselectComboBox;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -220,7 +222,11 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
         description.setWidthFull();
 //        description.setReadOnly(true);
 
-        ComboBox<String> scope = new ComboBox<>("Alcance");
+//        ComboBox<String> scope = new ComboBox<>("Alcance");
+//        scope.setItems("LOCAL","NACIONAL");
+//        scope.setWidthFull();
+
+        MultiselectComboBox<String> scope = new MultiselectComboBox<>("Alcance");
         scope.setItems("LOCAL","NACIONAL");
         scope.setWidthFull();
 
@@ -232,7 +238,9 @@ public class RolRegister extends SplitViewFrame implements HasUrlParameter<Strin
 
         binder.forField(name).asRequired("Nombre Rol es requerido").bind(Rol::getName,Rol::setName);
         binder.forField(description).bind(Rol::getDescription,Rol::setDescription);
-        binder.forField(scope).asRequired("Alcance es requerido").bind(Rol::getScope,Rol::setScope);
+        binder.forField(scope).asRequired("Alcance es requerido")
+                .withConverter(new UtilValues.SetToStringConverter())
+                .bind(Rol::getScope,Rol::setScope);
 
         Grid<Option> grid = new Grid<>();
         grid.setWidthFull();

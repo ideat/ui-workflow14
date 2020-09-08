@@ -221,6 +221,7 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
            users.setState("RESET");
            restTemplate.updateUser(users);
            UIUtils.showNotification("Operacion realizada correctamente");
+
         });
 
         binder = new BeanValidationBinder<>(Users.class);

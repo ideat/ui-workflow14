@@ -3,12 +3,15 @@ package com.mindware.workflow.ui.ui.views.authorizerExceptions;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindware.workflow.ui.backend.entity.exceptions.Authorizer;
 import com.mindware.workflow.ui.backend.entity.exceptions.ExceptionsCreditRequest;
 import com.mindware.workflow.ui.backend.entity.exceptions.ExceptionsCreditRequestDto;
 import com.mindware.workflow.ui.backend.entity.exceptions.StatusReview;
+import com.mindware.workflow.ui.backend.rest.exceptions.AuthorizerRestTemplate;
 import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsCreditRequestDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.exceptions.ExceptionsCreditRequestRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawer;
@@ -32,12 +35,14 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Route(value = "authorizer-exceptions-creditrequest", layout = MainLayout.class)
@@ -54,9 +59,10 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
     private DetailsDrawer detailsDrawer;
     private DetailsDrawerHeader detailsDrawerHeader;
     private DetailsDrawerFooter footer;
-    private StatusReview statusReview;
+    private Optional<StatusReview> statusReview;
     private String currency;
     private Double amount;
+    private boolean isActiveCreditRequest;
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
@@ -69,7 +75,7 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
 
         exceptionsCreditRequestDtoList = new LinkedList<>(exceptionsCreditRequestDtoRestTemplate.getByNumberRequest(Integer.parseInt(params.get("number-request").get(0))));
         dataProvider = new ListDataProvider<>(exceptionsCreditRequestDtoList);
-
+        isActiveCreditRequest = UtilValues.isActiveCreditRequest(Integer.parseInt(params.get("number-request").get(0)));
         setViewContent(createGrid());
         setViewDetails(createDetailDrawer());
         setViewDetailsPosition(Position.BOTTOM);
@@ -152,18 +158,25 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
 
         ObjectMapper mapper = new ObjectMapper();
         List<StatusReview> statusReviewList = mapper.readValue(exceptionsCreditRequest.getStatusReview(), new TypeReference<List<StatusReview>>() {});
-        boolean validUser;
+        boolean validUser=isAuthorizedUser(VaadinSession.getCurrent()
+                .getAttribute("login").toString(), exceptionsCreditRequest.getRiskType());
         if(statusReviewList.size()>0) {
-
             statusReview = statusReviewList.stream().filter(f -> f.getLoginUser().equals(VaadinSession.getCurrent()
                     .getAttribute("login").toString()))
-                    .collect(Collectors.toList()).get(0);
-
-
+                    .findFirst();
+            if(!statusReview.isPresent()){
+                statusReview =  statusReviewList.stream()
+                        .findFirst();
+                UIUtils.showNotification(String.format("Excepcion '%s' por el usuario '%s', no puede ser modificada con su cuenta",
+                        statusReview.get().getState(),statusReview.get().getLoginUser()));
+            }
+            if(!validUser){
+                UIUtils.showNotification(String.format("Usuario no esta habilitado para Aprobar/Rechazar excepciones de riesgo '%s'",exceptionsCreditRequest.getRiskType()));
+            }
         }else{
-            statusReview = new StatusReview();
-            statusReview.setState("PROPUESTA");
-            statusReview.setLoginUser(VaadinSession.getCurrent().getAttribute("login").toString());
+            statusReview = Optional.ofNullable(new StatusReview());
+            statusReview.get().setState("PROPUESTA");
+            statusReview.get().setLoginUser(VaadinSession.getCurrent().getAttribute("login").toString());
         }
 
 
@@ -179,7 +192,7 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
 
         RadioButtonGroup<String> state = new RadioButtonGroup<>();
         state.setItems("PROPUESTA","APROBADA","RECHAZADA");
-        state.setValue(statusReview.getState());
+        state.setValue(statusReview.get().getState());
         state.setItemEnabledProvider(item -> !"PROPUESTA".equals(item));
 
         DatePicker register = new DatePicker();
@@ -201,20 +214,22 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
 
         DetailsDrawer detailsDrawerException =  new DetailsDrawer(DetailsDrawer.Position.BOTTOM);
         DetailsDrawerFooter footer = new DetailsDrawerFooter();
-        footer.saveState(GrantOptions.grantedOption("Autorizar Excepciones"));
+        footer.saveState(GrantOptions.grantedOption("Autorizar Excepciones")
+                && VaadinSession.getCurrent().getAttribute("login").toString().equals(statusReview.get().getLoginUser())
+                && validUser && isActiveCreditRequest);
 
         footer.addSaveListener(e ->{
            exceptionsCreditRequest.setState(state.getValue());
             try {
 
-                statusReviewList.removeIf(s -> s.getLoginUser().equals(statusReview.getLoginUser()));
+                statusReviewList.removeIf(s -> s.getLoginUser().equals(statusReview.get().getLoginUser()));
 
-                if(!statusReview.getState().equals(state.getValue())) {
-                    statusReview.setState(state.getValue());
-                    statusReview.setRegisterDate(LocalDate.now());
+                if(!statusReview.get().getState().equals(state.getValue())) {
+                    statusReview.get().setState(state.getValue());
+                    statusReview.get().setRegisterDate(LocalDate.now());
                 }
 
-                statusReviewList.add(statusReview);
+                statusReviewList.add(statusReview.get());
                 exceptionsCreditRequest.setState(verifyStatus(statusReviewList));
                 String jsonStatusReview = mapper.writeValueAsString(statusReviewList);
                 exceptionsCreditRequest.setStatusReview(jsonStatusReview);
@@ -252,4 +267,9 @@ public class AuthorizerExceptionsCreditRequestView extends SplitViewFrame implem
         return status;
     }
 
+    private boolean isAuthorizedUser(String loginUser, String typeRisk){
+        AuthorizerRestTemplate authorizerRestTemplate = new AuthorizerRestTemplate();
+        Authorizer authorizer = authorizerRestTemplate.getByLoginUser(loginUser);
+        return  authorizer.getRiskType().contains(typeRisk);
+    }
 }

@@ -51,6 +51,8 @@ public class CreditRequestApplicantDto {
     private String blockSpouse;
     private String typeHomeSpouse;
     private String cityOffice;
+    private String typeCredit;
+    private String objectCredit;
 
     public String getFullName(){
         return firstName + " " + lastName;

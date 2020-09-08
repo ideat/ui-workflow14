@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.workflow.ui.backend.entity.config.ObjectCredit;
 import com.mindware.workflow.ui.backend.entity.config.ProductTypeCredit;
+import com.mindware.workflow.ui.backend.entity.config.RequestStage;
 import com.mindware.workflow.ui.backend.entity.config.TypeCredit;
 import com.mindware.workflow.ui.backend.entity.config.dto.TypeCreditObjectCreditDto;
 import com.mindware.workflow.ui.backend.entity.config.dto.TypeCreditProductCreditDto;
@@ -115,4 +116,5 @@ public class TypeCreditDto {
         }
         return result;
     }
+
 }

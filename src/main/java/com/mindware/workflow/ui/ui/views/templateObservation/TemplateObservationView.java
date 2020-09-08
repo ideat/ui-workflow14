@@ -242,7 +242,7 @@ public class TemplateObservationView extends SplitViewFrame implements RouterLay
 
     private List<String> getTaskFromParameter(){
         ParameterRestTemplate parameterRestTemplate = new ParameterRestTemplate();
-        List<Parameter> parameters = parameterRestTemplate.getParametersByCategory("OBSERVACIONES");
+        List<Parameter> parameters = parameterRestTemplate.getParametersByCategory("INFORME OBSERVACIONES");
         List<String> list = new ArrayList<>();
         for(Parameter p : parameters){
             String s = p.getValue();

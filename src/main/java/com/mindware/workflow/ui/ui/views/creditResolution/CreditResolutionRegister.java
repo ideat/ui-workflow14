@@ -93,6 +93,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
     private ComboBox<String> typeResolution;
     private NumberField reciprocity;
     private ComboBox<String> applicantRating;
+    private boolean isActiveCreditRequest;
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
@@ -143,6 +144,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
 //            }
 //        }
         exceptionsList = getExceptionsCreditRequest(numberRequest);
+        isActiveCreditRequest = UtilValues.isActiveCreditRequest(numberRequest);
 
     }
 
@@ -236,7 +238,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
 
         Button btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnSave.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+        btnSave.setEnabled(GrantOptions.grantedOption("Resolucion de Credito") && isActiveCreditRequest);
         btnSave.addClickListener(click ->{
             if(validateDisbursement()) {
                 if (binderCreditResolution.writeBeanIfValid(creditResolution)) {
@@ -410,7 +412,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         Button button = new Button();
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_ERROR);
         button.setIcon(VaadinIcon.TRASH.create());
-        button.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+        button.setEnabled(GrantOptions.grantedOption("Resolucion de Credito") && isActiveCreditRequest);
         button.addClickListener(e ->{
             directIndirectDebtsList.removeIf(item -> item.getId().equals(directIndirectDebts.getId()));
             directIndirectDebtsListDataProvider.refreshAll();
@@ -425,7 +427,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         layout.setSizeFull();
         Button btnNew = new Button("Nuevo");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        btnNew.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Resolucion de Credito") && isActiveCreditRequest);
         btnNew.addClickListener(click -> {
            DirectIndirectDebts directIndirectDebts = new DirectIndirectDebts();
            directIndirectDebts.setEntity("");
@@ -447,7 +449,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         layout.setSizeFull();
         Button btnNew = new Button("Nuevo");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        btnNew.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Resolucion de Credito") && isActiveCreditRequest);
         btnNew.addClickListener(event ->{
            Disbursements disbursements = new Disbursements();
            showDisbursements(disbursements);
@@ -637,7 +639,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         Button button = new Button();
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_ERROR);
         button.setIcon(VaadinIcon.TRASH.create());
-        button.setEnabled(GrantOptions.grantedOption("Resolucion de Credito"));
+        button.setEnabled(GrantOptions.grantedOption("Resolucion de Credito") && isActiveCreditRequest);
         button.addClickListener(e ->{
             disbursementsList.removeIf(item -> item.getId().equals(disbursements.getId()));
             disbursementsListDataProvider.refreshAll();
@@ -694,7 +696,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         binderDisbursements.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderDisbursements.hasChanges();
-           footer.saveState(isValid && hasChanges);
+           footer.saveState(isValid && hasChanges && isActiveCreditRequest);
         });
 
         formLayout.addFormItem(description,"Descripcion");
@@ -805,7 +807,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         binderDirectIndirectDebts.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderDirectIndirectDebts.hasChanges();
-           footer.saveState(isValid && hasChanges);
+           footer.saveState(isValid && hasChanges && isActiveCreditRequest);
         });
 
         formLayout.addFormItem(entity,"Entidad");
@@ -878,7 +880,7 @@ public class CreditResolutionRegister extends SplitViewFrame implements HasUrlPa
         binderExceptions.addStatusChangeListener(event -> {
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderExceptions.hasChanges();
-           footer.saveState(isValid && hasChanges);
+           footer.saveState(isValid && hasChanges && isActiveCreditRequest);
         });
 
         formLayout.addFormItem(politicalNumber,"Cod. Excepcion");

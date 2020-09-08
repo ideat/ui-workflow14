@@ -3,16 +3,21 @@ package com.mindware.workflow.ui.ui.views.stageHistory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mindware.workflow.ui.backend.entity.CreditRequestApplicant;
 import com.mindware.workflow.ui.backend.entity.config.Parameter;
 import com.mindware.workflow.ui.backend.entity.config.RequestStage;
 import com.mindware.workflow.ui.backend.entity.config.States;
 import com.mindware.workflow.ui.backend.entity.config.WorkflowProduct;
 import com.mindware.workflow.ui.backend.entity.creditRequest.CreditRequest;
+import com.mindware.workflow.ui.backend.entity.dto.CreditRequestApplicantDto;
+import com.mindware.workflow.ui.backend.entity.patrimonialStatement.PatrimonialStatement;
 import com.mindware.workflow.ui.backend.entity.rol.Rol;
 import com.mindware.workflow.ui.backend.entity.stageHistory.StageHistory;
 import com.mindware.workflow.ui.backend.rest.creditRequest.CreditRequestRestTemplate;
+import com.mindware.workflow.ui.backend.rest.creditRequestApplicantDto.CreditRequestApplicantDtoRestTemplate;
 import com.mindware.workflow.ui.backend.rest.email.MailRestTemplate;
 import com.mindware.workflow.ui.backend.rest.parameter.ParameterRestTemplate;
+import com.mindware.workflow.ui.backend.rest.patrimonialStatement.PatrimonialStatementRestTemplate;
 import com.mindware.workflow.ui.backend.rest.rol.RolRestTemplate;
 import com.mindware.workflow.ui.backend.rest.stageHistory.StageHistoryRestTemplate;
 import com.mindware.workflow.ui.backend.rest.workflowProducdt.WorkflowProductRestTemplate;
@@ -309,7 +314,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
                  List<RequestStage> nextRequestStages = getNextStage(stageHistory, requestStages,0);
                  String comesFrom = getAllStagesForNextStage(stageHistoryList,stageHistory.getStage(),requestStages);
                  for (RequestStage r : nextRequestStages) {
-                     if(r.getStage().equals("APROBACION2")){
+                     if(r.getStage().equals("APROBACION2") || r.getStage().equals("APROBACION3")){
                         if(validStage(r.getStage(),creditRequest)){
                             StageHistory s = createNewStageHistory(r.getStage(), nextState.getValue());
                             s.setNumberRequest(stageHistory.getNumberRequest());
@@ -317,7 +322,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
                             restTemplate.add(s);
                             PrepareMail.sendMailWorkflowGoForward(stageHistory.getUserTask(), stageHistory.getNumberRequest(),
                                     r.getRols(), "");
-                        }else{ //next stage after APROBACION2
+                        }else{ //next stage after APROBACION2 /APROBACION3
                             List<RequestStage> nextRequestStages1 = getNextStage(stageHistory, requestStages,1);
                             for(RequestStage r1:nextRequestStages1) {
                                 StageHistory s = createNewStageHistory(r1.getStage(), nextState.getValue());
@@ -329,7 +334,7 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
                             }
                         }
 
-                     }else {
+                     } else {
                          StageHistory s = createNewStageHistory(r.getStage(), nextState.getValue());
                          s.setNumberRequest(stageHistory.getNumberRequest());
                          s.setComesFrom(comesFrom);
@@ -352,28 +357,163 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
 
     private boolean validStage(String stage, CreditRequest creditRequest){
         boolean result =false;
+        Double amount = creditRequest.getAmount();
         if(stage.equals("APROBACION2")){
-            Double amount = creditRequest.getAmount();
-            if(creditRequest.getCurrency().equals("$us.")) {
-                amount = amount * UtilValues.getExchange();
-            }
+            PatrimonialStatementRestTemplate patrimonialStatementRestTemplate = new PatrimonialStatementRestTemplate();
+            CreditRequestApplicantDtoRestTemplate creditRequestApplicantDtoRestTemplate = new CreditRequestApplicantDtoRestTemplate();
+            List<CreditRequestApplicantDto> creditRequestApplicantDtoList = creditRequestApplicantDtoRestTemplate.getByNumberRequest(creditRequest.getNumberRequest());
+            CreditRequestApplicantDto creditRequestApplicantDto = creditRequestApplicantDtoList.stream()
+                    .filter(c->c.getTypeRelation().equals("deudor") && c.getNumberRequest().equals(creditRequest.getNumberRequest().toString()))
+                    .findFirst().get();
+
+            List<PatrimonialStatement> patrimonialStatementList = patrimonialStatementRestTemplate
+                    .getByIdCreditRequestApplicant(creditRequestApplicantDto.getId());
+            patrimonialStatementList = patrimonialStatementList.stream()
+                    .filter(p->p.getElementCategory().equals("DOCUMENTOS Y CUENTAS POR PAGAR") && p.getFieldBoolean1().equals("SI"))
+                    .collect(Collectors.toList());
 
             ParameterRestTemplate parameterRestTemplate = new ParameterRestTemplate();
             List<Parameter> parameterList = new ArrayList<>();
             parameterList = parameterRestTemplate.getParametersByCategory("RANGO APROBACION");
-            String[] conditions = new String[2];
+            parameterList = parameterList.stream()
+                    .filter(p->p.getValue().contains("APROBACION2"))
+                    .collect(Collectors.toList());
+            Parameter parameterHomeMortage = parameterList.stream()
+                    .filter(f -> f.getValue().equals("APROBACION2-VIVIENDA")).findFirst().get();
+
+            if(creditRequest.getCurrency().equals("$us.")) {
+                amount = amount * UtilValues.getExchange();
+            }
+
+            Map<String,Double> totalByTypeCredit = getTotalDebtsByTypeCredit(patrimonialStatementList
+                    , parameterHomeMortage.getExternalCode(),creditRequest.getCurrency());
+
+            if(parameterHomeMortage.getExternalCode().contains(creditRequest.getTypeCredit())){
+                if(totalByTypeCredit.get("H")!=null)
+                    amount=amount+totalByTypeCredit.get("H").doubleValue();
+            }else{
+                if(totalByTypeCredit.get("O")!=null)
+                    amount=amount+totalByTypeCredit.get("O").doubleValue();
+            }
+
+            String[] conditions1 = new String[2];
+            String[] conditions2 = new String[2];
+            String[] allConditions = new String[2];
+            //Get conditions amount
             for(Parameter p:parameterList){
                 if(p.getValue().contains(stage)){
                     String[] listTypeCredit = p.getExternalCode().split(",");
                     if(Arrays.stream(listTypeCredit).anyMatch(s -> s.trim().equals(creditRequest.getTypeCredit()))){
-                        conditions = p.getDescription().split(";");
+                        allConditions = p.getDescription().split("-");
+
+                        conditions1 = allConditions[0].length()>0? allConditions[0].split(";"):new String[0];
+                        if(allConditions.length>1) {
+                            conditions2 = allConditions[1].length() > 0 ? allConditions[1].split(";") : new String[0];
+                        }else{
+                            conditions2[0]="";
+                        }
                     }
                 }
             }
-            if(conditions[0].equals(">")){
-                if(amount > Double.parseDouble(conditions[1])) result = true;
-            } else if(conditions[0].equals(">=")){
-                if(amount >= Double.parseDouble(conditions[1])) result = true;
+
+            if(conditions1[0].equals(">")){
+                if(conditions2[0].equals("<")){
+                    if(amount > Double.parseDouble(conditions1[1]) && amount < Double.parseDouble(conditions2[1])){
+                        result = true;
+                    }
+                }else if(conditions2[0].equals("<=")){
+                    if(amount > Double.parseDouble(conditions1[1]) && amount <= Double.parseDouble(conditions2[1])){
+                        result = true;
+                    }
+                }else {
+                    if (amount > Double.parseDouble(conditions1[1])) result = true;
+                }
+            } else if(conditions1[0].equals(">=")){
+                if(conditions2[0].equals("<")){
+                    if(amount >= Double.parseDouble(conditions1[1]) && amount < Double.parseDouble(conditions2[1])){
+                        result = true;
+                    }
+                }else if(conditions2[0].equals("<=")){
+                    if(amount >= Double.parseDouble(conditions1[1]) && amount <= Double.parseDouble(conditions2[1])){
+                        result = true;
+                    }
+                }else {
+                    if (amount >= Double.parseDouble(conditions1[1])) result = true;
+                }
+            }
+        }else if(stage.equals("APROBACION3")){
+            PatrimonialStatementRestTemplate patrimonialStatementRestTemplate = new PatrimonialStatementRestTemplate();
+            CreditRequestApplicantDtoRestTemplate creditRequestApplicantDtoRestTemplate = new CreditRequestApplicantDtoRestTemplate();
+            List<CreditRequestApplicantDto> creditRequestApplicantDtoList = creditRequestApplicantDtoRestTemplate.getByNumberRequest(creditRequest.getNumberRequest());
+            CreditRequestApplicantDto creditRequestApplicantDto = creditRequestApplicantDtoList.stream()
+                    .filter(c->c.getTypeRelation().equals("deudor") && c.getNumberRequest().equals(creditRequest.getNumberRequest().toString()))
+                    .findFirst().get();
+            List<PatrimonialStatement> patrimonialStatementList = patrimonialStatementRestTemplate
+                    .getByIdCreditRequestApplicant(creditRequestApplicantDto.getId());
+            patrimonialStatementList = patrimonialStatementList.stream()
+                    .filter(p->p.getElementCategory().equals("DOCUMENTOS Y CUENTAS POR PAGAR") && p.getFieldBoolean1().equals("SI"))
+                    .collect(Collectors.toList());
+            ParameterRestTemplate parameterRestTemplate = new ParameterRestTemplate();
+            List<Parameter> parameterList = new ArrayList<>();
+            parameterList = parameterRestTemplate.getParametersByCategory("RANGO APROBACION");
+            parameterList = parameterList.stream()
+                    .filter(p->p.getValue().contains("APROBACION3"))
+                    .collect(Collectors.toList());
+            Parameter parameterHomeMortage = parameterList.stream()
+                    .filter(f -> f.getValue().equals("APROBACION3-VIVIENDA")).findFirst().get();
+            if(creditRequest.getCurrency().equals("$us.")) {
+                amount = amount * UtilValues.getExchange();
+            }
+            Map<String,Double> totalByTypeCredit = getTotalDebtsByTypeCredit(patrimonialStatementList
+                    , parameterHomeMortage.getExternalCode(),creditRequest.getCurrency());
+
+            Double aux = totalByTypeCredit.values().stream().reduce(0.0,Double::sum);
+            amount=amount+aux;
+
+            String[] conditions1 = new String[2];
+            String[] conditions2 = new String[2];
+            String[] allConditions = new String[2];
+            for(Parameter p:parameterList){
+                if(p.getValue().contains(stage)){
+                    String[] listTypeCredit = p.getExternalCode().split(",");
+                    if(Arrays.stream(listTypeCredit).anyMatch(s -> s.trim().equals(creditRequest.getTypeCredit()))){
+                        allConditions = p.getDescription().split("-");
+
+                        conditions1 = allConditions[0].length()>0? allConditions[0].split(";"):new String[0];
+                        if(allConditions.length>1) {
+                            conditions2 = allConditions[1].length() > 0 ? allConditions[1].split(";") : new String[0];
+                        }else{
+                            conditions2[0]="";
+                        }
+
+                    }
+                }
+            }
+
+            if(conditions1[0].equals(">")){
+                if(conditions2[0].equals("<")){
+                    if(amount > Double.parseDouble(conditions1[1]) && amount < Double.parseDouble(conditions2[1])){
+                        result = true;
+                    }
+                }else if(conditions2[0].equals("<=")){
+                    if(amount > Double.parseDouble(conditions1[1]) && amount <= Double.parseDouble(conditions2[1])){
+                        result = true;
+                    }
+                }else {
+                    if (amount > Double.parseDouble(conditions1[1])) result = true;
+                }
+            } else if(conditions1[0].equals(">=")){
+                if(conditions2[0].equals("<")){
+                    if(amount >= Double.parseDouble(conditions1[1]) && amount < Double.parseDouble(conditions2[1])){
+                        result = true;
+                    }
+                }else if(conditions2[0].equals("<=")){
+                    if(amount >= Double.parseDouble(conditions1[1]) && amount <= Double.parseDouble(conditions2[1])){
+                        result = true;
+                    }
+                }else {
+                    if (amount >= Double.parseDouble(conditions1[1])) result = true;
+                }
             }
         }
         return result;
@@ -547,8 +687,35 @@ public class StageHistoryRegister extends SplitViewFrame implements HasUrlParame
         UI.getCurrent().navigate(StageHistoryView.class);
     }
 
-    private void createFinishedStage(StageHistory stageHistory,String stage){
+    private Map<String,Double> getTotalDebtsByTypeCredit(List<PatrimonialStatement> patrimonialStatementList
+            , String typeCreditsHome, String currency){
+        Double totalHomeMortage=0.0;
+        Double totalOthers=0.0;
+        Double amount =0.0;
+        Map<String,Double> totalByTypeCredit = new HashMap<>();
+        for(PatrimonialStatement p:patrimonialStatementList){
+            if(currency.equals("$us.")){
+                amount = p.getFieldDouble1()*UtilValues.getExchange();
+            }else{
+                amount = p.getFieldDouble1();
+            }
+            boolean isHomeMortage = false;
 
+            if(typeCreditsHome.contains(p.getFieldSelection1())){
+                isHomeMortage=true;
+            }
 
+            if(isHomeMortage){
+                totalHomeMortage = totalHomeMortage + amount;
+                totalByTypeCredit.remove("H");
+                totalByTypeCredit.put("H",totalHomeMortage);
+            }else{
+                totalOthers = totalOthers + amount;
+                totalByTypeCredit.remove("O");
+                totalByTypeCredit.put("O",totalOthers);
+            }
+        }
+
+        return totalByTypeCredit;
     }
 }

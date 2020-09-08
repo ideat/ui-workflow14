@@ -168,6 +168,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
     private String codeTypeCredit;
     private String typePerson;
     private String codeTypeGuarantee;
+    private boolean isActiveCreditRequest;
 
     @Override
     protected void onAttach(AttachEvent attachEvent){
@@ -199,6 +200,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
 
         if(paramCredit.get("numberRequest").get(0).equals("NUEVO")){
+            isActiveCreditRequest = true;
             current = new CreditRequest();
             current.setLoginUser(VaadinSession.getCurrent().getAttribute("login").toString());
             current.setCharge(getCharge());
@@ -217,6 +219,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         }else{
             idCreditRequest = UUID.fromString(paramCredit.get("idCreditRequest").get(0));
             current = restTemplate.getCreditRequestById(idCreditRequest);
+            isActiveCreditRequest = UtilValues.isActiveCreditRequest(current.getNumberRequest());
             paymentPlanList = paymentPlanRestTemplate.add(current);
 
             paramNumberApplicant = Integer.parseInt(paramCredit.get("numberApplicant").get(0));
@@ -414,7 +417,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         gridExceptionsCreditRequestDto = new Grid<>();
         Button btnCreateException = new Button("Agregar");
         btnCreateException.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnCreateException.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        btnCreateException.setEnabled(GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest);
         btnCreateException.addClickListener(e -> showCreateException(new ExceptionsCreditRequest()));
 
         topLayout.add(btnCreateException);
@@ -463,7 +466,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         gridCodebtorGuarantor.setWidthFull();
         Button btnCreatGC = new Button("Agregar");
         btnCreatGC.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnCreatGC.setEnabled(GrantOptions.grantedOption("Solicitud") && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
+        btnCreatGC.setEnabled(GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest
+                && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         btnCreatGC.addClickListener(e ->{
             showSearch();
         });
@@ -515,7 +519,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     private Component createButtonDelete(CreditRequestApplicantDto creditRequestApplicantDto){
         Button btn =UIUtils.createErrorPrimaryButton(VaadinIcon.TRASH);
-        btn.setEnabled(GrantOptions.grantedOption("Solicitud") && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
+        btn.setEnabled(GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest
+                && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         btn.addClickListener(e -> {
             CreditRequestAplicantRestTemplate rest = new CreditRequestAplicantRestTemplate();
             creditRequestApplicantDtoList.remove(creditRequestApplicantDto);
@@ -530,7 +535,8 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     private Component createButtonDeleteException(ExceptionsCreditRequestDto exceptionsCreditRequestDto){
         Button btn = UIUtils.createErrorPrimaryButton(VaadinIcon.TRASH);
-        btn.setEnabled(GrantOptions.grantedOption("Solicitud") && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
+        btn.setEnabled(GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest
+                && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         btn.addClickListener(e ->{
             ExceptionsCreditRequestRestTemplate rest = new ExceptionsCreditRequestRestTemplate();
             exceptionsCreditRequestDtoList.remove(exceptionsCreditRequestDto);
@@ -763,7 +769,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         layout.setWidthFull();
         Button btnNew = new Button("NUEVO");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        btnNew.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest);
         btnNew.addClickListener(click -> {
             LinkUp linkUp = new LinkUp();
             if (relation.equals("REFERENCIA_PERSONAL")){
@@ -836,14 +842,14 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         Button button = new Button();
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_ERROR);
         button.setIcon(VaadinIcon.TRASH.create());
-        button.setEnabled(GrantOptions.grantedOption("Solicitud") &&
+        button.setEnabled(GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest &&
                 current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         button.addClickListener(e ->{
             linkUpList.removeIf(l -> l.getId().equals(linkUp.getId()));
             ObjectMapper mapper = new ObjectMapper();
             try {
                 current.setLinkup(mapper.writeValueAsString(linkUpList));
-                footer.saveState(true);
+                footer.saveState(true && isActiveCreditRequest);
                 UIUtils.showNotification("Registro marcado para borrar, Guarde los cambio en Datos Solicitud");
             } catch (JsonProcessingException ex) {
                 ex.printStackTrace();
@@ -866,7 +872,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         numberApplicant.setEnabled(false);
         numberApplicant.addValueChangeListener(event -> {
            if(!event.getHasValue().getValue().equals(paramNumberApplicant)) {
-               footer.saveState(true && GrantOptions.grantedOption("Solicitud"));
+               footer.saveState(true && GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest);
            }
         });
         Button btnSearch = new Button();
@@ -1116,9 +1122,9 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binder.hasChanges();
 
-           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud")
+           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest
                    && (creditRequest.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString())
-                   || creditRequest.getId()==null)|| !linkUpList.equals(linkUpListAux));
+                   || creditRequest.getId()==null)|| !linkUpList.equals(linkUpListAux) );
         });
 
         formRequest = new FormLayout();
@@ -1358,7 +1364,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         layout.setWidthFull();
         Button btnNew = new Button("NUEVA");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_SUCCESS);
-        btnNew.setEnabled(GrantOptions.grantedOption("Solicitud"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest);
         btnNew.addClickListener(click ->{
 
             showCreateNoOwnGuarantee(new NoOwnGuarantee());
@@ -1474,8 +1480,9 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         binderNoOwnGuarantee.addStatusChangeListener(event -> {
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binderNoOwnGuarantee.hasChanges();
-            footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud")
-                    && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
+            footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest
+                    && current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString())
+                    && UtilValues.isActiveCreditRequest(current.getNumberRequest()));
         });
 
         footerNoOwnGuarantee.addSaveListener(e ->{
@@ -1498,7 +1505,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
                    current.setNoOwnGuarantee(jsonNoOwnGuarantee);
                    UIUtils.showNotification("Datos Garantias no propias creados, para terminar de guardar GUARDE en la solicitud");
                    detailsDrawer.hide();
-                   footer.saveState(true && GrantOptions.grantedOption("Solicitud"));
+                   footer.saveState(true && GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest);
                    dataProviderNoOwnGuarantee.refreshAll();
 
                } catch (JsonProcessingException jsonProcessingException) {
@@ -1562,14 +1569,14 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
     private Component createButtonDeleteNoOwnGuarantee(NoOwnGuarantee noOwnGuarantee){
         Button btn = UIUtils.createErrorPrimaryButton(VaadinIcon.TRASH);
-        btn.setEnabled(GrantOptions.grantedOption("Solicitud") &&
+        btn.setEnabled(GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest &&
                 current.getLoginUser().equals(VaadinSession.getCurrent().getAttribute("login").toString()));
         btn.addClickListener(e -> {
             noOwnGuaranteeList.removeIf(n -> n.getId().equals(noOwnGuarantee.getId()));
             ObjectMapper mapper = new ObjectMapper();
             try {
                 current.setNoOwnGuarantee(mapper.writeValueAsString(noOwnGuaranteeList));
-                footer.saveState(true);
+                footer.saveState(true && isActiveCreditRequest);
                 UIUtils.showNotification("Registro marcado para borrar, Guarde los cambios en Datos Solicitud");
             } catch (JsonProcessingException jsonProcessingException) {
                 jsonProcessingException.printStackTrace();
@@ -1753,7 +1760,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
             editor.save();
             try {
                 current.setCharge(mapper.writeValueAsString(chargeList));
-                footer.saveState(true && GrantOptions.grantedOption("Solicitud"));
+                footer.saveState(true && GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest);
             } catch (JsonProcessingException ex) {
                 ex.printStackTrace();
             }
@@ -2015,7 +2022,7 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
 
                     UIUtils.showNotification("Datos relacion creados, para terminar de guardar guarde en la solicitud");
                     detailsDrawer.hide();
-                    footer.saveState(true && GrantOptions.grantedOption("Solicitud"));
+                    footer.saveState(true && GrantOptions.grantedOption("Solicitud") && isActiveCreditRequest);
                     dataProviderLinkUp.refreshAll();
                 } catch (JsonProcessingException ex) {
                     ex.printStackTrace();
@@ -2074,4 +2081,6 @@ public class CreditRequestRegister extends SplitViewFrame implements HasUrlParam
         }
         return listValues;
     }
+
+
 }

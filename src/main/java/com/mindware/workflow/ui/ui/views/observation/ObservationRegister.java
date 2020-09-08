@@ -8,6 +8,7 @@ import com.mindware.workflow.ui.backend.entity.templateObservation.TemplateObser
 import com.mindware.workflow.ui.backend.rest.observation.ObservationRestTemplate;
 import com.mindware.workflow.ui.backend.rest.templateObservation.TemplateObservationRestTemplate;
 import com.mindware.workflow.ui.backend.util.GrantOptions;
+import com.mindware.workflow.ui.backend.util.UtilValues;
 import com.mindware.workflow.ui.ui.MainLayout;
 import com.mindware.workflow.ui.ui.components.FlexBoxLayout;
 import com.mindware.workflow.ui.ui.components.detailsdrawer.DetailsDrawer;
@@ -52,6 +53,7 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
     private DetailsDrawer detailsDrawerGlobal;
     private DetailsDrawerHeader detailsDrawerHeaderGlobal;
     private FlexBoxLayout contentObservationDetail;
+    private boolean isActiveCreditRequest;
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
@@ -62,6 +64,7 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
         param = qp.getParameters();
 
         Integer numberRequest = Integer.parseInt(param.get("number-request").get(0));
+        isActiveCreditRequest = UtilValues.isActiveCreditRequest(numberRequest);
         observation = new Observation();
         observation = observationRestTemplate.getByNumberRequestApplicantTask(numberRequest,param.get("task").get(0));
         if(observation.getObservations()==null || observation.getObservations().equals("[]") || observation.getObservations().equals("")){
@@ -138,10 +141,13 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
         gridPaymentCapacity.setHeight("300px");
         Grid<TemplateObservation> gridPatrimony = createGridObservation("INFORME ANALISTA","III. PATRIMONIO (Cumplimiento normativa y coherencia análisis)");
         gridPatrimony.setHeight("300px");
+        Grid<TemplateObservation> gridConcentration = createGridObservation("INFORME ANALISTA","IV. CONCENTRACIÓN");
+        gridConcentration.setHeight("300px");
 
         gridConditionGeneral.setDataProvider(templateObservationListDataProvider);
         gridPaymentCapacity.setDataProvider(templateObservationListDataProvider);
         gridPatrimony.setDataProvider(templateObservationListDataProvider);
+        gridConcentration.setDataProvider(templateObservationListDataProvider);
 
         gridConditionGeneral.addSelectionListener(e ->{
            if(e.getFirstSelectedItem().isPresent()==true) {
@@ -164,6 +170,13 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
             }
         });
 
+        gridConcentration.addSelectionListener(e ->{
+            if(e.getFirstSelectedItem().isPresent()==true) {
+                e.getFirstSelectedItem().ifPresent(this::showTemplateObservation);
+                binderTemplateObservation.readBean(e.getFirstSelectedItem().get());
+            }
+        });
+
         accordion.addOpenedChangeListener(e -> {
            if(e.getOpenedIndex().isPresent()==true) {
                if (e.getOpenedIndex().getAsInt() == 0) {
@@ -172,12 +185,15 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
                    filter("II. CAPACIDAD DE PAGO (Cumplimiento normativa y coherencia análisis)");
                } else if (e.getOpenedIndex().getAsInt() == 2) {
                    filter("III. PATRIMONIO (Cumplimiento normativa y coherencia análisis)");
+               } else if(e.getOpenedIndex().getAsInt()==3){
+                   filter("IV. CONCENTRACIÓN");
                }
            }
         });
         accordion.add("Condiciones Generales",gridConditionGeneral);
         accordion.add("Capacidad de Pago",gridPaymentCapacity);
         accordion.add("Patrimonio",gridPatrimony);
+        accordion.add("Concentracion",gridConcentration);
 
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
@@ -266,7 +282,7 @@ public class ObservationRegister extends SplitViewFrame implements HasUrlParamet
         binderTemplateObservation.addStatusChangeListener(event -> {
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderTemplateObservation.hasChanges();
-           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Formulario Observaciones"));
+           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Formulario Observaciones") && isActiveCreditRequest);
         });
 
         footer.addSaveListener(e -> {

@@ -89,6 +89,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
     private List<String> listTabs;
     private Integer numberRequest;
     private DocumentSubmitted documentSubmitted;
+    private boolean isActiveCreditRequest;
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
@@ -98,6 +99,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
         QueryParameters qp =  location.getQueryParameters();
         param = qp.getParameters();
         numberRequest = Integer.parseInt(param.get("number-request").get(0));
+        isActiveCreditRequest = UtilValues.isActiveCreditRequest(numberRequest);
         legalInformation = legalInformationRestTemplate.getByNumberRequest(numberRequest);
         binderLegalInformation = new BeanValidationBinder<>(LegalInformation.class);
 
@@ -173,7 +175,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
         contentGenericItems.setVisible(false);
 
         DetailsDrawerFooter footer = new DetailsDrawerFooter();
-        footer.saveState(true && GrantOptions.grantedOption("Informe Legal"));
+        footer.saveState(GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
         footer.addSaveListener(e -> {
             ObjectMapper mapper = new ObjectMapper();
             if(binderDocumentSubmitted.writeBeanIfValid(documentSubmitted)) {
@@ -379,7 +381,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
 
         Button btnNew = new Button("Nuevo");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnNew.setEnabled(GrantOptions.grantedOption("Informe Legal"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
         btnNew.addClickListener(event -> {
             showSeatDetail(new Seat());
         });
@@ -432,7 +434,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
         binderSeat.addStatusChangeListener(event -> {
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderSeat.hasChanges();
-           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Informe Legal"));
+           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
         });
 
         footer.addSaveListener(e ->{
@@ -609,7 +611,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
 
         Button btnNew = new Button("Nuevo");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL);
-        btnNew.setEnabled(GrantOptions.grantedOption("Informe Legal"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
         btnNew.addClickListener(event ->{
            showOwners(new Owners());
 
@@ -672,7 +674,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
         binderOwners.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderOwners.hasChanges();
-           footer.saveState(hasChanges && isValid && GrantOptions.grantedOption("Informe Legal"));
+           footer.saveState(hasChanges && isValid && GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
         });
 
         footer.addSaveListener(e -> {
@@ -714,7 +716,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
 
         Button btnNew = new Button("Nuevo");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnNew.setEnabled(GrantOptions.grantedOption("Informe Legal"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
         btnNew.addClickListener(event -> {
             DataDocument dataDocument = new DataDocument();
             dataDocument.setDocument("Nuevo");
@@ -885,7 +887,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
         binderDataDocument.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderDataDocument.hasChanges();
-           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Informe Legal"));
+           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
 
 
         });
@@ -988,7 +990,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
 
         Button btnNew = new Button("Nuevo");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL);
-        btnNew.setEnabled(GrantOptions.grantedOption("Informe Legal"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
         btnNew.addClickListener(event -> {
             GenericItem genericItem = new GenericItem();
             genericItem.setTypeItem(labelHeader);
@@ -1044,7 +1046,7 @@ public class LegalInformationRegister extends SplitViewFrame implements HasUrlPa
         binderGenericItem.addStatusChangeListener(event ->{
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binderGenericItem.hasChanges();
-            footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Informe Legal"));
+            footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Informe Legal") && isActiveCreditRequest);
         });
 
         footer.addSaveListener(e ->{

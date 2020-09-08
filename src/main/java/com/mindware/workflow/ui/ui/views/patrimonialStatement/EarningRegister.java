@@ -117,6 +117,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
     private Grid<ProductionSalesInventory> gridProcess;
     private Grid<ProductionSalesInventory> gridFinished;
     private NumberField frecuency;
+    private boolean isActiveCreditRequest;
 
     @Override
     protected void onAttach(AttachEvent attachEvent){
@@ -149,6 +150,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         Location location = beforeEvent.getLocation();
         QueryParameters qp =  location.getQueryParameters();
         param = qp.getParameters();
+        isActiveCreditRequest = Boolean.valueOf(param.get("is-active-credit-request").get(0));
         restTemplate = new PatrimonialStatementRestTemplate();
         patrimonialStatementList = restTemplate.getByIdCreditRequestApplicantCategory(UUID.fromString(param.get("id-credit-request-applicant").get(0))
                 , param.get("category").get(0));
@@ -362,7 +364,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
 
             showProductSalesInventory(productionSalesInventory);
         });
-        btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
 
         Button btnPrint = new Button("Imprimir");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
@@ -536,7 +538,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         layout.setSizeFull();
         Button btnNew = new Button("Nuevo");
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         btnNew.addClickListener(click -> {
            ProductionSalesInventory productionSalesInventory = new ProductionSalesInventory();
            productionSalesInventory.setPriceSale(0.0);
@@ -673,7 +675,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         binderProductSalesInventory.addStatusChangeListener(event ->{
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderProductSalesInventory.hasChanges();
-           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Declaracion Patrimonial"));
+           footer.saveState(isValid && hasChanges && GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         });
 
         footer.addSaveListener(e ->{
@@ -802,7 +804,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         detailsDrawer.setHeight("95%");
         detailsDrawer.setWidthFull();
         DetailsDrawerFooter footer = new DetailsDrawerFooter();
-        footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial"));
+        footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         footer.addSaveListener(e -> {
             ObjectMapper mapper = new ObjectMapper();
             try {
@@ -896,7 +898,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         binderCostProduct.addStatusChangeListener(event -> {
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderCostProduct.hasChanges();
-           footer.saveState(hasChanges && isValid && GrantOptions.grantedOption("Declaracion Patrimonial"));
+           footer.saveState(hasChanges && isValid && GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         });
 
         footer.addSaveListener(e -> {
@@ -986,7 +988,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
                 cmbProduct.focus();
             }
         });
-        btnNewSupplie.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
+        btnNewSupplie.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         Button btnPrint = new Button("Imprimir");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
         btnPrint.addClickListener(e -> {
@@ -1096,7 +1098,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
                 showOperativeExpenses(currentOperativeOperativeExpenses);
             }
         });
-        btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
+        btnNew.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         return layout;
     }
 
@@ -1165,7 +1167,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         Button button = new Button();
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_ERROR);
         button.setIcon(VaadinIcon.TRASH.create());
-        button.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
+        button.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         button.addClickListener(e ->{
             if(p.getClass().getName().equals("com.mindware.workflow.ui.backend.entity.patrimonialStatement.ProductSalesBuys")) {
                 productSalesBuysList.removeIf(productSalesBuys1 -> productSalesBuys1.equals(p));
@@ -1221,7 +1223,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         binderOperativeExpenses.addStatusChangeListener(event -> {
            boolean isValid = !event.hasValidationErrors();
            boolean hasChanges = binderOperativeExpenses.hasChanges();
-           footer.saveState(hasChanges && isValid && GrantOptions.grantedOption("Declaracion Patrimonial"));
+           footer.saveState(hasChanges && isValid && GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         });
 
         footer.addSaveListener(e ->{
@@ -1476,7 +1478,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         detailsDrawer.setHeight("95%");
         detailsDrawer.setWidthFull();
         DetailsDrawerFooter footer = new DetailsDrawerFooter();
-        footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial"));
+        footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         footer.addSaveListener(e ->{
             if(frecuency.getValue()!=null || !frecuency.isEmpty()) {
                 ObjectMapper mapper = new ObjectMapper();
@@ -1496,6 +1498,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
                 PatrimonialStatementDtoRestTemplate rest = new PatrimonialStatementDtoRestTemplate();
                 Double earning = rest.getOperativeEarningVae(patrimonialStatementCommerce.getId().toString(),
                         param.get("id-applicant").get(0));
+
                 patrimonialStatementCommerce.setFieldDouble1(earning);
                 restTemplate.add(patrimonialStatementCommerce);
 
@@ -1771,7 +1774,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
         detailsDrawer.setHeight("95%");
         detailsDrawer.setWidthFull();
         DetailsDrawerFooter footer = new DetailsDrawerFooter();
-        footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial"));
+        footer.saveState(true && GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
         footer.addSaveListener(e ->{
             ObjectMapper mapper = new ObjectMapper();
             try {
@@ -1847,7 +1850,7 @@ public class EarningRegister extends SplitViewFrame implements HasUrlParameter<S
             gridSalesHistory.setDataProvider(dataProviderSalesHistory);
             filterSalesHistory();
         });
-        btnCreate.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial"));
+        btnCreate.setEnabled(GrantOptions.grantedOption("Declaracion Patrimonial") && isActiveCreditRequest);
 
         btnPrint.addClickListener(e ->{
             Map<String,List<String>> paramSales = new HashMap<>();

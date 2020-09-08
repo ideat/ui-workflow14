@@ -89,11 +89,15 @@ public class CashFlowView extends SplitViewFrame implements RouterLayout  {
         grid.setSizeFull();
         grid.setDataProvider(dataProvider);
         grid.addSelectionListener(event -> {
-            if(event.getFirstSelectedItem().get().isHasPatrimonialStatement() &&
-            event.getFirstSelectedItem().get().isHasPaymentPlan()) {
-                viewRegister(event.getFirstSelectedItem().get());
+            if(!event.getFirstSelectedItem().get().getTypeFee().equals("PLAZO FIJO")) {
+                if (event.getFirstSelectedItem().get().isHasPatrimonialStatement() &&
+                        event.getFirstSelectedItem().get().isHasPaymentPlan()) {
+                    viewRegister(event.getFirstSelectedItem().get());
+                } else {
+                    UIUtils.showNotification("Complete el registro de la declaracion patrimoniol o Plan de Pagos");
+                }
             }else{
-                UIUtils.showNotification("Complete el registro de la declaracion patrimoniol o Plan de Pagos");
+                UIUtils.showNotification("Operacion a PLAZO FIJO, no corresponde un flujo de caja proyectado");
             }
         });
 

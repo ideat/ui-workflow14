@@ -120,6 +120,8 @@ public class Applicant {
 
     private Integer externalSystemCode;
 
+    private String zone;
+
 //    public String getIdCardComplement(){
 //        return this.idCard+this.idCardExpedition;
 //    }

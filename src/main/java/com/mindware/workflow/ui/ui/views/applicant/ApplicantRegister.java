@@ -259,9 +259,6 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
            }
         });
 
-
-
-
         FlexBoxLayout layoutIdCard = new FlexBoxLayout(idCard, idCardComplement,idCardExpedition);
         layoutIdCard.setFlexGrow(1,idCardExpedition);
         layoutIdCard.setFlexGrow(1,idCardComplement);
@@ -343,6 +340,9 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         TextField nit = new TextField();
         nit.setWidth("100%");
 
+        TextField zone = new TextField();
+        zone.setWidthFull();
+
         ComboBox<String> province = new ComboBox<>();
         province.setItems(provinceList);
         province.setWidth("100%");
@@ -356,7 +356,6 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
             provinceList = getProvinces(cityProvince);
             province.clear();
             province.setItems(provinceList);
-
 
         });
 
@@ -382,7 +381,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         //Company Data
         societyType = new ComboBox<>();
         societyType.setWidth("100%");
-        societyType.setItems("SRL","LTDA","RL","SA");
+        societyType.setItems(UtilValues.getParamterValue("TIPO SOCIEDAD"));
         societyType.setPlaceholder("Seleccionar");
 
 
@@ -482,6 +481,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         binder.forField(numberApplicantSpouse).withConverter(new UtilValues.DoubleToIntegerConverter())
                 .bind(Applicant::getNumberApplicantSpouse,Applicant::setNumberApplicantSpouse);
         binder.forField(city).bind(Applicant::getCity, Applicant::setCity);
+        binder.forField(zone).asRequired("Zona es requerida").bind(Applicant::getZone,Applicant::setZone);
         binder.forField(province).bind(Applicant::getProvince,Applicant::setProvince);
         binder.forField(block).bind(Applicant::getBlock, Applicant::setBlock);
         binder.forField(typeHome).bind(Applicant::getTypeHome, Applicant::setTypeHome);
@@ -516,6 +516,7 @@ public class ApplicantRegister extends SplitViewFrame implements HasUrlParameter
         formPersonal.addFormItem(motherLastName,"Apellido materno");
         formPersonal.addFormItem(city, "Ciudad");
         formPersonal.addFormItem(province,"Provincia");
+        formPersonal.addFormItem(zone,"Zona");
         formPersonal.addFormItem(block,"Manzano/UV");
         formPersonal.addFormItem(typeHome,"Tipo vivienda");
         formPersonal.addFormItem(homeaddress,"Direccion domicilio");
